@@ -77,28 +77,22 @@ export const Roulette: React.FC<RouletteProps> = ({
       </Card>
 
       {/* Spin Button */}
-      {isActive && value === undefined && (
+      {isActive && value === undefined && !isSpinning && (
         <Button
           onClick={handleSpin}
           disabled={isSpinning || !isActive || value !== undefined}
-          className={`
-            w-full h-12 font-semibold transition-all
-            ${isSpinning 
-              ? 'bg-gray-600 cursor-not-allowed' 
-              : 'bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 hover:scale-105'
-            }
-            text-white
-          `}
+          className="w-full h-12 font-semibold transition-all bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 hover:scale-105 text-white"
         >
-          {isSpinning ? (
-            <>
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-              Spinning...
-            </>
-          ) : (
-            'SPIN!'
-          )}
+          SPIN!
         </Button>
+      )}
+
+      {/* Spinning State */}
+      {isSpinning && (
+        <div className="w-full h-12 flex items-center justify-center bg-gray-600 rounded text-white font-semibold">
+          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+          Spinning...
+        </div>
       )}
 
       {/* Result Display */}
