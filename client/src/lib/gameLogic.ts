@@ -82,17 +82,6 @@ export function determineRPSWinner(
   return p1Wins 
     ? { winner: player1, loser: player2 }
     : { winner: player2, loser: player1 };
-
-  if (p1BeatsP2 && !p2BeatsP1) {
-    return { winner: player1, loser: player2 };
-  } else if (p2BeatsP1 && !p1BeatsP2) {
-    return { winner: player2, loser: player1 };
-  } else {
-    // Tie - same attack types, pick randomly
-    return Math.random() > 0.5 
-      ? { winner: player1, loser: player2 }
-      : { winner: player2, loser: player1 };
-  }
 }
 
 export function getAttackName(attack: AttackType): string {

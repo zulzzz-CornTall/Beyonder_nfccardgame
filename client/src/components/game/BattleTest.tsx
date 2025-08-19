@@ -6,7 +6,6 @@ import { HealthBar } from './HealthBar';
 import { BattleResults } from './BattleResults';
 import { NFCCardDisplay } from './NFCCardDisplay';
 import { RockPaperScissors } from './RockPaperScissors';
-import { RPSSelector } from './RPSSelector';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { ArrowLeft, RotateCcw } from 'lucide-react';
@@ -100,16 +99,6 @@ export const BattleTest: React.FC = () => {
                 </div>
               )}
 
-              {/* RPS Selection */}
-              {battleState.phase === 'resolving' && (
-                <div className="mt-6">
-                  <RPSSelector 
-                    playerId={player.id}
-                    selectedChoice={player.selectedAttack}
-                    disabled={battleState.phase !== 'resolving'}
-                  />
-                </div>
-              )}
 
               {/* Rock-Paper-Scissors Display */}
               {battleState.phase === 'resolving' && player.selectedAttack && (
@@ -138,23 +127,6 @@ export const BattleTest: React.FC = () => {
       </div>
 
       {/* RPS selection interface */}
-      {battleState.phase === 'resolving' && (
-        <div className="mt-6 grid grid-cols-2 gap-6">
-          {battleState.players.map((player) => (
-            <div key={player.id} className="space-y-4">
-              <h2 className="text-xl font-bold text-white text-center">
-                Player {player.id}
-              </h2>
-              <RPSSelector
-                playerId={player.id}
-                selectedChoice={player.rpsChoice}
-                disabled={!!player.rpsChoice}
-              />
-            </div>
-          ))}
-        </div>
-      )}
-      )}
 
       {/* Auto-resolving message when both players selected */}
       {battleState.phase === 'resolving' && (
