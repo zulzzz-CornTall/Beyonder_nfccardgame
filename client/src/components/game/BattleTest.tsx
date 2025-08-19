@@ -134,15 +134,14 @@ export const BattleTest: React.FC = () => {
         ))}
       </div>
 
-      {/* Continue Button */}
+      {/* Auto-resolving message when both players spun */}
       {allPlayersSpun && battleState.phase === 'spinning' && (
         <div className="text-center mt-6">
-          <Button 
-            onClick={resolveRound}
-            className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold px-8 py-3"
-          >
-            Resolve Battle!
-          </Button>
+          <div className="p-4 bg-yellow-900/30 rounded-lg border border-yellow-500/30">
+            <p className="text-yellow-300 text-lg font-semibold animate-pulse">
+              ⚔️ Resolving Battle Automatically...
+            </p>
+          </div>
         </div>
       )}
     </div>

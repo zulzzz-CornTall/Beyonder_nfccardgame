@@ -84,6 +84,13 @@ export const useFighting = create<FightingState>()(
             }
           });
           
+          // Auto-resolve battle when both players have spun
+          if (bothSpun) {
+            setTimeout(() => {
+              get().resolveRound();
+            }, 1000); // 1 second delay to show both roulette results
+          }
+          
           resolve(value);
         }, 2000); // 2 second spin animation
       });
