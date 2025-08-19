@@ -98,10 +98,13 @@ export const useFighting = create<FightingState>()(
         return;
       }
       
+      // Determine winner based on highest roulette value
       const roundResult = determineRoundWinner(player1, player2);
       if (!roundResult) return;
       
       const { winner, loser } = roundResult;
+      
+      // Winner (highest roulette) attacks the loser
       const battleResult = calculateDamage(
         winner,
         loser,
@@ -109,7 +112,7 @@ export const useFighting = create<FightingState>()(
         loser.selectedAttack!
       );
       
-      // Apply damage
+      // Apply damage to the player who had the lower roulette value
       const updatedPlayers = battleState.players.map(player => {
         if (player.id === loser.id) {
           const newHealth = Math.max(0, player.health - battleResult.damage);
