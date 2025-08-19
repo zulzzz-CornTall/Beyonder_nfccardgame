@@ -6,6 +6,7 @@ import { HealthBar } from './HealthBar';
 import { BattleResults } from './BattleResults';
 import { NFCCardDisplay } from './NFCCardDisplay';
 import { RockPaperScissors } from './RockPaperScissors';
+import { RPSSelector } from './RPSSelector';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { ArrowLeft, RotateCcw } from 'lucide-react';
@@ -99,8 +100,19 @@ export const BattleTest: React.FC = () => {
                 </div>
               )}
 
+              {/* RPS Selection */}
+              {battleState.phase === 'rps-selecting' && (
+                <div className="mt-6">
+                  <RPSSelector 
+                    playerId={player.id}
+                    selectedChoice={player.rpsChoice}
+                    disabled={battleState.phase !== 'rps-selecting'}
+                  />
+                </div>
+              )}
+
               {/* Rock-Paper-Scissors Display */}
-              {battleState.phase === 'resolving' && player.selectedAttack && (
+              {battleState.phase === 'resolving' && player.selectedAttack && player.rpsChoice && (
                 <div className="mt-6">
                   <RockPaperScissors 
                     playerId={player.id}
@@ -125,8 +137,19 @@ export const BattleTest: React.FC = () => {
         ))}
       </div>
 
+      {/* RPS selection message */}
+      {battleState.phase === 'rps-selecting' && (
+        <div className="text-center mt-6">
+          <div className="p-4 bg-blue-900/30 rounded-lg border border-blue-500/30">
+            <p className="text-blue-300 text-lg font-semibold">
+              🎯 Choose your Rock-Paper-Scissors move!
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Auto-resolving message when both players selected */}
-      {allPlayersSelectedAttacks && battleState.phase === 'resolving' && (
+      {battleState.phase === 'resolving' && (
         <div className="text-center mt-6">
           <div className="p-4 bg-yellow-900/30 rounded-lg border border-yellow-500/30">
             <p className="text-yellow-300 text-lg font-semibold animate-pulse">

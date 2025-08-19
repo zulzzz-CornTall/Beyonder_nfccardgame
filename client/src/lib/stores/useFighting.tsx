@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
-import { GamePhase, Player, BattleState, BattleResult, AttackType } from '@/types/game';
-import { calculateDamage, determineRoundWinner, createMockNFCCard, getWinReason } from '@/lib/gameLogic';
+import { GamePhase, Player, BattleState, BattleResult, AttackType, RPSChoice } from '@/types/game';
+import { calculateDamage, determineRoundWinner, determineRPSWinner, createMockNFCCard, getWinReason } from '@/lib/gameLogic';
 
 interface FightingState {
   gamePhase: GamePhase;
@@ -11,6 +11,7 @@ interface FightingState {
   setGamePhase: (phase: GamePhase) => void;
   startBattle: () => void;
   selectAttack: (playerId: 1 | 2, attack: AttackType) => void;
+  selectRPSChoice: (playerId: 1 | 2, choice: RPSChoice) => void;
   resolveRound: () => void;
   resetBattle: () => void;
   scanNFCCard: (playerId: 1 | 2) => void;
@@ -59,11 +60,28 @@ export const useFighting = create<FightingState>()(
         battleState: {
           ...battleState,
           players: updatedPlayers,
-          phase: bothSelected ? 'resolving' : 'selecting'
+          phase: bothSelected ? 'rps-selecting' : 'selecting'
+        }
+      });
+    },
+    
+    selectRPSChoice: (playerId, choice) => {
+      const { battleState } = get();
+      const updatedPlayers = battleState.players.map(player => 
+        player.id === playerId ? { ...player, rpsChoice: choice } : player
+      ) as [Player, Player];
+      
+      const bothSelected = updatedPlayers.every(p => p.rpsChoice);
+      
+      set({
+        battleState: {
+          ...battleState,
+          players: updatedPlayers,
+          phase: bothSelected ? 'resolving' : 'rps-selecting'
         }
       });
       
-      // Auto-resolve when both players have selected
+      // Auto-resolve when both players have selected RPS choices
       if (bothSelected) {
         setTimeout(() => {
           get().resolveRound();
@@ -76,12 +94,12 @@ export const useFighting = create<FightingState>()(
       const { battleState } = get();
       const [player1, player2] = battleState.players;
       
-      if (!player1.selectedAttack || !player2.selectedAttack) {
+      if (!player1.selectedAttack || !player2.selectedAttack || !player1.rpsChoice || !player2.rpsChoice) {
         return;
       }
       
-      // Determine winner based on rock-paper-scissors rules
-      const roundResult = determineRoundWinner(player1, player2);
+      // Determine winner based on rock-paper-scissors choices
+      const roundResult = determineRPSWinner(player1, player2);
       if (!roundResult) return;
       
       const { winner, loser } = roundResult;
@@ -102,12 +120,14 @@ export const useFighting = create<FightingState>()(
           return { 
             ...player, 
             health: newHealth,
-            selectedAttack: undefined
+            selectedAttack: undefined,
+            rpsChoice: undefined
           };
         }
         return { 
           ...player, 
-          selectedAttack: undefined
+          selectedAttack: undefined,
+          rpsChoice: undefined
         };
       }) as [Player, Player];
       

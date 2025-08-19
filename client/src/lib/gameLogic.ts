@@ -1,4 +1,4 @@
-import { AttackType, Player, BattleResult } from '@/types/game';
+import { AttackType, NFCCard, Player, BattleResult, RPSChoice } from '@/types/game';
 
 // Attack effectiveness chart: attacker -> defender -> multiplier
 const EFFECTIVENESS_CHART: Record<AttackType, Record<AttackType, number>> = {
@@ -16,9 +16,9 @@ export function calculateDamage(
   const baseDamage = 25; // Base damage amount
   const effectiveness = EFFECTIVENESS_CHART[attackerAttack][defenderAttack];
   const finalDamage = Math.floor(baseDamage * effectiveness);
-  
+
   console.log(`Damage calculation: ${attackerAttack} vs ${defenderAttack}, effectiveness: ${effectiveness}, damage: ${finalDamage}`);
-  
+
   return {
     attacker,
     defender,
@@ -35,14 +35,14 @@ export function determineRoundWinner(
   if (!player1.selectedAttack || !player2.selectedAttack) {
     return null;
   }
-  
+
   const p1Attack = player1.selectedAttack;
   const p2Attack = player2.selectedAttack;
-  
+
   // Rock-paper-scissors logic using attack effectiveness
   const p1BeatsP2 = EFFECTIVENESS_CHART[p1Attack][p2Attack] > 1;
   const p2BeatsP1 = EFFECTIVENESS_CHART[p2Attack][p1Attack] > 1;
-  
+
   if (p1BeatsP2 && !p2BeatsP1) {
     return { winner: player1, loser: player2 };
   } else if (p2BeatsP1 && !p1BeatsP2) {
@@ -91,7 +91,7 @@ export function createMockNFCCard(playerId: 1 | 2) {
     { name: 'Stone Wall', element: 'guts' as AttackType, attack: 50, defense: 90 },
     { name: 'Swift Assassin', element: 'slash' as AttackType, attack: 85, defense: 55 }
   ];
-  
+
   const card = cards[Math.floor(Math.random() * cards.length)];
   return {
     id: `card_${playerId}_${Date.now()}`,
