@@ -20,18 +20,17 @@ export const BattleTest: React.FC = () => {
   }, [startBattle]);
 
   useEffect(() => {
-    if (battleState.phase === 'resolving' && battleState.lastBattleResult) {
+    if (battleState.lastBattleResult) {
       setShowResults(true);
       playHit();
       
       const timer = setTimeout(() => {
         setShowResults(false);
-        resolveRound();
-      }, 3000);
+      }, 2000);
       
       return () => clearTimeout(timer);
     }
-  }, [battleState.phase, battleState.lastBattleResult, resolveRound, playHit]);
+  }, [battleState.lastBattleResult, playHit]);
 
   const allPlayersSelectedAttacks = battleState.players.every(p => p.selectedAttack);
   const allPlayersSpun = battleState.players.every(p => p.rouletteValue !== undefined);
@@ -134,16 +133,7 @@ export const BattleTest: React.FC = () => {
         ))}
       </div>
 
-      {/* Auto-resolving message when both players spun */}
-      {allPlayersSpun && battleState.phase === 'spinning' && (
-        <div className="text-center mt-6">
-          <div className="p-4 bg-yellow-900/30 rounded-lg border border-yellow-500/30">
-            <p className="text-yellow-300 text-lg font-semibold animate-pulse">
-              ⚔️ Resolving Battle Automatically...
-            </p>
-          </div>
-        </div>
-      )}
+      
     </div>
   );
 };
