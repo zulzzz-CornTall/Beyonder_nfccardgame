@@ -17,6 +17,8 @@ export function calculateDamage(
   const effectiveness = EFFECTIVENESS_CHART[attackerAttack][defenderAttack];
   const finalDamage = Math.floor(baseDamage * effectiveness);
   
+  console.log(`Damage calculation: ${attackerAttack} vs ${defenderAttack}, effectiveness: ${effectiveness}, damage: ${finalDamage}`);
+  
   return {
     attacker,
     defender,

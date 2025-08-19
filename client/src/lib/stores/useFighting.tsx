@@ -116,6 +116,7 @@ export const useFighting = create<FightingState>()(
       const updatedPlayers = battleState.players.map(player => {
         if (player.id === loser.id) {
           const newHealth = Math.max(0, player.health - battleResult.damage);
+          console.log(`Player ${player.id} took ${battleResult.damage} damage. Health: ${player.health} -> ${newHealth}`);
           return { 
             ...player, 
             health: newHealth,
