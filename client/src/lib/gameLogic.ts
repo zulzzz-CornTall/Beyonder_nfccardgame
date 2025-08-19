@@ -32,16 +32,23 @@ export function determineRoundWinner(
   player1: Player,
   player2: Player
 ): { winner: Player; loser: Player } | null {
-  if (!player1.rouletteValue || !player2.rouletteValue) {
+  if (!player1.selectedAttack || !player2.selectedAttack) {
     return null;
   }
   
-  if (player1.rouletteValue > player2.rouletteValue) {
+  const p1Attack = player1.selectedAttack;
+  const p2Attack = player2.selectedAttack;
+  
+  // Rock-paper-scissors logic using attack effectiveness
+  const p1BeatsP2 = EFFECTIVENESS_CHART[p1Attack][p2Attack] > 1;
+  const p2BeatsP1 = EFFECTIVENESS_CHART[p2Attack][p1Attack] > 1;
+  
+  if (p1BeatsP2 && !p2BeatsP1) {
     return { winner: player1, loser: player2 };
-  } else if (player2.rouletteValue > player1.rouletteValue) {
+  } else if (p2BeatsP1 && !p1BeatsP2) {
     return { winner: player2, loser: player1 };
   } else {
-    // Tie - re-spin needed, but for simplicity, let's just pick randomly
+    // Tie - same attack types, pick randomly
     return Math.random() > 0.5 
       ? { winner: player1, loser: player2 }
       : { winner: player2, loser: player1 };
@@ -68,8 +75,11 @@ export function getEffectivenessText(attackType: AttackType, defenseType: Attack
   return 'Normal damage';
 }
 
-export function generateRouletteValue(): number {
-  return Math.floor(Math.random() * 100) + 1; // 1-100
+export function getWinReason(winnerAttack: AttackType, loserAttack: AttackType): string {
+  if (EFFECTIVENESS_CHART[winnerAttack][loserAttack] > 1) {
+    return `${getAttackName(winnerAttack)} beats ${getAttackName(loserAttack)}!`;
+  }
+  return 'Random winner (tie)!';
 }
 
 export function createMockNFCCard(playerId: 1 | 2) {

@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { useFighting } from '@/lib/stores/useFighting';
 import { useAudio } from '@/lib/stores/useAudio';
 import { AttackSelector } from './AttackSelector';
-import { Roulette } from './Roulette';
 import { HealthBar } from './HealthBar';
 import { BattleResults } from './BattleResults';
 import { NFCCardDisplay } from './NFCCardDisplay';
+import { RockPaperScissors } from './RockPaperScissors';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { ArrowLeft, RotateCcw } from 'lucide-react';
@@ -33,7 +33,6 @@ export const BattleTest: React.FC = () => {
   }, [battleState.lastBattleResult, playHit]);
 
   const allPlayersSelectedAttacks = battleState.players.every(p => p.selectedAttack);
-  const allPlayersSpun = battleState.players.every(p => p.rouletteValue !== undefined);
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-4">
@@ -52,8 +51,7 @@ export const BattleTest: React.FC = () => {
           <h1 className="text-2xl font-bold text-white">Round {battleState.currentRound}</h1>
           <p className="text-purple-300 text-sm">
             {battleState.phase === 'selecting' && 'Select your attacks'}
-            {battleState.phase === 'spinning' && 'Spin the roulettes!'}
-            {battleState.phase === 'resolving' && 'Resolving battle...'}
+            {battleState.phase === 'resolving' && 'Determining winner...'}
             {battleState.phase === 'ended' && 'Battle Complete!'}
           </p>
         </div>
@@ -101,14 +99,13 @@ export const BattleTest: React.FC = () => {
                 </div>
               )}
 
-              {/* Roulette */}
-              {(battleState.phase === 'spinning' || battleState.phase === 'resolving') && allPlayersSelectedAttacks && (
+              {/* Rock-Paper-Scissors Display */}
+              {battleState.phase === 'resolving' && player.selectedAttack && (
                 <div className="mt-6">
-                  <Roulette 
+                  <RockPaperScissors 
                     playerId={player.id}
-                    value={player.rouletteValue}
-                    isActive={battleState.phase === 'spinning'}
                     selectedAttack={player.selectedAttack}
+                    isResolving={true}
                   />
                 </div>
               )}
@@ -122,18 +119,22 @@ export const BattleTest: React.FC = () => {
                     </span>
                   </p>
                 )}
-                {player.rouletteValue && (
-                  <p className="text-sm text-yellow-300">
-                    Roulette: <span className="font-bold text-yellow-400">{player.rouletteValue}</span>
-                  </p>
-                )}
               </div>
             </CardContent>
           </Card>
         ))}
       </div>
 
-      
+      {/* Auto-resolving message when both players selected */}
+      {allPlayersSelectedAttacks && battleState.phase === 'resolving' && (
+        <div className="text-center mt-6">
+          <div className="p-4 bg-yellow-900/30 rounded-lg border border-yellow-500/30">
+            <p className="text-yellow-300 text-lg font-semibold animate-pulse">
+              ⚔️ Determining Winner via Rock-Paper-Scissors...
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

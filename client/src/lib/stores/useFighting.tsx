@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 import { GamePhase, Player, BattleState, BattleResult, AttackType } from '@/types/game';
-import { calculateDamage, determineRoundWinner, generateRouletteValue, createMockNFCCard } from '@/lib/gameLogic';
+import { calculateDamage, determineRoundWinner, createMockNFCCard, getWinReason } from '@/lib/gameLogic';
 
 interface FightingState {
   gamePhase: GamePhase;
@@ -11,7 +11,6 @@ interface FightingState {
   setGamePhase: (phase: GamePhase) => void;
   startBattle: () => void;
   selectAttack: (playerId: 1 | 2, attack: AttackType) => void;
-  spinRoulette: (playerId: 1 | 2) => Promise<number>;
   resolveRound: () => void;
   resetBattle: () => void;
   scanNFCCard: (playerId: 1 | 2) => void;
@@ -54,62 +53,34 @@ export const useFighting = create<FightingState>()(
         player.id === playerId ? { ...player, selectedAttack: attack } : player
       ) as [Player, Player];
       
+      const bothSelected = updatedPlayers.every(p => p.selectedAttack);
+      
       set({
         battleState: {
           ...battleState,
           players: updatedPlayers,
-          phase: updatedPlayers.every(p => p.selectedAttack) ? 'spinning' : 'selecting'
+          phase: bothSelected ? 'resolving' : 'selecting'
         }
       });
+      
+      // Auto-resolve when both players have selected
+      if (bothSelected) {
+        setTimeout(() => {
+          get().resolveRound();
+        }, 1500); // 1.5 second delay to show selections
+      }
     },
     
-    spinRoulette: async (playerId) => {
-      const { battleState } = get();
-      
-      // Check if player has already spun this round
-      const player = battleState.players.find(p => p.id === playerId);
-      if (player?.rouletteValue !== undefined) {
-        return Promise.resolve(player.rouletteValue);
-      }
-      
-      return new Promise((resolve) => {
-        // Simulate spinning animation delay
-        setTimeout(() => {
-          const value = generateRouletteValue();
-          const updatedPlayers = battleState.players.map(player => 
-            player.id === playerId ? { ...player, rouletteValue: value } : player
-          ) as [Player, Player];
-          
-          const bothSpun = updatedPlayers.every(p => p.rouletteValue !== undefined);
-          
-          set({
-            battleState: {
-              ...battleState,
-              players: updatedPlayers,
-              phase: bothSpun ? 'resolving' : 'spinning'
-            }
-          });
-          
-          // Auto-resolve battle immediately when both players have spun
-          if (bothSpun) {
-            get().resolveRound();
-          }
-          
-          resolve(value);
-        }, 2000); // 2 second spin animation
-      });
-    },
     
     resolveRound: () => {
       const { battleState } = get();
       const [player1, player2] = battleState.players;
       
-      if (!player1.selectedAttack || !player2.selectedAttack || 
-          !player1.rouletteValue || !player2.rouletteValue) {
+      if (!player1.selectedAttack || !player2.selectedAttack) {
         return;
       }
       
-      // Determine winner based on highest roulette value
+      // Determine winner based on rock-paper-scissors rules
       const roundResult = determineRoundWinner(player1, player2);
       if (!roundResult) return;
       
@@ -131,14 +102,12 @@ export const useFighting = create<FightingState>()(
           return { 
             ...player, 
             health: newHealth,
-            selectedAttack: undefined,
-            rouletteValue: undefined
+            selectedAttack: undefined
           };
         }
         return { 
           ...player, 
-          selectedAttack: undefined,
-          rouletteValue: undefined
+          selectedAttack: undefined
         };
       }) as [Player, Player];
       

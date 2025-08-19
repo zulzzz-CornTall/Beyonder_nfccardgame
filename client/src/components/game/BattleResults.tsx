@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { BattleResult } from '@/types/game';
-import { getAttackName, getEffectivenessText } from '@/lib/gameLogic';
+import { getAttackName, getEffectivenessText, getWinReason } from '@/lib/gameLogic';
 
 interface BattleResultsProps {
   result: BattleResult;
@@ -18,7 +18,7 @@ export const BattleResults: React.FC<BattleResultsProps> = ({ result }) => {
               🎯 {result.attacker.name} Wins!
             </h2>
             <p className="text-white text-lg">
-              Roulette: {result.attacker.rouletteValue} vs {result.defender.rouletteValue}
+              {getWinReason(result.attacker.selectedAttack!, result.defender.selectedAttack!)}
             </p>
           </div>
 

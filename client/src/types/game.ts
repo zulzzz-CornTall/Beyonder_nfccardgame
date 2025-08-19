@@ -8,7 +8,6 @@ export interface Player {
   health: number;
   maxHealth: number;
   selectedAttack?: AttackType;
-  rouletteValue?: number;
   nfcCard?: NFCCard;
 }
 
@@ -24,7 +23,7 @@ export interface NFCCard {
 export interface BattleState {
   players: [Player, Player];
   currentRound: number;
-  phase: 'selecting' | 'spinning' | 'resolving' | 'ended';
+  phase: 'selecting' | 'resolving' | 'ended';
   winner?: 1 | 2;
   lastBattleResult?: BattleResult;
 }
@@ -37,8 +36,3 @@ export interface BattleResult {
   attackerWon: boolean;
 }
 
-export interface RouletteState {
-  isSpinning: boolean;
-  value: number;
-  targetValue?: number;
-}

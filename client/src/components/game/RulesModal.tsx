@@ -36,8 +36,8 @@ export const RulesModal: React.FC = () => {
               <div className="space-y-3 text-gray-300">
                 <p>• NFC Fighter is a simultaneous combat game where both players act at the same time</p>
                 <p>• Each round, both players secretly select an attack type</p>
-                <p>• After selection, both players spin their roulettes</p>
-                <p>• The player with the highest roulette number gets to attack first</p>
+                <p>• After selection, the winner is determined by rock-paper-scissors rules</p>
+                <p>• The player with the superior attack type gets to deal damage</p>
                 <p>• Combat continues until one player reaches 0 HP</p>
               </div>
             </section>
@@ -113,15 +113,15 @@ export const RulesModal: React.FC = () => {
               </div>
             </section>
 
-            {/* Roulette System */}
+            {/* Rock-Paper-Scissors System */}
             <section>
-              <h2 className="text-2xl font-semibold mb-4 text-yellow-400">🎰 Roulette System</h2>
+              <h2 className="text-2xl font-semibold mb-4 text-yellow-400">✂️ Rock-Paper-Scissors System</h2>
               <div className="space-y-3 text-gray-300">
-                <p>• After both players select attacks, roulettes are spun simultaneously</p>
-                <p>• Roulettes generate random numbers from 1 to 100</p>
-                <p>• The player with the higher number wins the round and attacks</p>
-                <p>• In case of a tie, the winner is determined randomly</p>
-                <p>• Roulette results add excitement and unpredictability to each round!</p>
+                <p>• After both players select attacks, the winner is determined by attack type effectiveness</p>
+                <p>• Each attack type beats one other type: Slash beats Burst, Burst beats Guts, Guts beats Slash</p>
+                <p>• The player with the superior attack type wins the round and deals damage</p>
+                <p>• If both players choose the same attack type, the winner is determined randomly</p>
+                <p>• Strategy is key - try to predict your opponent's choice!</p>
               </div>
             </section>
 

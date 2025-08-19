@@ -18,31 +18,13 @@ export const Roulette: React.FC<RouletteProps> = ({
   isActive,
   selectedAttack
 }) => {
-  const { spinRoulette } = useFighting();
+  // const { spinRoulette } = useFighting(); // Removed roulette functionality
   const [isSpinning, setIsSpinning] = useState(false);
   const [displayValue, setDisplayValue] = useState(0);
 
   const handleSpin = async () => {
-    if (!isActive || isSpinning || value !== undefined) return;
-    
-    setIsSpinning(true);
-    setDisplayValue(0);
-    
-    // Animate the roulette spinning
-    const animationInterval = setInterval(() => {
-      setDisplayValue(Math.floor(Math.random() * 100) + 1);
-    }, 50);
-    
-    try {
-      const finalValue = await spinRoulette(playerId);
-      clearInterval(animationInterval);
-      setDisplayValue(finalValue);
-    } catch (error) {
-      clearInterval(animationInterval);
-      console.error('Roulette spin failed:', error);
-    } finally {
-      setIsSpinning(false);
-    }
+    // Roulette functionality has been replaced with rock-paper-scissors
+    console.log('Roulette no longer used - using rock-paper-scissors instead');
   };
 
   useEffect(() => {
