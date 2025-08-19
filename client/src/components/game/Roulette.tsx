@@ -23,7 +23,7 @@ export const Roulette: React.FC<RouletteProps> = ({
   const [displayValue, setDisplayValue] = useState(0);
 
   const handleSpin = async () => {
-    if (!isActive || isSpinning) return;
+    if (!isActive || isSpinning || value !== undefined) return;
     
     setIsSpinning(true);
     setDisplayValue(0);
@@ -77,7 +77,7 @@ export const Roulette: React.FC<RouletteProps> = ({
       </Card>
 
       {/* Spin Button */}
-      {isActive && !value && (
+      {isActive && value === undefined && (
         <Button
           onClick={handleSpin}
           disabled={isSpinning || !isActive || value !== undefined}
