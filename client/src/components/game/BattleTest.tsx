@@ -137,15 +137,23 @@ export const BattleTest: React.FC = () => {
         ))}
       </div>
 
-      {/* RPS selection message */}
+      {/* RPS selection interface */}
       {battleState.phase === 'resolving' && (
-        <div className="text-center mt-6">
-          <div className="p-4 bg-blue-900/30 rounded-lg border border-blue-500/30">
-            <p className="text-blue-300 text-lg font-semibold">
-              🎯 Choose your Rock-Paper-Scissors move!
-            </p>
-          </div>
+        <div className="mt-6 grid grid-cols-2 gap-6">
+          {battleState.players.map((player) => (
+            <div key={player.id} className="space-y-4">
+              <h2 className="text-xl font-bold text-white text-center">
+                Player {player.id}
+              </h2>
+              <RPSSelector
+                playerId={player.id}
+                selectedChoice={player.rpsChoice}
+                disabled={!!player.rpsChoice}
+              />
+            </div>
+          ))}
         </div>
+      )}
       )}
 
       {/* Auto-resolving message when both players selected */}

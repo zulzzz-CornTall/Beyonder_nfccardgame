@@ -9,6 +9,7 @@ export interface Player {
   maxHealth: number;
   selectedAttack?: AttackType;
   nfcCard?: NFCCard;
+  rpsChoice?: RPSChoice;
 }
 
 export interface NFCCard {
@@ -35,3 +36,5 @@ export interface BattleResult {
   wasEffective: boolean;
   attackerWon: boolean;
 }
+
+export type RPSChoice = 'rock' | 'paper' | 'scissors';

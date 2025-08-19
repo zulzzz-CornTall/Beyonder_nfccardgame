@@ -132,6 +132,30 @@ export const useFighting = create<FightingState>()(
       });
     },
     
+    selectRPSChoice: (playerId, choice) => {
+      const { battleState } = get();
+      const updatedPlayers = battleState.players.map(player => 
+        player.id === playerId ? { ...player, rpsChoice: choice } : player
+      ) as [Player, Player];
+      
+      const bothSelected = updatedPlayers.every(p => p.rpsChoice);
+      
+      set({
+        battleState: {
+          ...battleState,
+          players: updatedPlayers,
+          phase: bothSelected ? 'resolving' : battleState.phase
+        }
+      });
+      
+      // Auto-resolve if both players have made their RPS choices
+      if (bothSelected) {
+        setTimeout(() => {
+          get().resolveRound();
+        }, 1000);
+      }
+    },
+    
     scanNFCCard: (playerId) => {
       // Mock NFC card scanning
       const { battleState } = get();

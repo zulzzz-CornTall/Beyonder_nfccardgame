@@ -43,6 +43,46 @@ export function determineRoundWinner(
   const p1BeatsP2 = EFFECTIVENESS_CHART[p1Attack][p2Attack] > 1;
   const p2BeatsP1 = EFFECTIVENESS_CHART[p2Attack][p1Attack] > 1;
 
+  if (p1BeatsP2) {
+    return { winner: player1, loser: player2 };
+  } else if (p2BeatsP1) {
+    return { winner: player2, loser: player1 };
+  } else {
+    // Tie - random winner
+    return Math.random() < 0.5 
+      ? { winner: player1, loser: player2 }
+      : { winner: player2, loser: player1 };
+  }
+}
+
+export function determineRPSWinner(
+  player1: Player,
+  player2: Player
+): { winner: Player; loser: Player } | null {
+  if (!player1.rpsChoice || !player2.rpsChoice) {
+    return null;
+  }
+
+  const p1Choice = player1.rpsChoice;
+  const p2Choice = player2.rpsChoice;
+
+  // Standard rock-paper-scissors logic
+  if (p1Choice === p2Choice) {
+    // Tie - random winner
+    return Math.random() < 0.5 
+      ? { winner: player1, loser: player2 }
+      : { winner: player2, loser: player1 };
+  }
+
+  const p1Wins = 
+    (p1Choice === 'rock' && p2Choice === 'scissors') ||
+    (p1Choice === 'paper' && p2Choice === 'rock') ||
+    (p1Choice === 'scissors' && p2Choice === 'paper');
+
+  return p1Wins 
+    ? { winner: player1, loser: player2 }
+    : { winner: player2, loser: player1 };
+
   if (p1BeatsP2 && !p2BeatsP1) {
     return { winner: player1, loser: player2 };
   } else if (p2BeatsP1 && !p1BeatsP2) {
