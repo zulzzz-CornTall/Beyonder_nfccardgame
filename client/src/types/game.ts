@@ -1,8 +1,6 @@
 export type AttackType = 'burst' | 'guts' | 'slash';
 
-export type GamePhase = 'menu' | 'battle' | 'results';
-export type BattlePhase = 'selecting' | 'rps-selecting' | 'resolving' | 'ended';
-export type RPSChoice = 'rock' | 'paper' | 'scissors';
+export type GamePhase = 'menu' | 'battle' | 'results' | 'rules';
 
 export interface Player {
   id: 1 | 2;
@@ -10,8 +8,7 @@ export interface Player {
   health: number;
   maxHealth: number;
   selectedAttack?: AttackType;
-  rpsChoice?: RPSChoice;
-  nfcCard: NFCCard;
+  nfcCard?: NFCCard;
 }
 
 export interface NFCCard {

@@ -101,18 +101,18 @@ export const BattleTest: React.FC = () => {
               )}
 
               {/* RPS Selection */}
-              {battleState.phase === 'rps-selecting' && (
+              {battleState.phase === 'resolving' && (
                 <div className="mt-6">
                   <RPSSelector 
                     playerId={player.id}
-                    selectedChoice={player.rpsChoice}
-                    disabled={battleState.phase !== 'rps-selecting'}
+                    selectedChoice={player.selectedAttack}
+                    disabled={battleState.phase !== 'resolving'}
                   />
                 </div>
               )}
 
               {/* Rock-Paper-Scissors Display */}
-              {battleState.phase === 'resolving' && player.selectedAttack && player.rpsChoice && (
+              {battleState.phase === 'resolving' && player.selectedAttack && (
                 <div className="mt-6">
                   <RockPaperScissors 
                     playerId={player.id}
@@ -138,7 +138,7 @@ export const BattleTest: React.FC = () => {
       </div>
 
       {/* RPS selection message */}
-      {battleState.phase === 'rps-selecting' && (
+      {battleState.phase === 'resolving' && (
         <div className="text-center mt-6">
           <div className="p-4 bg-blue-900/30 rounded-lg border border-blue-500/30">
             <p className="text-blue-300 text-lg font-semibold">

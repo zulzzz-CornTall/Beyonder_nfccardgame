@@ -1,4 +1,4 @@
-import { AttackType, NFCCard, Player, BattleResult, RPSChoice } from '@/types/game';
+import { AttackType, NFCCard, Player, BattleResult } from '@/types/game';
 
 // Attack effectiveness chart: attacker -> defender -> multiplier
 const EFFECTIVENESS_CHART: Record<AttackType, Record<AttackType, number>> = {
