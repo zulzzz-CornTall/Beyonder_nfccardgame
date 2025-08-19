@@ -66,6 +66,12 @@ export const useFighting = create<FightingState>()(
     spinRoulette: async (playerId) => {
       const { battleState } = get();
       
+      // Check if player has already spun this round
+      const player = battleState.players.find(p => p.id === playerId);
+      if (player?.rouletteValue !== undefined) {
+        return Promise.resolve(player.rouletteValue);
+      }
+      
       return new Promise((resolve) => {
         // Simulate spinning animation delay
         setTimeout(() => {

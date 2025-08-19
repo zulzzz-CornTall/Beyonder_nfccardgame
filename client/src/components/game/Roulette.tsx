@@ -80,7 +80,7 @@ export const Roulette: React.FC<RouletteProps> = ({
       {isActive && !value && (
         <Button
           onClick={handleSpin}
-          disabled={isSpinning || !isActive}
+          disabled={isSpinning || !isActive || value !== undefined}
           className={`
             w-full h-12 font-semibold transition-all
             ${isSpinning 
