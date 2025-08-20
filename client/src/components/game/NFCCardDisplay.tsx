@@ -70,13 +70,23 @@ export const NFCCardDisplay: React.FC<NFCCardDisplayProps> = ({ card, playerId }
               alt={card.name}
               className="w-full h-full object-cover"
               onError={(e) => {
+                console.error(`Failed to load image for ${card.name}:`, card.imageUrl);
                 // Fallback to icon if image fails to load
-                e.currentTarget.style.display = 'none';
-                e.currentTarget.nextElementSibling?.setAttribute('style', 'display: block');
+                const target = e.currentTarget as HTMLImageElement;
+                target.style.display = 'none';
+                const fallbackSpan = target.parentElement?.querySelector('.fallback-icon') as HTMLElement;
+                if (fallbackSpan) {
+                  fallbackSpan.style.display = 'block';
+                }
               }}
             />
           ) : null}
-          <span className="text-2xl" style={{ display: card.imageUrl ? 'none' : 'block' }}>⚡</span>
+          <span 
+            className="fallback-icon text-2xl" 
+            style={{ display: card.imageUrl ? 'none' : 'block' }}
+          >
+            ⚡
+          </span>
         </div>
 
         {/* Stats */}

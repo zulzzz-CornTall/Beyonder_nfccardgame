@@ -63,7 +63,7 @@ export function parseNFCText(text: string): ParsedNFCData | null {
 
       // Direct key matching
       if (normalizedKey === 'imgurl' || normalizedKey.includes('img')) {
-        console.log('Matched imageUrl field');
+        console.log('Matched imageUrl field, value:', value);
         data.imageUrl = value;
       } else if (normalizedKey === 'name') {
         console.log('Matched name field');
@@ -234,7 +234,7 @@ export function mockNFCScan(): Promise<ParsedNFCData> {
     setTimeout(() => {
       // Directly return the expected data structure instead of parsing text
       const mockData: ParsedNFCData = {
-        imageUrl: '/textures/grass.png',
+        imageUrl: 'https://picsum.photos/64/64?random=1',
         name: 'Test Warrior',
         hp: 100,
         burst: 75,
