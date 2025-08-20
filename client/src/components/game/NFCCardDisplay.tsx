@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { NFCCard } from '@/types/game';
 import { useFighting } from '@/lib/stores/useFighting';
 import { getAttackColor, getAttackName } from '@/lib/gameLogic';
-import { RefreshCw, Zap, Shield } from 'lucide-react';
+import { RefreshCw, Zap, Shield, Loader2 } from 'lucide-react';
 
 interface NFCCardDisplayProps {
   card?: NFCCard;
@@ -13,6 +13,16 @@ interface NFCCardDisplayProps {
 
 export const NFCCardDisplay: React.FC<NFCCardDisplayProps> = ({ card, playerId }) => {
   const { scanNFCCard, gamePhase } = useFighting();
+  const [imageLoading, setImageLoading] = useState(true);
+  const [imageError, setImageError] = useState(false);
+
+  // Reset image loading state when card changes
+  useEffect(() => {
+    if (card?.imageUrl) {
+      setImageLoading(true);
+      setImageError(false);
+    }
+  }, [card?.imageUrl]);
 
   // Debug logging
   console.log(`NFCCardDisplay for Player ${playerId}:`, card);
@@ -60,33 +70,48 @@ export const NFCCardDisplay: React.FC<NFCCardDisplayProps> = ({ card, playerId }
         <div className="text-center mb-3">
           <h3 className="font-bold text-white text-lg">{card.name}</h3>
           <p className="text-xs text-gray-300">NFC Card #{card.id.slice(-6)}</p>
+          {card.imageUrl && (
+            <p className="text-xs text-blue-300 truncate mt-1" title={card.imageUrl}>
+              🔗 Image: {card.imageUrl.length > 30 ? `${card.imageUrl.substring(0, 30)}...` : card.imageUrl}
+            </p>
+          )}
         </div>
 
         {/* Card Image */}
-        <div className="w-16 h-16 mx-auto mb-4 bg-gray-700 rounded-lg flex items-center justify-center overflow-hidden">
-          {card.imageUrl ? (
-            <img
-              src={card.imageUrl}
-              alt={card.name}
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                console.error(`Failed to load image for ${card.name}:`, card.imageUrl);
-                // Fallback to icon if image fails to load
-                const target = e.currentTarget as HTMLImageElement;
-                target.style.display = 'none';
-                const fallbackSpan = target.parentElement?.querySelector('.fallback-icon') as HTMLElement;
-                if (fallbackSpan) {
-                  fallbackSpan.style.display = 'block';
-                }
-              }}
-            />
-          ) : null}
-          <span 
-            className="fallback-icon text-2xl" 
-            style={{ display: card.imageUrl ? 'none' : 'block' }}
-          >
-            ⚡
-          </span>
+        <div className="w-32 h-32 mx-auto mb-4 bg-gray-700 rounded-lg flex items-center justify-center overflow-hidden border-2 border-gray-600 relative">
+          {card.imageUrl && !imageError ? (
+            <>
+              {imageLoading && (
+                <div className="absolute inset-0 flex items-center justify-center bg-gray-700">
+                  <Loader2 className="h-6 w-6 text-purple-400 animate-spin" />
+                </div>
+              )}
+              <img
+                src={card.imageUrl}
+                alt={`${card.name} character image`}
+                className={`w-full h-full object-cover rounded transition-opacity duration-300 ${
+                  imageLoading ? 'opacity-0' : 'opacity-100'
+                }`}
+                onLoad={() => {
+                  console.log(`Successfully loaded image for ${card.name}:`, card.imageUrl);
+                  setImageLoading(false);
+                  setImageError(false);
+                }}
+                onError={(e) => {
+                  console.error(`Failed to load image for ${card.name}:`, card.imageUrl);
+                  setImageLoading(false);
+                  setImageError(true);
+                }}
+              />
+            </>
+          ) : (
+            <div className="text-center">
+              <div className="text-4xl text-yellow-400 mb-1">🎴</div>
+              <div className="text-xs text-gray-400">
+                {imageError ? 'Image failed' : 'No image'}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Stats */}
