@@ -20,54 +20,64 @@ export interface ParsedNFCData {
 
 export function parseNFCText(text: string): ParsedNFCData | null {
   try {
-    // Remove all Unicode control characters and normalize whitespace
+    console.log('Raw NFC text received:', JSON.stringify(text));
+    
+    // Extremely aggressive text cleaning - remove ALL problematic Unicode characters
     const cleanText = text
-      .replace(/[\u0000-\u001F\u007F-\u009F\u200B-\u200D\uFEFF]/g, '') // Remove control chars and zero-width chars
-      .replace(/\u00A0/g, ' ') // Replace non-breaking spaces with regular spaces
-      .replace(/\u202F/g, ' ') // Replace narrow no-break spaces
+      // Remove all control characters, zero-width characters, and weird spaces
+      .replace(/[\u0000-\u001F\u007F-\u009F\u00A0\u1680\u2000-\u200F\u2028-\u202F\u205F-\u206F\u3000\uFEFF]/g, ' ')
+      // Replace multiple spaces/tabs with single space
+      .replace(/\s+/g, ' ')
+      // Remove any remaining invisible characters
+      .replace(/[\u200B-\u200D\u2060\uFEFF]/g, '')
       .trim();
 
+    console.log('Cleaned text:', JSON.stringify(cleanText));
+
+    // Very flexible line splitting - handle any kind of line breaks
     const lines = cleanText
-      .split(/[\r\n]+/) // Split on any newline combination
+      .split(/[\r\n\u2028\u2029]+/)
       .map(line => line.trim())
       .filter(line => line.length > 0);
     
     const data: Partial<ParsedNFCData> = {};
 
-    console.log('Parsing NFC text lines:', lines);
+    console.log('Split into lines:', lines);
 
     for (const line of lines) {
+      // Look for colon anywhere in the line
       const colonIndex = line.indexOf(':');
-      if (colonIndex === -1) continue;
+      if (colonIndex === -1) {
+        console.log('Skipping line without colon:', line);
+        continue;
+      }
 
-      const key = line.substring(0, colonIndex).trim().toLowerCase();
-      const value = line.substring(colonIndex + 1).trim();
+      let key = line.substring(0, colonIndex).trim().toLowerCase();
+      let value = line.substring(colonIndex + 1).trim();
 
-      console.log(`Parsing line - Key: "${key}", Value: "${value}"`);
+      // Clean key and value more aggressively
+      key = key.replace(/[^\w]/g, '').toLowerCase();
+      value = value.replace(/^\s+|\s+$/g, '');
 
-      switch (key) {
-        case 'imgurl':
-          data.imageUrl = value;
-          break;
-        case 'name':
-          data.name = value;
-          break;
-        case 'hp':
-          const hp = parseInt(value);
-          if (!isNaN(hp)) data.hp = hp;
-          break;
-        case 'b':
-          const burst = parseInt(value);
-          if (!isNaN(burst)) data.burst = burst;
-          break;
-        case 'g':
-          const guts = parseInt(value);
-          if (!isNaN(guts)) data.guts = guts;
-          break;
-        case 's':
-          const slash = parseInt(value);
-          if (!isNaN(slash)) data.slash = slash;
-          break;
+      console.log(`Parsed - Key: "${key}", Value: "${value}"`);
+
+      // More flexible key matching
+      if (key.includes('img') || key.includes('url')) {
+        data.imageUrl = value;
+      } else if (key.includes('name')) {
+        data.name = value;
+      } else if (key === 'hp' || key.includes('health')) {
+        const hp = parseInt(value.replace(/\D/g, ''));
+        if (!isNaN(hp)) data.hp = hp;
+      } else if (key === 'b' || key.includes('burst')) {
+        const burst = parseInt(value.replace(/\D/g, ''));
+        if (!isNaN(burst)) data.burst = burst;
+      } else if (key === 'g' || key.includes('gut')) {
+        const guts = parseInt(value.replace(/\D/g, ''));
+        if (!isNaN(guts)) data.guts = guts;
+      } else if (key === 's' || key.includes('slash')) {
+        const slash = parseInt(value.replace(/\D/g, ''));
+        if (!isNaN(slash)) data.slash = slash;
       }
     }
 
