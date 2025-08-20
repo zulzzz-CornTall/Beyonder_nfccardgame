@@ -20,31 +20,30 @@ export interface ParsedNFCData {
 
 export function parseNFCText(text: string): ParsedNFCData | null {
   try {
-    console.log('Raw NFC text received:', JSON.stringify(text));
+    console.log('Raw NFC text received:', text);
+    console.log('Raw NFC text length:', text.length);
+    console.log('Raw NFC text bytes:', Array.from(text).map(c => c.charCodeAt(0)));
     
-    // Extremely aggressive text cleaning - remove ALL problematic Unicode characters
+    // Much simpler cleaning - only handle basic whitespace
     const cleanText = text
-      // Remove all control characters, zero-width characters, and weird spaces
-      .replace(/[\u0000-\u001F\u007F-\u009F\u00A0\u1680\u2000-\u200F\u2028-\u202F\u205F-\u206F\u3000\uFEFF]/g, ' ')
-      // Replace multiple spaces/tabs with single space
-      .replace(/\s+/g, ' ')
-      // Remove any remaining invisible characters
-      .replace(/[\u200B-\u200D\u2060\uFEFF]/g, '')
+      .replace(/\r\n/g, '\n')  // Normalize line endings
+      .replace(/\r/g, '\n')    // Handle old Mac line endings
       .trim();
 
-    console.log('Cleaned text:', JSON.stringify(cleanText));
+    console.log('Cleaned text:', cleanText);
+    console.log('Cleaned text length:', cleanText.length);
 
-    // Very flexible line splitting - handle any kind of line breaks
-    const lines = cleanText
-      .split(/[\r\n\u2028\u2029]+/)
-      .map(line => line.trim())
-      .filter(line => line.length > 0);
+    // Simple line splitting
+    const lines = cleanText.split('\n').map(line => line.trim()).filter(line => line.length > 0);
     
     const data: Partial<ParsedNFCData> = {};
 
     console.log('Split into lines:', lines);
+    console.log('Number of lines:', lines.length);
 
     for (const line of lines) {
+      console.log(`Processing line: "${line}"`);
+      
       // Look for colon anywhere in the line
       const colonIndex = line.indexOf(':');
       if (colonIndex === -1) {
@@ -52,32 +51,45 @@ export function parseNFCText(text: string): ParsedNFCData | null {
         continue;
       }
 
-      let key = line.substring(0, colonIndex).trim().toLowerCase();
+      let key = line.substring(0, colonIndex).trim();
       let value = line.substring(colonIndex + 1).trim();
 
-      // Clean key and value more aggressively
-      key = key.replace(/[^\w]/g, '').toLowerCase();
-      value = value.replace(/^\s+|\s+$/g, '');
+      console.log(`Raw key: "${key}", Raw value: "${value}"`);
 
-      console.log(`Parsed - Key: "${key}", Value: "${value}"`);
+      // Simpler key normalization
+      const normalizedKey = key.toLowerCase().replace(/\s+/g, '');
 
-      // More flexible key matching
-      if (key.includes('img') || key.includes('url')) {
+      console.log(`Normalized key: "${normalizedKey}"`);
+
+      // Direct key matching
+      if (normalizedKey === 'imgurl' || normalizedKey.includes('img')) {
+        console.log('Matched imageUrl field');
         data.imageUrl = value;
-      } else if (key.includes('name')) {
+      } else if (normalizedKey === 'name') {
+        console.log('Matched name field');
         data.name = value;
-      } else if (key === 'hp' || key.includes('health')) {
-        const hp = parseInt(value.replace(/\D/g, ''));
+      } else if (normalizedKey === 'hp') {
+        console.log('Matched HP field');
+        const hp = parseInt(value);
+        console.log(`Parsed HP: ${hp}`);
         if (!isNaN(hp)) data.hp = hp;
-      } else if (key === 'b' || key.includes('burst')) {
-        const burst = parseInt(value.replace(/\D/g, ''));
+      } else if (normalizedKey === 'b') {
+        console.log('Matched B (burst) field');
+        const burst = parseInt(value);
+        console.log(`Parsed burst: ${burst}`);
         if (!isNaN(burst)) data.burst = burst;
-      } else if (key === 'g' || key.includes('gut')) {
-        const guts = parseInt(value.replace(/\D/g, ''));
+      } else if (normalizedKey === 'g') {
+        console.log('Matched G (guts) field');
+        const guts = parseInt(value);
+        console.log(`Parsed guts: ${guts}`);
         if (!isNaN(guts)) data.guts = guts;
-      } else if (key === 's' || key.includes('slash')) {
-        const slash = parseInt(value.replace(/\D/g, ''));
+      } else if (normalizedKey === 's') {
+        console.log('Matched S (slash) field');
+        const slash = parseInt(value);
+        console.log(`Parsed slash: ${slash}`);
         if (!isNaN(slash)) data.slash = slash;
+      } else {
+        console.log(`Unknown key: "${normalizedKey}"`);
       }
     }
 
