@@ -143,11 +143,15 @@ export const useFighting = create<FightingState>()(
           console.log('NFC not supported, using mock scan');
           // Fallback to mock for testing
           const parsedData = await mockNFCScan();
+          console.log('Mock scan result:', parsedData);
           const newCard = createNFCCardFromParsedData(parsedData, playerId);
+          console.log('Created NFC card:', newCard);
           
           const updatedPlayers = battleState.players.map(player => 
             player.id === playerId ? { ...player, nfcCard: newCard } : player
           ) as [Player, Player];
+          
+          console.log('Updated players:', updatedPlayers);
           
           set({
             battleState: {

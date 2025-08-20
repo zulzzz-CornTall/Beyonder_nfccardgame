@@ -213,26 +213,18 @@ export async function scanNFCCard(): Promise<ParsedNFCData | null> {
 export function mockNFCScan(): Promise<ParsedNFCData> {
   return new Promise((resolve) => {
     setTimeout(() => {
-      const mockText = `Imgurl: /textures/grass.png
-Name: Test Warrior
-HP: 100
-B: 75
-G: 60
-S: 80`;
+      // Directly return the expected data structure instead of parsing text
+      const mockData: ParsedNFCData = {
+        imageUrl: '/textures/grass.png',
+        name: 'Test Warrior',
+        hp: 100,
+        burst: 75,
+        guts: 60,
+        slash: 80
+      };
       
-      const parsed = parseNFCText(mockText);
-      if (parsed) {
-        resolve(parsed);
-      } else {
-        resolve({
-          imageUrl: '/textures/grass.png',
-          name: 'Test Warrior',
-          hp: 100,
-          burst: 75,
-          guts: 60,
-          slash: 80
-        });
-      }
+      console.log('Mock NFC data created:', mockData);
+      resolve(mockData);
     }, 1000); // Simulate scan delay
   });
 }

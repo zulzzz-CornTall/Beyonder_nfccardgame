@@ -13,13 +13,24 @@ interface NFCCardDisplayProps {
 
 export const NFCCardDisplay: React.FC<NFCCardDisplayProps> = ({ card, playerId }) => {
   const { scanNFCCard } = useFighting();
+  
+  // Debug logging
+  console.log(`NFCCardDisplay for Player ${playerId}:`, card);
 
   if (!card) {
     return (
       <div className="text-center p-6">
         <p className="text-gray-400 mb-4">No NFC Card Detected</p>
         <Button 
-          onClick={() => scanNFCCard(playerId)}
+          onClick={async () => {
+            try {
+              console.log(`Starting NFC scan for Player ${playerId}`);
+              await scanNFCCard(playerId);
+              console.log(`NFC scan completed for Player ${playerId}`);
+            } catch (error) {
+              console.error(`NFC scan error for Player ${playerId}:`, error);
+            }
+          }}
           variant="outline"
           className="border-purple-500/50 text-purple-200 hover:bg-purple-500/10"
         >
@@ -90,7 +101,15 @@ export const NFCCardDisplay: React.FC<NFCCardDisplayProps> = ({ card, playerId }
 
         {/* Rescan Button */}
         <Button 
-          onClick={() => scanNFCCard(playerId)}
+          onClick={async () => {
+            try {
+              console.log(`Starting NFC rescan for Player ${playerId}`);
+              await scanNFCCard(playerId);
+              console.log(`NFC rescan completed for Player ${playerId}`);
+            } catch (error) {
+              console.error(`NFC rescan error for Player ${playerId}:`, error);
+            }
+          }}
           variant="outline"
           size="sm"
           className="w-full mt-4 border-white/30 text-white hover:bg-white/10"
