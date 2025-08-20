@@ -55,10 +55,9 @@ export const useFighting = create<FightingState>()(
     
     startCharacterSelection: () => {
       const { battleState } = get();
-      // Clear selected characters and go to character selection
+      // Clear selected attacks and RPS choices, but preserve health and selected character
       const updatedPlayers = battleState.players.map(player => ({
         ...player,
-        selectedCard: undefined,
         selectedAttack: undefined,
         rpsChoice: undefined
       })) as [Player, Player];

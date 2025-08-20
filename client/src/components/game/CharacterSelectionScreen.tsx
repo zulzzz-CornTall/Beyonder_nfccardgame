@@ -102,11 +102,17 @@ export const CharacterSelectionScreen: React.FC = () => {
             if (bothPlayersSelectedCharacters) {
               // Set health based on selected characters and go to battle
               const { battleState } = useFighting.getState();
-              const updatedPlayers = battleState.players.map(player => ({
-                ...player,
-                health: player.selectedCard!.hp,
-                maxHealth: player.selectedCard!.hp
-              })) as [Player, Player];
+              const updatedPlayers = battleState.players.map(player => {
+                // Only set health to full HP if this is the first round or if character changed
+                const isFirstRound = battleState.currentRound === 1;
+                const characterChanged = !player.selectedCard || player.health === 0;
+                
+                return {
+                  ...player,
+                  health: (isFirstRound || characterChanged) ? player.selectedCard!.hp : player.health,
+                  maxHealth: player.selectedCard!.hp
+                };
+              }) as [Player, Player];
               
               useFighting.setState({
                 gamePhase: 'battle',
