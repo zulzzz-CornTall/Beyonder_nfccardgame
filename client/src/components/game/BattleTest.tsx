@@ -15,9 +15,7 @@ export const BattleTest: React.FC = () => {
   const { playHit } = useAudio();
   const [showResults, setShowResults] = useState(false);
 
-  useEffect(() => {
-    startBattle();
-  }, [startBattle]);
+  
 
   useEffect(() => {
     if (battleState.lastBattleResult) {

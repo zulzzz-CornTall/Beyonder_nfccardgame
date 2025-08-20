@@ -101,7 +101,7 @@ export const CharacterSelectionScreen: React.FC = () => {
           onClick={() => {
             if (bothPlayersSelectedCharacters) {
               // Set health based on selected characters and go to battle
-              const { battleState, setGamePhase } = useFighting.getState();
+              const { battleState } = useFighting.getState();
               const updatedPlayers = battleState.players.map(player => ({
                 ...player,
                 health: player.selectedCard!.hp,
