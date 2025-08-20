@@ -83,32 +83,18 @@ export function parseNFCText(text: string): ParsedNFCData | null {
 
     console.log('Parsed data:', data);
 
-    // Only validate essential fields - imageUrl is optional
-    if (data.name && 
-        typeof data.hp === 'number' && 
-        typeof data.burst === 'number' && 
-        typeof data.guts === 'number' && 
-        typeof data.slash === 'number') {
-      
-      // Use default image if no imageUrl provided
-      if (!data.imageUrl) {
-        data.imageUrl = '/textures/grass.png'; // Default fallback image
-      }
-      
-      console.log('NFC parsing successful:', data);
-      return data as ParsedNFCData;
-    }
+    // Use whatever data we found, fill in defaults for missing fields
+    const result: ParsedNFCData = {
+      imageUrl: data.imageUrl || '/textures/grass.png',
+      name: data.name || 'Unknown Card',
+      hp: data.hp || 100,
+      burst: data.burst || 50,
+      guts: data.guts || 50,
+      slash: data.slash || 50
+    };
 
-    console.error('NFC parsing failed - missing required fields:', {
-      hasName: !!data.name,
-      hasHP: typeof data.hp === 'number',
-      hasBurst: typeof data.burst === 'number',
-      hasGuts: typeof data.guts === 'number',
-      hasSlash: typeof data.slash === 'number',
-      actualData: data
-    });
-
-    return null;
+    console.log('NFC parsing successful:', result);
+    return result;
   } catch (error) {
     console.error('Error parsing NFC text:', error);
     return null;
