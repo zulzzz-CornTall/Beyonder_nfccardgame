@@ -11,12 +11,14 @@ interface FightingState {
   // Actions
   setGamePhase: (phase: GamePhase) => void;
   startPreparation: () => void;
+  startCharacterSelection: () => void;
   startBattle: () => void;
   selectAttack: (playerId: 1 | 2, attack: AttackType) => void;
   selectRPS: (playerId: 1 | 2, choice: RPSChoice) => void;
   resolveRound: () => void;
   resetBattle: () => void;
   scanNFCCard: (playerId: 1 | 2) => Promise<void>;
+  selectCharacter: (playerId: 1 | 2, cardIndex: number) => void;
 }
 
 const createInitialPlayer = (id: 1 | 2): Player => ({
@@ -24,7 +26,8 @@ const createInitialPlayer = (id: 1 | 2): Player => ({
   name: `Player ${id}`,
   health: 100,
   maxHealth: 100,
-  nfcCard: undefined  // Start without NFC card - players must scan to get one
+  scannedCards: [],  // Start with no scanned cards
+  selectedCard: undefined  // No character selected yet
 });
 
 const initialBattleState: BattleState = {
@@ -50,20 +53,43 @@ export const useFighting = create<FightingState>()(
       });
     },
     
-    startBattle: () => {
+    startCharacterSelection: () => {
       const { battleState } = get();
-      // Only start battle if both players have scanned NFC cards
-      const bothPlayersHaveCards = battleState.players.every(p => p.nfcCard);
+      // Only start character selection if both players have at least 1 scanned card
+      const bothPlayersHaveCards = battleState.players.every(p => p.scannedCards.length > 0);
       
       if (!bothPlayersHaveCards) {
-        alert('Both players must scan their NFC cards before starting the battle!');
+        alert('Both players must scan at least one NFC card before character selection!');
         return;
       }
+
+      set({
+        gamePhase: 'character-selection'
+      });
+    },
+    
+    startBattle: () => {
+      const { battleState } = get();
+      // Only start battle if both players have selected their characters
+      const bothPlayersSelectedCharacters = battleState.players.every(p => p.selectedCard);
+      
+      if (!bothPlayersSelectedCharacters) {
+        alert('Both players must select their characters before starting the battle!');
+        return;
+      }
+
+      // Set health based on selected character's HP
+      const updatedPlayers = battleState.players.map(player => ({
+        ...player,
+        health: player.selectedCard!.hp,
+        maxHealth: player.selectedCard!.hp
+      })) as [Player, Player];
 
       set({
         gamePhase: 'battle',
         battleState: {
           ...battleState,
+          players: updatedPlayers,
           phase: 'selecting'
         }
       });
@@ -180,10 +206,41 @@ export const useFighting = create<FightingState>()(
       });
     },
     
+    selectCharacter: (playerId, cardIndex) => {
+      const { battleState } = get();
+      const updatedPlayers = battleState.players.map(player => {
+        if (player.id === playerId) {
+          const selectedCard = player.scannedCards[cardIndex];
+          if (!selectedCard) {
+            console.error(`No card found at index ${cardIndex} for player ${playerId}`);
+            return player;
+          }
+          return { ...player, selectedCard };
+        }
+        return player;
+      }) as [Player, Player];
+      
+      set({
+        battleState: {
+          ...battleState,
+          players: updatedPlayers
+        }
+      });
+      
+      console.log(`Player ${playerId} selected character: ${updatedPlayers.find(p => p.id === playerId)?.selectedCard?.name}`);
+    },
+    
     
     scanNFCCard: async (playerId) => {
       try {
         const { battleState } = get();
+        const currentPlayer = battleState.players.find(p => p.id === playerId);
+        
+        // Check if player already has 3 cards
+        if (currentPlayer && currentPlayer.scannedCards.length >= 3) {
+          alert('You can only scan up to 3 cards per player!');
+          return;
+        }
         
         // Check if NFC is supported
         if (!isNFCSupported()) {
@@ -194,9 +251,15 @@ export const useFighting = create<FightingState>()(
           const newCard = createNFCCardFromParsedData(parsedData, playerId);
           console.log('Created NFC card:', newCard);
           
-          const updatedPlayers = battleState.players.map(player => 
-            player.id === playerId ? { ...player, nfcCard: newCard } : player
-          ) as [Player, Player];
+          const updatedPlayers = battleState.players.map(player => {
+            if (player.id === playerId) {
+              return { 
+                ...player, 
+                scannedCards: [...player.scannedCards, newCard]
+              };
+            }
+            return player;
+          }) as [Player, Player];
           
           console.log('Updated players:', updatedPlayers);
           
@@ -224,9 +287,15 @@ export const useFighting = create<FightingState>()(
         // Create NFC card from parsed data
         const newCard = createNFCCardFromParsedData(parsedData, playerId);
         
-        const updatedPlayers = battleState.players.map(player => 
-          player.id === playerId ? { ...player, nfcCard: newCard } : player
-        ) as [Player, Player];
+        const updatedPlayers = battleState.players.map(player => {
+          if (player.id === playerId) {
+            return { 
+              ...player, 
+              scannedCards: [...player.scannedCards, newCard]
+            };
+          }
+          return player;
+        }) as [Player, Player];
         
         set({
           battleState: {
@@ -236,6 +305,7 @@ export const useFighting = create<FightingState>()(
         });
 
         console.log(`NFC card scanned successfully for Player ${playerId}:`, newCard);
+        console.log(`Player ${playerId} now has ${updatedPlayers.find(p => p.id === playerId)?.scannedCards.length} cards`);
         
       } catch (error) {
         console.error('NFC scan failed:', error);
@@ -245,12 +315,25 @@ export const useFighting = create<FightingState>()(
         alert(`NFC scan failed: ${errorMessage}. Using mock card for testing.`);
         
         const { battleState } = get();
+        const currentPlayer = battleState.players.find(p => p.id === playerId);
+        
+        // Check if player already has 3 cards
+        if (currentPlayer && currentPlayer.scannedCards.length >= 3) {
+          return;
+        }
+        
         const parsedData = await mockNFCScan();
         const newCard = createNFCCardFromParsedData(parsedData, playerId);
         
-        const updatedPlayers = battleState.players.map(player => 
-          player.id === playerId ? { ...player, nfcCard: newCard } : player
-        ) as [Player, Player];
+        const updatedPlayers = battleState.players.map(player => {
+          if (player.id === playerId) {
+            return { 
+              ...player, 
+              scannedCards: [...player.scannedCards, newCard]
+            };
+          }
+          return player;
+        }) as [Player, Player];
         
         set({
           battleState: {

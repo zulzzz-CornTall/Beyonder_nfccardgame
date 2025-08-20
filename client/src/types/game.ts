@@ -1,6 +1,6 @@
 export type AttackType = 'burst' | 'guts' | 'slash';
 
-export type GamePhase = 'menu' | 'preparation' | 'battle' | 'results' | 'rules';
+export type GamePhase = 'menu' | 'preparation' | 'character-selection' | 'battle' | 'results' | 'rules';
 
 export interface Player {
   id: 1 | 2;
@@ -8,7 +8,8 @@ export interface Player {
   health: number;
   maxHealth: number;
   selectedAttack?: AttackType;
-  nfcCard?: NFCCard;
+  scannedCards: NFCCard[];  // Array of up to 3 scanned cards
+  selectedCard?: NFCCard;   // The character they chose for battle
   rpsChoice?: RPSChoice;
 }
 

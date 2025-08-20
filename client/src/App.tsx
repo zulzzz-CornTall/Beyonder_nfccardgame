@@ -3,6 +3,7 @@ import { useFighting } from "@/lib/stores/useFighting";
 import { useAudio } from "@/lib/stores/useAudio";
 import { MainMenu } from "@/components/game/MainMenu";
 import { PreparationScreen } from "@/components/game/PreparationScreen";
+import { CharacterSelectionScreen } from "@/components/game/CharacterSelectionScreen";
 import { BattleTest } from "@/components/game/BattleTest";
 import { RulesModal } from "@/components/game/RulesModal";
 import "@fontsource/inter";
@@ -38,12 +39,12 @@ const GameResults: React.FC = () => {
               <div className="space-y-2">
                 <p className="text-green-400 font-bold text-lg">{winner?.name}</p>
                 <p className="text-sm">HP Remaining: {winner?.health}</p>
-                <p className="text-sm">Card: {winner?.nfcCard?.name}</p>
+                <p className="text-sm">Card: {winner?.selectedCard?.name}</p>
               </div>
               <div className="space-y-2">
                 <p className="text-red-400 font-bold text-lg">{loser?.name}</p>
                 <p className="text-sm">HP Remaining: {loser?.health}</p>
-                <p className="text-sm">Card: {loser?.nfcCard?.name}</p>
+                <p className="text-sm">Card: {loser?.selectedCard?.name}</p>
               </div>
             </div>
           </div>
@@ -85,6 +86,7 @@ function App() {
     <div style={{ width: '100vw', height: '100vh', position: 'relative', overflow: 'hidden' }}>
       {gamePhase === 'menu' && <MainMenu />}
       {gamePhase === 'preparation' && <PreparationScreen />}
+      {gamePhase === 'character-selection' && <CharacterSelectionScreen />}
       {gamePhase === 'battle' && <BattleTest />}
       {gamePhase === 'results' && <GameResults />}
       {gamePhase === 'rules' && <RulesModal />}

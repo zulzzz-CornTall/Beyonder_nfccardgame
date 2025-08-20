@@ -6,9 +6,9 @@ import { NFCCardDisplay } from './NFCCardDisplay';
 import { ArrowLeft, Play } from 'lucide-react';
 
 export const PreparationScreen: React.FC = () => {
-  const { battleState, setGamePhase, startBattle } = useFighting();
+  const { battleState, setGamePhase, startCharacterSelection } = useFighting();
   
-  const bothPlayersHaveCards = battleState.players.every(p => p.nfcCard);
+  const bothPlayersHaveCards = battleState.players.every(p => p.scannedCards.length > 0);
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-4">
@@ -31,7 +31,7 @@ export const PreparationScreen: React.FC = () => {
         </div>
         
         <Button 
-          onClick={startBattle}
+          onClick={startCharacterSelection}
           disabled={!bothPlayersHaveCards}
           className={`${
             bothPlayersHaveCards 
@@ -40,7 +40,7 @@ export const PreparationScreen: React.FC = () => {
           }`}
         >
           <Play className="h-4 w-4 mr-2" />
-          Start Battle
+          Choose Characters
         </Button>
       </div>
 
@@ -55,8 +55,8 @@ export const PreparationScreen: React.FC = () => {
             bothPlayersHaveCards ? 'text-green-300' : 'text-yellow-300'
           }`}>
             {bothPlayersHaveCards 
-              ? '✅ Both players ready - Click Start Battle!' 
-              : '⏳ Waiting for both players to scan their NFC cards'
+              ? '✅ Both players ready - Click Choose Characters!' 
+              : '⏳ Waiting for both players to scan their NFC cards (up to 3 each)'
             }
           </p>
         </div>
@@ -71,25 +71,45 @@ export const PreparationScreen: React.FC = () => {
               <div className="text-center mb-4">
                 <h2 className="text-xl font-bold text-white mb-2">{player.name}</h2>
                 <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                  player.nfcCard 
+                  player.scannedCards.length > 0 
                     ? 'bg-green-900/30 text-green-300 border border-green-500/30' 
                     : 'bg-red-900/30 text-red-300 border border-red-500/30'
                 }`}>
-                  {player.nfcCard ? '✅ Card Scanned' : '❌ No Card'}
+                  {player.scannedCards.length > 0 ? `✅ ${player.scannedCards.length} Cards Scanned` : '❌ No Cards'}
                 </div>
               </div>
 
-              {/* NFC Card Display - Always show, even during preparation */}
-              <NFCCardDisplay 
-                card={player.nfcCard}
-                playerId={player.id}
-              />
+              {/* Multiple Card Display */}
+              <div className="space-y-4">
+                {player.scannedCards.length > 0 ? (
+                  <div className="grid gap-2">
+                    {player.scannedCards.map((card, index) => (
+                      <div key={card.id} className="border border-purple-400/50 rounded p-2">
+                        <div className="text-center">
+                          <h4 className="text-white font-medium">{card.name}</h4>
+                          <p className="text-xs text-gray-400">Card {index + 1} - HP: {card.hp}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center p-6 border-2 border-dashed border-gray-600 rounded">
+                    <p className="text-gray-400 mb-4">No Cards Scanned</p>
+                  </div>
+                )}
+                
+                {/* Scan button */}
+                <NFCCardDisplay 
+                  playerId={player.id}
+                  scannedCardsCount={player.scannedCards.length}
+                />
+              </div>
 
               {/* Instructions */}
-              {!player.nfcCard && (
+              {player.scannedCards.length === 0 && (
                 <div className="mt-4 p-3 bg-blue-900/30 rounded-lg border border-blue-500/30">
                   <p className="text-blue-300 text-sm text-center">
-                    🔵 Tap "Scan NFC Card" above to load your character
+                    🔵 Scan up to 3 NFC cards to build your deck
                   </p>
                 </div>
               )}
@@ -104,10 +124,10 @@ export const PreparationScreen: React.FC = () => {
           <CardContent className="p-6">
             <h3 className="text-lg font-bold text-white mb-3">How to Prepare:</h3>
             <div className="space-y-2 text-purple-200">
-              <p>1. Each player must scan their NFC card using the "Scan NFC Card" button</p>
-              <p>2. Once both players have valid cards, the "Start Battle" button will become active</p>
-              <p>3. During battle, card scanning will be disabled until the fight ends</p>
-              <p>4. Your card contains your character's HP, Burst (B), Guts (G), and Slash (S) attack values</p>
+              <p>1. Each player can scan up to 3 NFC cards using the "Scan NFC Card" button</p>
+              <p>2. Once both players have at least 1 card, the "Choose Characters" button will become active</p>
+              <p>3. You'll then select which character you want to use in battle</p>
+              <p>4. Each card contains HP, Burst (B), Guts (G), and Slash (S) attack values</p>
             </div>
           </CardContent>
         </Card>
