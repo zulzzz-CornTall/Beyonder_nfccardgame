@@ -20,8 +20,21 @@ export interface ParsedNFCData {
 
 export function parseNFCText(text: string): ParsedNFCData | null {
   try {
-    const lines = text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+    // Remove all Unicode control characters and normalize whitespace
+    const cleanText = text
+      .replace(/[\u0000-\u001F\u007F-\u009F\u200B-\u200D\uFEFF]/g, '') // Remove control chars and zero-width chars
+      .replace(/\u00A0/g, ' ') // Replace non-breaking spaces with regular spaces
+      .replace(/\u202F/g, ' ') // Replace narrow no-break spaces
+      .trim();
+
+    const lines = cleanText
+      .split(/[\r\n]+/) // Split on any newline combination
+      .map(line => line.trim())
+      .filter(line => line.length > 0);
+    
     const data: Partial<ParsedNFCData> = {};
+
+    console.log('Parsing NFC text lines:', lines);
 
     for (const line of lines) {
       const colonIndex = line.indexOf(':');
@@ -29,6 +42,8 @@ export function parseNFCText(text: string): ParsedNFCData | null {
 
       const key = line.substring(0, colonIndex).trim().toLowerCase();
       const value = line.substring(colonIndex + 1).trim();
+
+      console.log(`Parsing line - Key: "${key}", Value: "${value}"`);
 
       switch (key) {
         case 'imgurl':
@@ -56,14 +71,27 @@ export function parseNFCText(text: string): ParsedNFCData | null {
       }
     }
 
+    console.log('Parsed data:', data);
+
     // Validate all required fields are present
     if (data.imageUrl && data.name && 
         typeof data.hp === 'number' && 
         typeof data.burst === 'number' && 
         typeof data.guts === 'number' && 
         typeof data.slash === 'number') {
+      console.log('NFC parsing successful:', data);
       return data as ParsedNFCData;
     }
+
+    console.error('NFC parsing failed - missing required fields:', {
+      hasImageUrl: !!data.imageUrl,
+      hasName: !!data.name,
+      hasHP: typeof data.hp === 'number',
+      hasBurst: typeof data.burst === 'number',
+      hasGuts: typeof data.guts === 'number',
+      hasSlash: typeof data.slash === 'number',
+      actualData: data
+    });
 
     return null;
   } catch (error) {
