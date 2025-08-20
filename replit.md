@@ -1,6 +1,13 @@
 # Overview
 
-NFC Fighter is a React-based card battle game featuring a roulette-style combat system. Players use NFC cards to battle in turn-based combat where attack selection is combined with roulette spinning to determine outcomes. The game includes a rock-paper-scissors style effectiveness system with three attack types (burst, guts, slash) and provides an engaging visual experience with 3D elements and audio feedback.
+NFC Fighter is a React-based card battle game featuring a roulette-style combat system with real NFC card integration. Players scan physical NFC cards containing character data to battle in turn-based combat where attack selection is combined with roulette spinning to determine outcomes. The game includes a rock-paper-scissors style effectiveness system with three attack types (burst, guts, slash) and provides an engaging visual experience with 3D elements and audio feedback.
+
+## Recent Changes (August 20, 2025)
+- **NFC Card Integration**: Added real NFC scanning functionality using Web NFC API
+- **Card Data Format**: Implemented parser for specific NFC text format (Imgurl, Name, HP, B, G, S)
+- **Enhanced UI**: Updated card display to show HP and individual attack values (B/G/S)
+- **Graceful Fallback**: Mock scanning for devices without NFC support
+- **Auto Permission**: Automatic NFC permission request with user feedback
 
 # User Preferences
 
@@ -32,6 +39,8 @@ Preferred communication style: Simple, everyday language.
 - **Roulette Mechanics**: Random value generation for turn order determination
 - **Player Management**: Health tracking, attack selection, and NFC card integration
 - **Round Resolution**: Sequential battle processing with damage calculation and win conditions
+- **NFC Integration**: Web NFC API implementation with text parsing for card data (Imgurl, Name, HP, B/G/S format)
+- **Card Management**: Dynamic character loading from physical NFC cards with graceful fallback to mock data
 
 ## Backend Architecture
 - **Express.js Server**: RESTful API server with middleware for logging and error handling

@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 import { GamePhase, Player, BattleState, BattleResult, AttackType } from '@/types/game';
 import { calculateDamage, determineRoundWinner, createMockNFCCard, getWinReason } from '@/lib/gameLogic';
+import { scanNFCCard, isNFCSupported, requestNFCPermission, createNFCCardFromParsedData, mockNFCScan } from '@/lib/nfc';
 
 interface FightingState {
   gamePhase: GamePhase;
@@ -13,7 +14,7 @@ interface FightingState {
   selectAttack: (playerId: 1 | 2, attack: AttackType) => void;
   resolveRound: () => void;
   resetBattle: () => void;
-  scanNFCCard: (playerId: 1 | 2) => void;
+  scanNFCCard: (playerId: 1 | 2) => Promise<void>;
 }
 
 const createInitialPlayer = (id: 1 | 2): Player => ({
@@ -21,7 +22,7 @@ const createInitialPlayer = (id: 1 | 2): Player => ({
   name: `Player ${id}`,
   health: 100,
   maxHealth: 100,
-  nfcCard: createMockNFCCard(id)
+  nfcCard: undefined  // Start without NFC card - players must scan to get one
 });
 
 const initialBattleState: BattleState = {
@@ -133,21 +134,80 @@ export const useFighting = create<FightingState>()(
     },
     
     
-    scanNFCCard: (playerId) => {
-      // Mock NFC card scanning
-      const { battleState } = get();
-      const newCard = createMockNFCCard(playerId);
-      
-      const updatedPlayers = battleState.players.map(player => 
-        player.id === playerId ? { ...player, nfcCard: newCard } : player
-      ) as [Player, Player];
-      
-      set({
-        battleState: {
-          ...battleState,
-          players: updatedPlayers
+    scanNFCCard: async (playerId) => {
+      try {
+        const { battleState } = get();
+        
+        // Check if NFC is supported
+        if (!isNFCSupported()) {
+          console.log('NFC not supported, using mock scan');
+          // Fallback to mock for testing
+          const parsedData = await mockNFCScan();
+          const newCard = createNFCCardFromParsedData(parsedData, playerId);
+          
+          const updatedPlayers = battleState.players.map(player => 
+            player.id === playerId ? { ...player, nfcCard: newCard } : player
+          ) as [Player, Player];
+          
+          set({
+            battleState: {
+              ...battleState,
+              players: updatedPlayers
+            }
+          });
+          return;
         }
-      });
+
+        // Request NFC permission first
+        const hasPermission = await requestNFCPermission();
+        if (!hasPermission) {
+          throw new Error('NFC permission not granted');
+        }
+
+        // Scan the NFC card
+        const parsedData = await scanNFCCard();
+        if (!parsedData) {
+          throw new Error('Could not read NFC card data');
+        }
+
+        // Create NFC card from parsed data
+        const newCard = createNFCCardFromParsedData(parsedData, playerId);
+        
+        const updatedPlayers = battleState.players.map(player => 
+          player.id === playerId ? { ...player, nfcCard: newCard } : player
+        ) as [Player, Player];
+        
+        set({
+          battleState: {
+            ...battleState,
+            players: updatedPlayers
+          }
+        });
+
+        console.log(`NFC card scanned successfully for Player ${playerId}:`, newCard);
+        
+      } catch (error) {
+        console.error('NFC scan failed:', error);
+        
+        // Show user-friendly error and fallback to mock
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        alert(`NFC scan failed: ${errorMessage}. Using mock card for testing.`);
+        
+        const { battleState } = get();
+        const parsedData = await mockNFCScan();
+        const newCard = createNFCCardFromParsedData(parsedData, playerId);
+        
+        const updatedPlayers = battleState.players.map(player => 
+          player.id === playerId ? { ...player, nfcCard: newCard } : player
+        ) as [Player, Player];
+        
+        set({
+          battleState: {
+            ...battleState,
+            players: updatedPlayers
+          }
+        });
+      }
     }
   }))
 );

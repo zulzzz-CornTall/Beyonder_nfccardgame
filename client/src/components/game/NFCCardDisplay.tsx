@@ -40,27 +40,46 @@ export const NFCCardDisplay: React.FC<NFCCardDisplayProps> = ({ card, playerId }
           <p className="text-xs text-gray-300">NFC Card #{card.id.slice(-6)}</p>
         </div>
 
-        {/* Card Image Placeholder */}
-        <div className="w-16 h-16 mx-auto mb-4 bg-gray-700 rounded-lg flex items-center justify-center">
-          <span className="text-2xl">⚡</span>
+        {/* Card Image */}
+        <div className="w-16 h-16 mx-auto mb-4 bg-gray-700 rounded-lg flex items-center justify-center overflow-hidden">
+          {card.imageUrl ? (
+            <img 
+              src={card.imageUrl} 
+              alt={card.name}
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                // Fallback to icon if image fails to load
+                e.currentTarget.style.display = 'none';
+                e.currentTarget.nextElementSibling?.setAttribute('style', 'display: block');
+              }}
+            />
+          ) : null}
+          <span className="text-2xl" style={{ display: card.imageUrl ? 'none' : 'block' }}>⚡</span>
         </div>
 
         {/* Stats */}
         <div className="space-y-2 text-sm">
           <div className="flex justify-between items-center">
             <span className="text-gray-300 flex items-center">
-              <Zap className="h-3 w-3 mr-1" />
-              Attack
+              <Shield className="h-3 w-3 mr-1" />
+              HP
             </span>
-            <span className="text-white font-bold">{card.attack}</span>
+            <span className="text-white font-bold">{card.hp}</span>
           </div>
           
           <div className="flex justify-between items-center">
-            <span className="text-gray-300 flex items-center">
-              <Shield className="h-3 w-3 mr-1" />
-              Defense
-            </span>
-            <span className="text-white font-bold">{card.defense}</span>
+            <span className="text-gray-300">B (Burst)</span>
+            <span className="text-red-400 font-bold">{card.burst}</span>
+          </div>
+          
+          <div className="flex justify-between items-center">
+            <span className="text-gray-300">G (Guts)</span>
+            <span className="text-green-400 font-bold">{card.guts}</span>
+          </div>
+          
+          <div className="flex justify-between items-center">
+            <span className="text-gray-300">S (Slash)</span>
+            <span className="text-blue-400 font-bold">{card.slash}</span>
           </div>
           
           <div className="flex justify-between items-center">

@@ -113,21 +113,27 @@ export function getWinReason(winnerAttack: AttackType, loserAttack: AttackType):
 
 export function createMockNFCCard(playerId: 1 | 2) {
   const cards = [
-    { name: 'Fire Warrior', element: 'burst' as AttackType, attack: 80, defense: 60 },
-    { name: 'Earth Guardian', element: 'guts' as AttackType, attack: 60, defense: 80 },
-    { name: 'Wind Blade', element: 'slash' as AttackType, attack: 70, defense: 70 },
-    { name: 'Lightning Strike', element: 'burst' as AttackType, attack: 90, defense: 50 },
-    { name: 'Stone Wall', element: 'guts' as AttackType, attack: 50, defense: 90 },
-    { name: 'Swift Assassin', element: 'slash' as AttackType, attack: 85, defense: 55 }
+    { name: 'Fire Warrior', element: 'burst' as AttackType, hp: 100, burst: 80, guts: 40, slash: 60, imageUrl: '/textures/grass.png' },
+    { name: 'Earth Guardian', element: 'guts' as AttackType, hp: 120, burst: 40, guts: 80, slash: 50, imageUrl: '/textures/grass.png' },
+    { name: 'Wind Blade', element: 'slash' as AttackType, hp: 90, burst: 50, guts: 60, slash: 70, imageUrl: '/textures/grass.png' },
+    { name: 'Lightning Strike', element: 'burst' as AttackType, hp: 85, burst: 90, guts: 30, slash: 55, imageUrl: '/textures/grass.png' },
+    { name: 'Stone Wall', element: 'guts' as AttackType, hp: 140, burst: 30, guts: 90, slash: 40, imageUrl: '/textures/grass.png' },
+    { name: 'Swift Assassin', element: 'slash' as AttackType, hp: 80, burst: 55, guts: 45, slash: 85, imageUrl: '/textures/grass.png' }
   ];
 
   const card = cards[Math.floor(Math.random() * cards.length)];
   return {
     id: `card_${playerId}_${Date.now()}`,
     name: card.name,
-    attack: card.attack,
-    defense: card.defense,
+    hp: card.hp,
+    burst: card.burst,
+    guts: card.guts,
+    slash: card.slash,
+    imageUrl: card.imageUrl,
     element: card.element,
-    image: `/textures/grass.png` // Using available texture as placeholder
+    // Legacy fields for backward compatibility
+    attack: card.burst, // Use burst as default attack
+    defense: card.hp / 2, // Derive defense from HP
+    image: card.imageUrl
   };
 }

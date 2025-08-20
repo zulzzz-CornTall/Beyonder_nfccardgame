@@ -15,9 +15,15 @@ export interface Player {
 export interface NFCCard {
   id: string;
   name: string;
+  hp: number;
+  burst: number;  // B: burst attack damage
+  guts: number;   // G: guts attack damage
+  slash: number;  // S: slash attack damage
+  imageUrl: string; // Imgurl from NFC
+  element: AttackType;
+  // Legacy fields for backward compatibility
   attack: number;
   defense: number;
-  element: AttackType;
   image: string;
 }
 
