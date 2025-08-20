@@ -74,24 +74,23 @@ export const useFighting = create<FightingState>()(
 
     startBattle: () => {
       const { battleState } = get();
-      // Only start battle if both players have scanned cards
-      const bothPlayersHaveCards = battleState.players.every(p => p.scannedCards.length > 0);
-
-      if (!bothPlayersHaveCards) {
-        alert('Both players must scan at least one NFC card before starting the battle!');
+      // Only start battle if both players have selected their characters
+      const bothPlayersSelectedCharacters = battleState.players.every(p => p.selectedCard);
+      
+      if (!bothPlayersSelectedCharacters) {
+        alert('Both players must select their characters before starting the battle!');
         return;
       }
 
-      // Clear any previously selected characters and start with character selection
+      // Set health based on selected character's current HP
       const updatedPlayers = battleState.players.map(player => ({
         ...player,
-        selectedCard: undefined,
-        health: 100,
-        maxHealth: 100
+        health: player.selectedCard!.currentHp,
+        maxHealth: player.selectedCard!.hp
       })) as [Player, Player];
 
       set({
-        gamePhase: 'character-selection',
+        gamePhase: 'battle',
         battleState: {
           ...battleState,
           players: updatedPlayers,
@@ -168,24 +167,43 @@ export const useFighting = create<FightingState>()(
       // Get current health values before any updates
       const [currentPlayer1, currentPlayer2] = battleState.players;
 
-      // Apply damage only to the losing player
+      // Apply damage only to the selected card of the losing player
       const updatedPlayers = battleState.players.map(player => {
         if (player.id === loser.id) {
-          const newHealth = Math.max(0, player.health - battleResult.damage);
-          console.log(`Player ${player.id} (${player.selectedCard?.name}) took ${battleResult.damage} damage. Health: ${player.health} -> ${newHealth}`);
-          return { 
+          // Update the selected card's health and sync player health
+          const selectedCard = player.selectedCard!;
+          const newCardHealth = Math.max(0, selectedCard.currentHp - battleResult.damage);
+          
+          // Update the selected card in the scannedCards array
+          const updatedScannedCards = player.scannedCards.map(card => 
+            card.id === selectedCard.id 
+              ? { ...card, currentHp: newCardHealth }
+              : card  // Other cards remain unchanged
+          );
+          
+          // Update the selected card reference
+          const updatedSelectedCard = {
+            ...selectedCard,
+            currentHp: newCardHealth
+          };
+          
+          console.log(`Player ${player.id} (${selectedCard.name}) took ${battleResult.damage} damage. Health: ${selectedCard.currentHp} -> ${newCardHealth}`);
+          console.log(`Other cards in Player ${player.id}'s collection remain unaffected`);
+          
+          return {
             ...player,
-            health: newHealth,
+            health: newCardHealth,  // Sync player health with selected card
+            scannedCards: updatedScannedCards,
+            selectedCard: updatedSelectedCard,
             selectedAttack: undefined,
             rpsChoice: undefined,
           };
         } else {
-          console.log(`Player ${player.id} (${player.selectedCard?.name}) won and took no damage. Health remains: ${player.health}`);
-          return { 
+          console.log(`Player ${player.id} (${player.selectedCard?.name}) won and took no damage. Health remains: ${player.selectedCard?.currentHp}`);
+          return {
             ...player,
             selectedAttack: undefined,
             rpsChoice: undefined,
-            // Explicitly keep the current health unchanged
           };
         }
       }) as [Player, Player];
@@ -207,17 +225,30 @@ export const useFighting = create<FightingState>()(
 
       if (gameWinner) {
         setTimeout(() => set({ gamePhase: 'results' }), 2000);
-      } else {
-        // After damage, go back to character selection for next round
-        setTimeout(() => {
-          get().startCharacterSelection();
-        }, 3000);
       }
+      // Continue battle for next round - no need to go back to character selection
+      // Players keep their selected characters until the battle ends
     },
 
     resetBattle: () => {
+      // Reset all card health back to max when resetting battle
+      const resetPlayers = initialBattleState.players.map(player => ({
+        ...player,
+        scannedCards: player.scannedCards.map(card => ({
+          ...card,
+          currentHp: card.hp  // Reset all cards to full health
+        })),
+        selectedCard: player.selectedCard ? {
+          ...player.selectedCard,
+          currentHp: player.selectedCard.hp
+        } : undefined
+      })) as [Player, Player];
+
       set({
-        battleState: initialBattleState,
+        battleState: {
+          ...initialBattleState,
+          players: resetPlayers
+        },
         gamePhase: 'menu'
       });
     },

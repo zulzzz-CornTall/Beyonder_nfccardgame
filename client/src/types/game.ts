@@ -17,6 +17,7 @@ export interface NFCCard {
   id: string;
   name: string;
   hp: number;
+  currentHp: number;  // Current health during battle - starts same as hp
   burst: number;  // B: burst attack damage
   guts: number;   // G: guts attack damage
   slash: number;  // S: slash attack damage

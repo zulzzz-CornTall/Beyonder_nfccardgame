@@ -138,6 +138,7 @@ export function createNFCCardFromParsedData(data: ParsedNFCData, playerId: 1 | 2
     id: `nfc_${playerId}_${Date.now()}`,
     name: data.name,
     hp: data.hp,
+    currentHp: data.hp,  // Initialize current HP to max HP
     burst: data.burst,
     guts: data.guts,
     slash: data.slash,

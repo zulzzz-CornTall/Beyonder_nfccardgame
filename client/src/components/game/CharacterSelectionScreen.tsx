@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useFighting } from '@/lib/stores/useFighting';
-import { NFCCard } from '@/types/game';
+import { NFCCard, Player } from '@/types/game';
 import { getAttackColor, getAttackName } from '@/lib/gameLogic';
 import { ArrowLeft, Play, Shield } from 'lucide-react';
 
@@ -29,6 +29,9 @@ export const CharacterSelectionScreen: React.FC = () => {
             <div className="text-center mb-3">
               <h3 className="font-bold text-white text-lg">{card.name}</h3>
               <p className="text-xs text-gray-300">Card {index + 1}</p>
+              {card.currentHp < card.hp && (
+                <p className="text-red-400 text-xs font-bold mt-1">🩹 DAMAGED</p>
+              )}
               {isSelected && (
                 <p className="text-yellow-400 text-sm font-bold mt-1">✅ SELECTED</p>
               )}
@@ -48,7 +51,9 @@ export const CharacterSelectionScreen: React.FC = () => {
                   <Shield className="h-3 w-3 mr-1" />
                   HP
                 </span>
-                <span className="text-white font-bold">{card.hp}</span>
+                <span className={`font-bold ${card.currentHp < card.hp ? 'text-red-400' : 'text-white'}`}>
+                  {card.currentHp}/{card.hp}
+                </span>
               </div>
 
               <div className="flex justify-between items-center">
