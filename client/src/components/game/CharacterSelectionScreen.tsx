@@ -184,16 +184,31 @@ export const CharacterSelectionScreen: React.FC = () => {
 
               {/* Character Cards Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                {player.scannedCards.map((card, index) => 
-                  renderCard(card, index, player.id, player.selectedCard?.id === card.id)
+                {player.scannedCards.length > 0 ? (
+                  player.scannedCards.map((card, index) => 
+                    renderCard(card, index, player.id, player.selectedCard?.id === card.id)
+                  )
+                ) : (
+                  <div className="col-span-3 p-6 bg-yellow-900/30 rounded-lg border border-yellow-500/30 text-center">
+                    <p className="text-yellow-300 font-semibold">No cards scanned yet!</p>
+                    <p className="text-yellow-200 text-sm mt-1">Go back to scan your NFC cards first.</p>
+                  </div>
                 )}
               </div>
 
               {/* Instructions */}
-              {!player.selectedCard && (
-                <div className="mt-4 p-3 bg-blue-900/30 rounded-lg border border-blue-500/30">
-                  <p className="text-blue-300 text-sm text-center">
-                    🔵 Click on a card above to select your character for battle
+              {player.scannedCards.length > 0 ? (
+                !player.selectedCard && (
+                  <div className="mt-4 p-3 bg-blue-900/30 rounded-lg border border-blue-500/30">
+                    <p className="text-blue-300 text-sm text-center">
+                      🔵 Click on a card above to select your character for battle
+                    </p>
+                  </div>
+                )
+              ) : (
+                <div className="mt-4 p-3 bg-red-900/30 rounded-lg border border-red-500/30">
+                  <p className="text-red-300 text-sm text-center">
+                    ⚠️ Please return to preparation to scan your NFC cards
                   </p>
                 </div>
               )}

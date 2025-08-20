@@ -7,7 +7,7 @@ import { ArrowLeft, Play } from 'lucide-react';
 
 export const PreparationScreen: React.FC = () => {
   const { battleState, setGamePhase, startCharacterSelection, startBattle } = useFighting();
-  
+
   const bothPlayersHaveCards = battleState.players.every(p => p.scannedCards.length > 0);
 
   return (
@@ -22,26 +22,19 @@ export const PreparationScreen: React.FC = () => {
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Menu
         </Button>
-        
+
         <div className="text-center">
           <h1 className="text-2xl font-bold text-white">Preparation Phase</h1>
           <p className="text-purple-300 text-sm">
             Both players must scan their NFC cards before battle
           </p>
         </div>
-        
+
         <Button 
           onClick={() => {
-            if (bothPlayersHaveCards) {
-              startBattle();
-            }
+            startBattle();
           }}
-          disabled={!bothPlayersHaveCards}
-          className={`${
-            bothPlayersHaveCards 
-              ? 'bg-green-600 hover:bg-green-700 text-white' 
-              : 'bg-gray-600 text-gray-400 cursor-not-allowed'
-          }`}
+          className="bg-green-600 hover:bg-green-700 text-white"
         >
           <Play className="h-4 w-4 mr-2" />
           Start Battle
@@ -59,7 +52,7 @@ export const PreparationScreen: React.FC = () => {
             bothPlayersHaveCards ? 'text-green-300' : 'text-yellow-300'
           }`}>
             {bothPlayersHaveCards 
-              ? '✅ Both players ready - Click Choose Characters!' 
+              ? '✅ Both players ready - Click Start Battle!' 
               : '⏳ Waiting for both players to scan their NFC cards (up to 3 each)'
             }
           </p>
@@ -101,7 +94,7 @@ export const PreparationScreen: React.FC = () => {
                     <p className="text-gray-400 mb-4">No Cards Scanned</p>
                   </div>
                 )}
-                
+
                 {/* Scan button */}
                 <NFCCardDisplay 
                   playerId={player.id}
@@ -113,7 +106,7 @@ export const PreparationScreen: React.FC = () => {
               {player.scannedCards.length === 0 && (
                 <div className="mt-4 p-3 bg-blue-900/30 rounded-lg border border-blue-500/30">
                   <p className="text-blue-300 text-sm text-center">
-                    🔵 Scan up to 3 NFC cards to build your deck
+                    🔵 Scan your NFC cards and click Start Battle when ready
                   </p>
                 </div>
               )}
@@ -129,7 +122,7 @@ export const PreparationScreen: React.FC = () => {
             <h3 className="text-lg font-bold text-white mb-3">How to Prepare:</h3>
             <div className="space-y-2 text-purple-200">
               <p>1. Each player can scan up to 3 NFC cards using the "Scan NFC Card" button</p>
-              <p>2. Once both players have at least 1 card, the "Choose Characters" button will become active</p>
+              <p>2. Once both players have at least 1 card, the "Start Battle" button will become active</p>
               <p>3. You'll then select which character you want to use in battle</p>
               <p>4. Each card contains HP, Burst (B), Guts (G), and Slash (S) attack values</p>
             </div>
