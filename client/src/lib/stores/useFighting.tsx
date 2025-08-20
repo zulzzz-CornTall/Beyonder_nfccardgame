@@ -169,19 +169,21 @@ export const useFighting = create<FightingState>()(
       const updatedPlayers = battleState.players.map(player => {
         if (player.id === loser.id) {
           const newHealth = Math.max(0, player.health - battleResult.damage);
-          console.log(`Player ${player.id} took ${battleResult.damage} damage. Health: ${player.health} -> ${newHealth}`);
+          console.log(`Player ${player.id} (${player.selectedCard?.name}) took ${battleResult.damage} damage. Health: ${player.health} -> ${newHealth}`);
           return { 
             ...player, 
             health: newHealth,
             selectedAttack: undefined,
             rpsChoice: undefined,
           };
+        } else {
+          console.log(`Player ${player.id} (${player.selectedCard?.name}) won and took no damage. Health remains: ${player.health}`);
+          return { 
+            ...player, 
+            selectedAttack: undefined,
+            rpsChoice: undefined,
+          };
         }
-        return { 
-          ...player, 
-          selectedAttack: undefined,
-          rpsChoice: undefined,
-        };
       }) as [Player, Player];
       
       const gameWinner = updatedPlayers.find(p => p.health <= 0) 
