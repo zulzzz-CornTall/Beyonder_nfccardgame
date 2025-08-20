@@ -11,13 +11,13 @@ export const PreparationScreen: React.FC = () => {
   const bothPlayersHaveCards = battleState.players.every(p => p.scannedCards.length > 0);
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-4">
+    <div className="min-h-screen w-full bg-gradient-to-br from-red-900 via-orange-800 to-yellow-700 p-4">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <Button 
           onClick={() => setGamePhase('menu')}
           variant="outline" 
-          className="border-purple-500/50 text-purple-200 hover:bg-purple-500/10"
+          className="border-black/50 text-yellow-200 hover:bg-black/20"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Menu
@@ -25,7 +25,7 @@ export const PreparationScreen: React.FC = () => {
 
         <div className="text-center">
           <h1 className="text-2xl font-bold text-white">Preparation Phase</h1>
-          <p className="text-purple-300 text-sm">
+          <p className="text-yellow-300 text-sm">
             Both players must scan their NFC cards before battle
           </p>
         </div>
@@ -39,8 +39,8 @@ export const PreparationScreen: React.FC = () => {
           disabled={!bothPlayersHaveCards}
           className={`${
             bothPlayersHaveCards 
-              ? 'bg-green-600 hover:bg-green-700 text-white' 
-              : 'bg-gray-600 text-gray-400 cursor-not-allowed'
+              ? 'bg-gradient-to-r from-red-600 to-yellow-600 hover:from-red-700 hover:to-yellow-700 text-black' 
+              : 'bg-gray-800 text-gray-400 cursor-not-allowed'
           }`}
         >
           <Play className="h-4 w-4 mr-2" />
@@ -52,11 +52,11 @@ export const PreparationScreen: React.FC = () => {
       <div className="text-center mb-6">
         <div className={`p-4 rounded-lg border ${
           bothPlayersHaveCards 
-            ? 'bg-green-900/30 border-green-500/30' 
-            : 'bg-yellow-900/30 border-yellow-500/30'
+            ? 'bg-black/30 border-red-500/50' 
+            : 'bg-black/20 border-yellow-500/50'
         }`}>
           <p className={`text-lg font-semibold ${
-            bothPlayersHaveCards ? 'text-green-300' : 'text-yellow-300'
+            bothPlayersHaveCards ? 'text-red-400' : 'text-yellow-400'
           }`}>
             {bothPlayersHaveCards 
               ? '✅ Both players ready - Click Next to select characters!' 
@@ -69,15 +69,15 @@ export const PreparationScreen: React.FC = () => {
       {/* Player cards setup area */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-6xl mx-auto">
         {battleState.players.map((player) => (
-          <Card key={player.id} className="bg-black/50 backdrop-blur-sm border-purple-500/30">
+          <Card key={player.id} className="bg-black/50 backdrop-blur-sm border-black/50">
             <CardContent className="p-6">
               {/* Player Header */}
               <div className="text-center mb-4">
                 <h2 className="text-xl font-bold text-white mb-2">{player.name}</h2>
                 <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
                   player.scannedCards.length > 0 
-                    ? 'bg-green-900/30 text-green-300 border border-green-500/30' 
-                    : 'bg-red-900/30 text-red-300 border border-red-500/30'
+                    ? 'bg-black/30 text-red-400 border border-red-500/50' 
+                    : 'bg-black/20 text-yellow-400 border border-yellow-500/50'
                 }`}>
                   {player.scannedCards.length > 0 ? `✅ ${player.scannedCards.length} Cards Scanned` : '❌ No Cards'}
                 </div>

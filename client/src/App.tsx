@@ -21,10 +21,10 @@ const GameResults: React.FC = () => {
   const loser = battleState.players.find(p => p.health <= 0);
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-yellow-900 via-orange-900 to-red-900 flex items-center justify-center p-4">
+    <div className="min-h-screen w-full bg-gradient-to-br from-red-900 via-orange-800 to-yellow-700 flex items-center justify-center p-4">
       <div className="text-center space-y-6">
         <div className="space-y-2">
-          <h1 className="text-6xl font-bold text-yellow-400 animate-bounce">
+          <h1 className="text-6xl font-bold text-red-400 animate-bounce">
             🏆 VICTORY! 🏆
           </h1>
           <h2 className="text-3xl font-bold text-white">
@@ -39,12 +39,12 @@ const GameResults: React.FC = () => {
               <div className="space-y-2">
                 <p className="text-green-400 font-bold text-lg">{winner?.name}</p>
                 <p className="text-sm">HP Remaining: {winner?.health}</p>
-                <p className="text-sm">Card: {winner?.selectedCard?.name}</p>
+                <p className="text-sm">Card: {winner?.selectedCharacterCard?.name}</p>
               </div>
               <div className="space-y-2">
                 <p className="text-red-400 font-bold text-lg">{loser?.name}</p>
                 <p className="text-sm">HP Remaining: {loser?.health}</p>
-                <p className="text-sm">Card: {loser?.selectedCard?.name}</p>
+                <p className="text-sm">Card: {loser?.selectedCharacterCard?.name}</p>
               </div>
             </div>
           </div>
@@ -54,7 +54,7 @@ const GameResults: React.FC = () => {
         
         <button
           onClick={resetBattle}
-          className="px-8 py-4 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-semibold rounded-lg text-lg transition-all hover:scale-105"
+          className="px-8 py-4 bg-gradient-to-r from-red-600 to-yellow-600 hover:from-red-700 hover:to-yellow-700 text-black font-semibold rounded-lg text-lg transition-all hover:scale-105"
         >
           Play Again
         </button>
@@ -86,7 +86,6 @@ function App() {
     <div style={{ width: '100vw', height: '100vh', position: 'relative', overflow: 'hidden' }}>
       {gamePhase === 'menu' && <MainMenu />}
       {gamePhase === 'preparation' && <PreparationScreen />}
-      {gamePhase === 'character-selection' && <CharacterSelectionScreen />}
       {gamePhase === 'battle' && <BattleTest />}
       {gamePhase === 'results' && <GameResults />}
       {gamePhase === 'rules' && <RulesModal />}

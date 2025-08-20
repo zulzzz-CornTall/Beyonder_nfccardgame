@@ -8,16 +8,27 @@ export const MainMenu: React.FC = () => {
   const { startPreparation } = useFighting();
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center p-2 sm:p-4">
-      <Card className="w-full max-w-sm sm:max-w-md bg-black/70 backdrop-blur-sm border-purple-500/30">
+    <div className="min-h-screen w-full bg-gradient-to-br from-red-900 via-orange-800 to-yellow-700 flex items-center justify-center p-2 sm:p-4">
+      <Card className="w-full max-w-sm sm:max-w-md bg-black/80 backdrop-blur-sm border-black/50">
         <CardHeader className="text-center pb-4 sm:pb-6">
-          <div className="mx-auto mb-3 sm:mb-4 p-2 sm:p-3 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500">
-            <Zap className="h-6 w-6 sm:h-8 sm:w-8 text-black" />
+          {/* Logo/PDF Display Section */}
+          <div className="mx-auto mb-3 sm:mb-4">
+            <div className="p-3 rounded-lg bg-black/20 border border-black/30">
+              <p className="text-yellow-200 text-xs mb-2">Game Logo:</p>
+              <a 
+                href="/logo.pdf" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="inline-flex items-center px-3 py-1 bg-gradient-to-r from-red-500 to-yellow-400 text-black text-xs font-semibold rounded hover:from-red-600 hover:to-yellow-500 transition-all"
+              >
+                📄 View Logo PDF
+              </a>
+            </div>
           </div>
-          <CardTitle className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+          <CardTitle className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-red-400 to-yellow-400 bg-clip-text text-transparent">
             NFC Fighter
           </CardTitle>
-          <p className="text-gray-300 text-xs sm:text-sm mt-2">
+          <p className="text-yellow-300 text-xs sm:text-sm mt-2">
             Roulette-Based Combat Arena
           </p>
         </CardHeader>
@@ -25,7 +36,7 @@ export const MainMenu: React.FC = () => {
         <CardContent className="space-y-3 sm:space-y-4 px-4 sm:px-6">
           <Button 
             onClick={startPreparation}
-            className="w-full h-10 sm:h-12 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold text-sm sm:text-base"
+            className="w-full h-10 sm:h-12 bg-gradient-to-r from-red-600 to-yellow-600 hover:from-red-700 hover:to-yellow-700 text-black font-semibold text-sm sm:text-base"
           >
             <Sword className="h-4 w-4 sm:h-5 sm:w-5 mr-1 sm:mr-2" />
             Start Battle
@@ -34,7 +45,7 @@ export const MainMenu: React.FC = () => {
           <Button 
             onClick={() => useFighting.getState().setGamePhase('rules')}
             variant="outline"
-            className="w-full h-10 sm:h-12 border-purple-500/50 text-purple-200 hover:bg-purple-500/10 text-sm sm:text-base"
+            className="w-full h-10 sm:h-12 border-black/50 text-yellow-200 hover:bg-black/20 text-sm sm:text-base"
           >
             <Info className="h-4 w-4 sm:h-5 sm:w-5 mr-1 sm:mr-2" />
             Game Rules
@@ -42,7 +53,7 @@ export const MainMenu: React.FC = () => {
           
           <Button 
             variant="outline"
-            className="w-full h-12 border-purple-500/50 text-purple-200 hover:bg-purple-500/10"
+            className="w-full h-12 border-black/50 text-yellow-200 hover:bg-black/20"
             disabled
           >
             <Settings className="h-5 w-5 mr-2" />

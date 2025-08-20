@@ -93,22 +93,22 @@ export const CharacterSelectionScreen: React.FC = () => {
         }`}
         onClick={() => selectPowerCard(playerId, index)}
       >
-        <Card className={`bg-purple-500 bg-opacity-20 border-2 border-purple-500 ${
-          isSelected ? 'border-purple-400' : ''
+        <Card className={`bg-black/30 border-2 border-black/50 ${
+          isSelected ? 'border-red-400' : ''
         }`}>
           <CardContent className="p-4">
             <div className="text-center mb-3">
               <h3 className="font-bold text-white text-lg">{card.name}</h3>
               <p className="text-xs text-gray-300">Power Card</p>
               {isSelected && (
-                <p className="text-purple-400 text-sm font-bold mt-1">✅ SELECTED</p>
+                <p className="text-red-400 text-sm font-bold mt-1">✅ SELECTED</p>
               )}
             </div>
 
             {/* Power Card Icon */}
-            <div className="w-20 h-20 mx-auto mb-3 bg-purple-700 rounded-lg flex items-center justify-center border-2 border-purple-600">
+            <div className="w-20 h-20 mx-auto mb-3 bg-black rounded-lg flex items-center justify-center border-2 border-red-500">
               <div className="text-center">
-                <Zap className="text-2xl text-purple-300 h-8 w-8" />
+                <Zap className="text-2xl text-red-400 h-8 w-8" />
               </div>
             </div>
 
@@ -116,7 +116,7 @@ export const CharacterSelectionScreen: React.FC = () => {
             <div className="space-y-1 text-sm">
               <div className="flex justify-between items-center">
                 <span className="text-gray-300">HP Boost</span>
-                <span className="text-purple-300 font-bold">+{card.hp}%</span>
+                <span className="text-red-400 font-bold">+{card.hp}%</span>
               </div>
 
               <div className="flex justify-between items-center">
@@ -214,7 +214,7 @@ export const CharacterSelectionScreen: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-red-900 via-orange-800 to-yellow-700 p-4">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">

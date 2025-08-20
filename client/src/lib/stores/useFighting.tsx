@@ -319,9 +319,9 @@ export const useFighting = create<FightingState>()(
         const { battleState } = get();
         const currentPlayer = battleState.players.find(p => p.id === playerId);
 
-        // Check if player already has 3 cards
-        if (currentPlayer && currentPlayer.scannedCards.length >= 3) {
-          alert('You can only scan up to 3 cards per player!');
+        // Check if player already has 2 cards (1 character + 1 power)
+        if (currentPlayer && currentPlayer.scannedCards.length >= 2) {
+          alert('You can only scan 2 cards per player (1 character + 1 power)!');
           return;
         }
 
@@ -336,10 +336,20 @@ export const useFighting = create<FightingState>()(
 
           const updatedPlayers = battleState.players.map(player => {
             if (player.id === playerId) {
-              return { 
+              const newScannedCards = [...player.scannedCards, newCard];
+              const newPlayer = { 
                 ...player, 
-                scannedCards: [...player.scannedCards, newCard]
+                scannedCards: newScannedCards
               };
+              
+              // Auto-select cards based on type
+              if (newCard.type === 'character' && !player.selectedCharacterCard) {
+                newPlayer.selectedCharacterCard = newCard;
+              } else if (newCard.type === 'power' && !player.selectedPowerCard) {
+                newPlayer.selectedPowerCard = newCard;
+              }
+              
+              return newPlayer;
             }
             return player;
           }) as [Player, Player];
@@ -352,6 +362,15 @@ export const useFighting = create<FightingState>()(
               players: updatedPlayers
             }
           });
+          
+          // Check if both players are ready for battle (have both character and power cards)
+          const bothPlayersReady = updatedPlayers.every(p => p.selectedCharacterCard && p.selectedPowerCard);
+          if (bothPlayersReady) {
+            console.log('Both players ready, starting battle automatically!');
+            // Auto-start battle
+            setTimeout(() => get().startBattle(), 500); // Small delay for UI feedback
+          }
+          
           return;
         }
 
@@ -372,10 +391,20 @@ export const useFighting = create<FightingState>()(
 
         const updatedPlayers = battleState.players.map(player => {
           if (player.id === playerId) {
-            return { 
+            const newScannedCards = [...player.scannedCards, newCard];
+            const newPlayer = { 
               ...player, 
-              scannedCards: [...player.scannedCards, newCard]
+              scannedCards: newScannedCards
             };
+            
+            // Auto-select cards based on type
+            if (newCard.type === 'character' && !player.selectedCharacterCard) {
+              newPlayer.selectedCharacterCard = newCard;
+            } else if (newCard.type === 'power' && !player.selectedPowerCard) {
+              newPlayer.selectedPowerCard = newCard;
+            }
+            
+            return newPlayer;
           }
           return player;
         }) as [Player, Player];
@@ -386,6 +415,14 @@ export const useFighting = create<FightingState>()(
             players: updatedPlayers
           }
         });
+
+        // Check if both players are ready for battle (have both character and power cards)
+        const bothPlayersReady = updatedPlayers.every(p => p.selectedCharacterCard && p.selectedPowerCard);
+        if (bothPlayersReady) {
+          console.log('Both players ready, starting battle automatically!');
+          // Auto-start battle
+          setTimeout(() => get().startBattle(), 500); // Small delay for UI feedback
+        }
 
         console.log(`NFC card scanned successfully for Player ${playerId}:`, newCard);
         console.log(`Player ${playerId} now has ${updatedPlayers.find(p => p.id === playerId)?.scannedCards.length} cards`);
@@ -400,8 +437,8 @@ export const useFighting = create<FightingState>()(
         const { battleState } = get();
         const currentPlayer = battleState.players.find(p => p.id === playerId);
 
-        // Check if player already has 3 cards
-        if (currentPlayer && currentPlayer.scannedCards.length >= 3) {
+        // Check if player already has 2 cards
+        if (currentPlayer && currentPlayer.scannedCards.length >= 2) {
           return;
         }
 
