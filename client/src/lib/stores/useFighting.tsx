@@ -225,9 +225,12 @@ export const useFighting = create<FightingState>()(
 
       if (gameWinner) {
         setTimeout(() => set({ gamePhase: 'results' }), 2000);
+      } else {
+        // After each round, allow players to change characters
+        setTimeout(() => {
+          get().startCharacterSelection();
+        }, 2000);
       }
-      // Continue battle for next round - no need to go back to character selection
-      // Players keep their selected characters until the battle ends
     },
 
     resetBattle: () => {

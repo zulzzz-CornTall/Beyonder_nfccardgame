@@ -33,18 +33,7 @@ export const PreparationScreen: React.FC = () => {
         <Button 
           onClick={() => {
             if (bothPlayersHaveCards) {
-              // Auto-select first card for each player and start battle directly
-              const { battleState } = useFighting.getState();
-              battleState.players.forEach(player => {
-                if (player.scannedCards.length > 0 && !player.selectedCard) {
-                  useFighting.getState().selectCharacter(player.id, 0); // Select first card
-                }
-              });
-              
-              // Small delay to ensure state updates, then start battle
-              setTimeout(() => {
-                startBattle();
-              }, 100);
+              startCharacterSelection();
             }
           }}
           disabled={!bothPlayersHaveCards}
@@ -55,7 +44,7 @@ export const PreparationScreen: React.FC = () => {
           }`}
         >
           <Play className="h-4 w-4 mr-2" />
-          Start Battle
+          Next: Character Selection
         </Button>
       </div>
 
@@ -70,7 +59,7 @@ export const PreparationScreen: React.FC = () => {
             bothPlayersHaveCards ? 'text-green-300' : 'text-yellow-300'
           }`}>
             {bothPlayersHaveCards 
-              ? '✅ Both players ready - Click Start Battle! (First card will be auto-selected)' 
+              ? '✅ Both players ready - Click Next to select characters!' 
               : '⏳ Waiting for both players to scan their NFC cards (up to 3 each)'
             }
           </p>
@@ -140,8 +129,8 @@ export const PreparationScreen: React.FC = () => {
             <h3 className="text-lg font-bold text-white mb-3">How to Prepare:</h3>
             <div className="space-y-2 text-purple-200">
               <p>1. Each player can scan up to 3 NFC cards using the "Scan NFC Card" button</p>
-              <p>2. Once both players have at least 1 card, click "Start Battle" to begin</p>
-              <p>3. The first scanned card will be automatically selected for battle</p>
+              <p>2. Once both players have at least 1 card, proceed to character selection</p>
+              <p>3. You'll choose which character to use in battle from your scanned cards</p>
               <p>4. Each card contains HP, Burst (B), Guts (G), and Slash (S) attack values</p>
             </div>
           </CardContent>

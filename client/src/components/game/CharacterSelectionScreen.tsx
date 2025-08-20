@@ -98,7 +98,9 @@ export const CharacterSelectionScreen: React.FC = () => {
         <div className="text-center">
           <h1 className="text-2xl font-bold text-white">Character Selection - Round {battleState.currentRound}</h1>
           <p className="text-purple-300 text-sm">
-            Choose your character for this round
+            {battleState.currentRound === 1 
+              ? "Choose your starting character for battle" 
+              : "Choose your character for the next round"}
           </p>
         </div>
         
@@ -224,9 +226,10 @@ export const CharacterSelectionScreen: React.FC = () => {
             <h3 className="text-lg font-bold text-white mb-3">Character Selection:</h3>
             <div className="space-y-2 text-purple-200">
               <p>1. Each player must choose one character from their scanned cards</p>
-              <p>2. Your character's HP will become your health in battle</p>
-              <p>3. Consider the attack values (Burst, Guts, Slash) when choosing</p>
-              <p>4. Once both players select, the battle will begin!</p>
+              <p>2. You can switch to a different character each round if you have multiple cards</p>
+              <p>3. Your character's current HP will become your health in battle</p>
+              <p>4. Consider the attack values (Burst, Guts, Slash) when choosing</p>
+              <p>5. Once both players select, the battle round will begin!</p>
             </div>
           </CardContent>
         </Card>
