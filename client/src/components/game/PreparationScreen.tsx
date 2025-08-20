@@ -6,7 +6,7 @@ import { NFCCardDisplay } from './NFCCardDisplay';
 import { ArrowLeft, Play } from 'lucide-react';
 
 export const PreparationScreen: React.FC = () => {
-  const { battleState, setGamePhase, startCharacterSelection } = useFighting();
+  const { battleState, setGamePhase, startCharacterSelection, startBattle } = useFighting();
   
   const bothPlayersHaveCards = battleState.players.every(p => p.scannedCards.length > 0);
 
