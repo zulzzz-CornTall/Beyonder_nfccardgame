@@ -7,17 +7,62 @@ const EFFECTIVENESS_CHART: Record<AttackType, Record<AttackType, number>> = {
   guts: { slash: 2, burst: 1, guts: 1 }
 };
 
+// Calculate boosted attack damage based on character and power cards
+function calculateBoostedAttack(character: any, powerCard: any, attackType: AttackType): number {
+  if (!character || !powerCard || powerCard.type !== 'power') {
+    // No power card or invalid power card, return base character attack
+    return character?.[attackType] || 0;
+  }
+
+  const baseAttack = character[attackType] || 0;
+  
+  // Map attack type to power card multiplier
+  let multiplier = 1;
+  if (attackType === 'burst') {
+    multiplier = powerCard.rock || 1;  // Burst = Rock
+  } else if (attackType === 'guts') {
+    multiplier = powerCard.paper || 1; // Guts = Paper  
+  } else if (attackType === 'slash') {
+    multiplier = powerCard.scizor || 1; // Slash = Scissors
+  }
+
+  const boostedAttack = baseAttack * multiplier;
+  console.log(`Boosted attack calculation: ${attackType} base=${baseAttack} * multiplier=${multiplier} = ${boostedAttack}`);
+  return boostedAttack;
+}
+
+// Calculate boosted HP based on character and power cards
+function calculateBoostedHP(character: any, powerCard: any): number {
+  if (!character || !powerCard || powerCard.type !== 'power') {
+    return character?.hp || 0;
+  }
+
+  const baseHP = character.hp || 0;
+  const hpBoostPercent = powerCard.hp || 0;
+  const boostedHP = Math.floor(baseHP * (1 + hpBoostPercent / 100));
+  
+  console.log(`Boosted HP calculation: base=${baseHP} * (1 + ${hpBoostPercent}%) = ${boostedHP}`);
+  return boostedHP;
+}
+
 export function calculateDamage(
   attacker: Player,
   defender: Player,
   attackerAttack: AttackType,
   defenderAttack: AttackType
 ): BattleResult {
-  const baseDamage = 25; // Base damage amount
+  // Calculate boosted attack damage using power cards
+  const boostedAttackDamage = calculateBoostedAttack(
+    attacker.selectedCharacterCard, 
+    attacker.selectedPowerCard, 
+    attackerAttack
+  );
+  
   const effectiveness = EFFECTIVENESS_CHART[attackerAttack][defenderAttack];
-  const finalDamage = Math.floor(baseDamage * effectiveness);
+  const finalDamage = Math.floor(boostedAttackDamage * effectiveness);
 
-  console.log(`Damage calculation: ${attackerAttack} vs ${defenderAttack}, effectiveness: ${effectiveness}, damage: ${finalDamage}`);
+  console.log(`Damage calculation: ${attackerAttack} vs ${defenderAttack}`);
+  console.log(`Boosted attack: ${boostedAttackDamage}, effectiveness: ${effectiveness}, final damage: ${finalDamage}`);
 
   return {
     attacker,
@@ -25,6 +70,23 @@ export function calculateDamage(
     damage: finalDamage,
     wasEffective: effectiveness > 1,
     attackerWon: true
+  };
+}
+
+// Helper function to calculate a player's total boosted stats
+export function calculatePlayerStats(player: Player): { hp: number; burst: number; guts: number; slash: number } {
+  const character = player.selectedCharacterCard;
+  const powerCard = player.selectedPowerCard;
+
+  if (!character) {
+    return { hp: 0, burst: 0, guts: 0, slash: 0 };
+  }
+
+  return {
+    hp: calculateBoostedHP(character, powerCard),
+    burst: calculateBoostedAttack(character, powerCard, 'burst'),
+    guts: calculateBoostedAttack(character, powerCard, 'guts'),
+    slash: calculateBoostedAttack(character, powerCard, 'slash')
   };
 }
 
@@ -69,7 +131,7 @@ export function getRPSWinReason(winnerChoice: string, loserChoice: string): stri
     scissors: { paper: 'Scissors cuts Paper!' }
   };
   
-  return reasons[winnerChoice]?.[loserChoice] || 'RPS Winner!';
+  return (reasons as any)[winnerChoice]?.[loserChoice] || 'RPS Winner!';
 }
 
 export function getAttackName(attack: AttackType): string {

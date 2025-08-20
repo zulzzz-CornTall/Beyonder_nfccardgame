@@ -9,7 +9,7 @@ import { NFCCard, AttackType } from '@/types/game';
 // G: (guts attack damage)
 // S: (slash attack damage)
 
-export interface ParsedNFCData {
+export interface ParsedCharacterData {
   imageUrl: string;
   name: string;
   hp: number;
@@ -18,102 +18,120 @@ export interface ParsedNFCData {
   slash: number;
 }
 
+export interface ParsedPowerData {
+  name: string;
+  hp: number;
+  rock: number;
+  paper: number;
+  scizor: number;
+}
+
+export type ParsedNFCData = ParsedCharacterData | ParsedPowerData;
+
 export function parseNFCText(text: string): ParsedNFCData | null {
   try {
     console.log('Raw NFC text received:', text);
-    console.log('Raw NFC text length:', text.length);
-    console.log('Raw NFC text bytes:', Array.from(text).map(c => c.charCodeAt(0)));
     
-    // Much simpler cleaning - only handle basic whitespace
+    // Clean the text
     const cleanText = text
       .replace(/\r\n/g, '\n')  // Normalize line endings
       .replace(/\r/g, '\n')    // Handle old Mac line endings
       .trim();
 
     console.log('Cleaned text:', cleanText);
-    console.log('Cleaned text length:', cleanText.length);
 
-    // Simple line splitting
+    // Split into lines
     const lines = cleanText.split('\n').map(line => line.trim()).filter(line => line.length > 0);
-    
-    const data: Partial<ParsedNFCData> = {};
-
     console.log('Split into lines:', lines);
-    console.log('Number of lines:', lines.length);
 
-    for (const line of lines) {
-      console.log(`Processing line: "${line}"`);
-      
-      // Look for colon anywhere in the line
-      const colonIndex = line.indexOf(':');
-      if (colonIndex === -1) {
-        console.log('Skipping line without colon:', line);
-        continue;
+    // Detect card type by looking for "Power" at the start
+    const isPowerCard = lines.length > 0 && lines[0].toLowerCase().trim() === 'power';
+    console.log('Is Power Card:', isPowerCard);
+
+    if (isPowerCard) {
+      // Parse Power card format
+      const powerData: Partial<ParsedPowerData> = {};
+
+      for (const line of lines.slice(1)) { // Skip first "Power" line
+        const colonIndex = line.indexOf(':');
+        if (colonIndex === -1) continue;
+
+        const key = line.substring(0, colonIndex).trim().toLowerCase();
+        const value = line.substring(colonIndex + 1).trim();
+
+        console.log(`Power card - Key: "${key}", Value: "${value}"`);
+
+        if (key === 'name') {
+          powerData.name = value;
+        } else if (key === 'hp') {
+          const hp = parseInt(value);
+          if (!isNaN(hp)) powerData.hp = hp;
+        } else if (key === 'rock') {
+          const rock = parseInt(value);
+          if (!isNaN(rock)) powerData.rock = rock;
+        } else if (key === 'paper') {
+          const paper = parseInt(value);
+          if (!isNaN(paper)) powerData.paper = paper;
+        } else if (key === 'scizor') {
+          const scizor = parseInt(value);
+          if (!isNaN(scizor)) powerData.scizor = scizor;
+        }
       }
 
-      let key = line.substring(0, colonIndex).trim();
-      let value = line.substring(colonIndex + 1).trim();
+      const result: ParsedPowerData = {
+        name: powerData.name || '',
+        hp: powerData.hp ?? 0,
+        rock: powerData.rock ?? 0,
+        paper: powerData.paper ?? 0,
+        scizor: powerData.scizor ?? 0
+      };
 
-      console.log(`Raw key: "${key}", Raw value: "${value}"`);
+      console.log('Power card parsed result:', result);
+      return result;
+    } else {
+      // Parse Character card format (existing format)
+      const characterData: Partial<ParsedCharacterData> = {};
 
-      // Simpler key normalization
-      const normalizedKey = key.toLowerCase().replace(/\s+/g, '');
+      for (const line of lines) {
+        const colonIndex = line.indexOf(':');
+        if (colonIndex === -1) continue;
 
-      console.log(`Normalized key: "${normalizedKey}"`);
+        const key = line.substring(0, colonIndex).trim().toLowerCase().replace(/\s+/g, '');
+        const value = line.substring(colonIndex + 1).trim();
 
-      // Direct key matching
-      if (normalizedKey === 'imgurl' || normalizedKey.includes('img')) {
-        console.log('Matched imageUrl field, value:', value);
-        data.imageUrl = value;
-      } else if (normalizedKey === 'name') {
-        console.log('Matched name field');
-        data.name = value;
-      } else if (normalizedKey === 'hp') {
-        console.log('Matched HP field');
-        const hp = parseInt(value);
-        console.log(`Parsed HP: ${hp}`);
-        if (!isNaN(hp)) data.hp = hp;
-      } else if (normalizedKey === 'b') {
-        console.log('Matched B (burst) field');
-        const burst = parseInt(value);
-        console.log(`Parsed burst: ${burst}`);
-        if (!isNaN(burst)) data.burst = burst;
-      } else if (normalizedKey === 'g') {
-        console.log('Matched G (guts) field');
-        const guts = parseInt(value);
-        console.log(`Parsed guts: ${guts}`);
-        if (!isNaN(guts)) data.guts = guts;
-      } else if (normalizedKey === 's') {
-        console.log('Matched S (slash) field');
-        const slash = parseInt(value);
-        console.log(`Parsed slash: ${slash}`);
-        if (!isNaN(slash)) data.slash = slash;
-      } else {
-        console.log(`Unknown key: "${normalizedKey}"`);
+        console.log(`Character card - Key: "${key}", Value: "${value}"`);
+
+        if (key === 'imgurl' || key.includes('img')) {
+          characterData.imageUrl = value;
+        } else if (key === 'name') {
+          characterData.name = value;
+        } else if (key === 'hp') {
+          const hp = parseInt(value);
+          if (!isNaN(hp)) characterData.hp = hp;
+        } else if (key === 'b') {
+          const burst = parseInt(value);
+          if (!isNaN(burst)) characterData.burst = burst;
+        } else if (key === 'g') {
+          const guts = parseInt(value);
+          if (!isNaN(guts)) characterData.guts = guts;
+        } else if (key === 's') {
+          const slash = parseInt(value);
+          if (!isNaN(slash)) characterData.slash = slash;
+        }
       }
-    }
 
-    console.log('Parsed data:', data);
+      const result: ParsedCharacterData = {
+        imageUrl: characterData.imageUrl || '',
+        name: characterData.name || '',
+        hp: characterData.hp ?? 0,
+        burst: characterData.burst ?? 0,
+        guts: characterData.guts ?? 0,
+        slash: characterData.slash ?? 0
+      };
 
-    // Return the actual parsed data
-    const result: ParsedNFCData = {
-      imageUrl: data.imageUrl || '',
-      name: data.name || '',
-      hp: data.hp ?? 0,
-      burst: data.burst ?? 0,
-      guts: data.guts ?? 0,
-      slash: data.slash ?? 0
-    };
-
-    console.log('Final result being returned:', result);
-    
-    // Only return if we have at least a name or some stats
-    if (data.name || data.hp || data.burst || data.guts || data.slash) {
+      console.log('Character card parsed result:', result);
       return result;
     }
-    
-    console.error('No valid data found in NFC card');
-    return null;
   } catch (error) {
     console.error('Error parsing NFC text:', error);
     return null;
@@ -121,34 +139,52 @@ export function parseNFCText(text: string): ParsedNFCData | null {
 }
 
 export function createNFCCardFromParsedData(data: ParsedNFCData, playerId: 1 | 2): NFCCard {
-  // Determine element based on highest attack value
-  let element: AttackType = 'burst';
-  let highestValue = data.burst;
+  const timestamp = Date.now();
   
-  if (data.guts > highestValue) {
-    element = 'guts';
-    highestValue = data.guts;
-  }
-  
-  if (data.slash > highestValue) {
-    element = 'slash';
-  }
+  // Check if it's character data or power data
+  if ('burst' in data) {
+    // Character card
+    let element: AttackType = 'burst';
+    let highestValue = data.burst;
+    
+    if (data.guts > highestValue) {
+      element = 'guts';
+      highestValue = data.guts;
+    }
+    
+    if (data.slash > highestValue) {
+      element = 'slash';
+    }
 
-  return {
-    id: `nfc_${playerId}_${Date.now()}`,
-    name: data.name,
-    hp: data.hp,
-    currentHp: data.hp,  // Initialize current HP to max HP
-    burst: data.burst,
-    guts: data.guts,
-    slash: data.slash,
-    imageUrl: data.imageUrl,
-    element: element,
-    // Legacy fields for backward compatibility
-    attack: highestValue,
-    defense: Math.floor(data.hp / 2),
-    image: data.imageUrl
-  };
+    return {
+      id: `character_${playerId}_${timestamp}`,
+      type: 'character',
+      name: data.name,
+      hp: data.hp,
+      currentHp: data.hp,  // Initialize current HP to max HP
+      burst: data.burst,
+      guts: data.guts,
+      slash: data.slash,
+      imageUrl: data.imageUrl,
+      element: element,
+      // Legacy fields for backward compatibility
+      attack: highestValue,
+      defense: Math.floor(data.hp / 2),
+      image: data.imageUrl
+    };
+  } else {
+    // Power card
+    return {
+      id: `power_${playerId}_${timestamp}`,
+      type: 'power',
+      name: data.name,
+      hp: data.hp,  // HP percentage multiplier
+      rock: data.rock,
+      paper: data.paper,
+      scizor: data.scizor,
+      imageUrl: ''  // Power cards might not have images
+    };
+  }
 }
 
 // Check if Web NFC is supported

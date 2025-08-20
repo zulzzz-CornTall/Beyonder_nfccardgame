@@ -18,7 +18,8 @@ interface FightingState {
   resolveRound: () => void;
   resetBattle: () => void;
   scanNFCCard: (playerId: 1 | 2) => Promise<void>;
-  selectCharacter: (playerId: 1 | 2, cardIndex: number) => void;
+  selectCharacterCard: (playerId: 1 | 2, cardIndex: number) => void;
+  selectPowerCard: (playerId: 1 | 2, cardIndex: number) => void;
 }
 
 const createInitialPlayer = (id: 1 | 2): Player => ({
@@ -27,7 +28,8 @@ const createInitialPlayer = (id: 1 | 2): Player => ({
   health: 100,
   maxHealth: 100,
   scannedCards: [],  // Start with no scanned cards
-  selectedCard: undefined  // No character selected yet
+  selectedCharacterCard: undefined,  // No character selected yet
+  selectedPowerCard: undefined       // No power card selected yet
 });
 
 const initialBattleState: BattleState = {
@@ -74,20 +76,26 @@ export const useFighting = create<FightingState>()(
 
     startBattle: () => {
       const { battleState } = get();
-      // Only start battle if both players have selected their characters
-      const bothPlayersSelectedCharacters = battleState.players.every(p => p.selectedCard);
+      // Only start battle if both players have selected both character and power cards
+      const bothPlayersReady = battleState.players.every(p => p.selectedCharacterCard && p.selectedPowerCard);
       
-      if (!bothPlayersSelectedCharacters) {
-        alert('Both players must select their characters before starting the battle!');
+      if (!bothPlayersReady) {
+        alert('Both players must select a character card AND a power card before starting the battle!');
         return;
       }
 
-      // Set health based on selected character's current HP
-      const updatedPlayers = battleState.players.map(player => ({
-        ...player,
-        health: player.selectedCard!.currentHp,
-        maxHealth: player.selectedCard!.hp
-      })) as [Player, Player];
+      // Calculate boosted HP and set health based on power card boosts
+      const updatedPlayers = battleState.players.map(player => {
+        const baseHP = player.selectedCharacterCard!.currentHp;
+        const powerCard = player.selectedPowerCard!;
+        const boostedHP = Math.floor(baseHP * (1 + powerCard.hp / 100));
+        
+        return {
+          ...player,
+          health: boostedHP,
+          maxHealth: boostedHP
+        };
+      }) as [Player, Player];
 
       set({
         gamePhase: 'battle',
@@ -171,7 +179,7 @@ export const useFighting = create<FightingState>()(
       const updatedPlayers = battleState.players.map(player => {
         if (player.id === loser.id) {
           // Update the selected card's health and sync player health
-          const selectedCard = player.selectedCard!;
+          const selectedCard = player.selectedCharacterCard!;
           const newCardHealth = Math.max(0, selectedCard.currentHp - battleResult.damage);
           
           // Update the selected card in the scannedCards array
@@ -181,8 +189,8 @@ export const useFighting = create<FightingState>()(
               : card  // Other cards remain unchanged
           );
           
-          // Update the selected card reference
-          const updatedSelectedCard = {
+          // Update the selected character card reference
+          const updatedSelectedCharacterCard = {
             ...selectedCard,
             currentHp: newCardHealth
           };
@@ -194,12 +202,12 @@ export const useFighting = create<FightingState>()(
             ...player,
             health: newCardHealth,  // Sync player health with selected card
             scannedCards: updatedScannedCards,
-            selectedCard: updatedSelectedCard,
+            selectedCharacterCard: updatedSelectedCharacterCard,
             selectedAttack: undefined,
             rpsChoice: undefined,
           };
         } else {
-          console.log(`Player ${player.id} (${player.selectedCard?.name}) won and took no damage. Health remains: ${player.selectedCard?.currentHp}`);
+          console.log(`Player ${player.id} (${player.selectedCharacterCard?.name}) won and took no damage. Health remains: ${player.selectedCharacterCard?.currentHp}`);
           return {
             ...player,
             selectedAttack: undefined,
@@ -241,10 +249,11 @@ export const useFighting = create<FightingState>()(
           ...card,
           currentHp: card.hp  // Reset all cards to full health
         })),
-        selectedCard: player.selectedCard ? {
-          ...player.selectedCard,
-          currentHp: player.selectedCard.hp
-        } : undefined
+        selectedCharacterCard: player.selectedCharacterCard ? {
+          ...player.selectedCharacterCard,
+          currentHp: player.selectedCharacterCard.hp
+        } : undefined,
+        selectedPowerCard: undefined  // Clear power card selection on reset
       })) as [Player, Player];
 
       set({
@@ -256,16 +265,16 @@ export const useFighting = create<FightingState>()(
       });
     },
 
-    selectCharacter: (playerId, cardIndex) => {
+    selectCharacterCard: (playerId, cardIndex) => {
       const { battleState } = get();
       const updatedPlayers = battleState.players.map(player => {
         if (player.id === playerId) {
           const selectedCard = player.scannedCards[cardIndex];
-          if (!selectedCard) {
-            console.error(`No card found at index ${cardIndex} for player ${playerId}`);
+          if (!selectedCard || selectedCard.type !== 'character') {
+            console.error(`No character card found at index ${cardIndex} for player ${playerId}`);
             return player;
           }
-          return { ...player, selectedCard };
+          return { ...player, selectedCharacterCard: selectedCard };
         }
         return player;
       }) as [Player, Player];
@@ -277,7 +286,31 @@ export const useFighting = create<FightingState>()(
         }
       });
 
-      console.log(`Player ${playerId} selected character: ${updatedPlayers.find(p => p.id === playerId)?.selectedCard?.name}`);
+      console.log(`Player ${playerId} selected character: ${updatedPlayers.find(p => p.id === playerId)?.selectedCharacterCard?.name}`);
+    },
+
+    selectPowerCard: (playerId, cardIndex) => {
+      const { battleState } = get();
+      const updatedPlayers = battleState.players.map(player => {
+        if (player.id === playerId) {
+          const selectedCard = player.scannedCards[cardIndex];
+          if (!selectedCard || selectedCard.type !== 'power') {
+            console.error(`No power card found at index ${cardIndex} for player ${playerId}`);
+            return player;
+          }
+          return { ...player, selectedPowerCard: selectedCard };
+        }
+        return player;
+      }) as [Player, Player];
+
+      set({
+        battleState: {
+          ...battleState,
+          players: updatedPlayers
+        }
+      });
+
+      console.log(`Player ${playerId} selected power card: ${updatedPlayers.find(p => p.id === playerId)?.selectedPowerCard?.name}`);
     },
 
 

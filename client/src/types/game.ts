@@ -8,13 +8,17 @@ export interface Player {
   health: number;
   maxHealth: number;
   selectedAttack?: AttackType;
-  scannedCards: NFCCard[];  // Array of up to 3 scanned cards
-  selectedCard?: NFCCard;   // The character they chose for battle
+  scannedCards: NFCCard[];  // Array of character and power cards
+  selectedCharacterCard?: CharacterCard;   // The character they chose for battle
+  selectedPowerCard?: PowerCard;           // The power card they chose for battle
   rpsChoice?: RPSChoice;
 }
 
-export interface NFCCard {
+export type CardType = 'character' | 'power';
+
+export interface CharacterCard {
   id: string;
+  type: 'character';
   name: string;
   hp: number;
   currentHp: number;  // Current health during battle - starts same as hp
@@ -28,6 +32,19 @@ export interface NFCCard {
   defense: number;
   image: string;
 }
+
+export interface PowerCard {
+  id: string;
+  type: 'power';
+  name: string;
+  hp: number;  // HP percentage multiplier
+  rock: number;  // Rock power level
+  paper: number; // Paper power level
+  scizor: number; // Scissor power level
+  imageUrl: string; // Imgurl from NFC
+}
+
+export type NFCCard = CharacterCard | PowerCard;
 
 export interface BattleState {
   players: [Player, Player];
