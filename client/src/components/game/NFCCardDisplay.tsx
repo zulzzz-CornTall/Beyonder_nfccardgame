@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { NFCCard } from '@/types/game';
 import { useFighting } from '@/lib/stores/useFighting';
@@ -13,10 +13,10 @@ interface NFCCardDisplayProps {
 
 export const NFCCardDisplay: React.FC<NFCCardDisplayProps> = ({ card, playerId }) => {
   const { scanNFCCard, gamePhase } = useFighting();
-  
+
   // Debug logging
   console.log(`NFCCardDisplay for Player ${playerId}:`, card);
-  
+
   // Disable scanning during battle
   const canScan = gamePhase !== 'battle';
 
@@ -24,7 +24,7 @@ export const NFCCardDisplay: React.FC<NFCCardDisplayProps> = ({ card, playerId }
     return (
       <div className="text-center p-6">
         <p className="text-gray-400 mb-4">No NFC Card Detected</p>
-        <Button 
+        <Button
           onClick={async () => {
             if (!canScan) {
               alert('Cannot scan cards during battle! Please wait until the battle ends.');
@@ -40,8 +40,8 @@ export const NFCCardDisplay: React.FC<NFCCardDisplayProps> = ({ card, playerId }
           }}
           disabled={!canScan}
           variant="outline"
-          className={`${canScan 
-            ? 'border-purple-500/50 text-purple-200 hover:bg-purple-500/10' 
+          className={`${canScan
+            ? 'border-purple-500/50 text-purple-200 hover:bg-purple-500/10'
             : 'border-gray-500/30 text-gray-400 cursor-not-allowed'
           }`}
         >
@@ -65,8 +65,8 @@ export const NFCCardDisplay: React.FC<NFCCardDisplayProps> = ({ card, playerId }
         {/* Card Image */}
         <div className="w-16 h-16 mx-auto mb-4 bg-gray-700 rounded-lg flex items-center justify-center overflow-hidden">
           {card.imageUrl ? (
-            <img 
-              src={card.imageUrl} 
+            <img
+              src={card.imageUrl}
               alt={card.name}
               className="w-full h-full object-cover"
               onError={(e) => {
@@ -88,22 +88,22 @@ export const NFCCardDisplay: React.FC<NFCCardDisplayProps> = ({ card, playerId }
             </span>
             <span className="text-white font-bold">{card.hp}</span>
           </div>
-          
+
           <div className="flex justify-between items-center">
             <span className="text-gray-300">B (Burst)</span>
             <span className="text-red-400 font-bold">{card.burst}</span>
           </div>
-          
+
           <div className="flex justify-between items-center">
             <span className="text-gray-300">G (Guts)</span>
             <span className="text-green-400 font-bold">{card.guts}</span>
           </div>
-          
+
           <div className="flex justify-between items-center">
             <span className="text-gray-300">S (Slash)</span>
             <span className="text-blue-400 font-bold">{card.slash}</span>
           </div>
-          
+
           <div className="flex justify-between items-center">
             <span className="text-gray-300">Element</span>
             <span className="text-white font-bold">{getAttackName(card.element)}</span>
@@ -111,7 +111,7 @@ export const NFCCardDisplay: React.FC<NFCCardDisplayProps> = ({ card, playerId }
         </div>
 
         {/* Rescan Button */}
-        <Button 
+        <Button
           onClick={async () => {
             if (!canScan) {
               alert('Cannot scan cards during battle! Please wait until the battle ends.');
@@ -128,8 +128,8 @@ export const NFCCardDisplay: React.FC<NFCCardDisplayProps> = ({ card, playerId }
           disabled={!canScan}
           variant="outline"
           size="sm"
-          className={`w-full mt-4 ${canScan 
-            ? 'border-white/30 text-white hover:bg-white/10' 
+          className={`w-full mt-4 ${canScan
+            ? 'border-white/30 text-white hover:bg-white/10'
             : 'border-gray-500/30 text-gray-400 cursor-not-allowed'
           }`}
         >
