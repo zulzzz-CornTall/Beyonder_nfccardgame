@@ -83,18 +83,25 @@ export function parseNFCText(text: string): ParsedNFCData | null {
 
     console.log('Parsed data:', data);
 
-    // Only use actual data from NFC card - no fake defaults
+    // Return the actual parsed data
     const result: ParsedNFCData = {
       imageUrl: data.imageUrl || '',
       name: data.name || '',
-      hp: data.hp || 0,
-      burst: data.burst || 0,
-      guts: data.guts || 0,
-      slash: data.slash || 0
+      hp: data.hp ?? 0,
+      burst: data.burst ?? 0,
+      guts: data.guts ?? 0,
+      slash: data.slash ?? 0
     };
 
-    console.log('NFC parsing successful:', result);
-    return result;
+    console.log('Final result being returned:', result);
+    
+    // Only return if we have at least a name or some stats
+    if (data.name || data.hp || data.burst || data.guts || data.slash) {
+      return result;
+    }
+    
+    console.error('No valid data found in NFC card');
+    return null;
   } catch (error) {
     console.error('Error parsing NFC text:', error);
     return null;
