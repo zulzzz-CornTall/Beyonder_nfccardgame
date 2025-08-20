@@ -83,14 +83,14 @@ export function parseNFCText(text: string): ParsedNFCData | null {
 
     console.log('Parsed data:', data);
 
-    // Use whatever data we found, fill in defaults for missing fields
+    // Only use actual data from NFC card - no fake defaults
     const result: ParsedNFCData = {
-      imageUrl: data.imageUrl || '/textures/grass.png',
-      name: data.name || 'Unknown Card',
-      hp: data.hp || 100,
-      burst: data.burst || 50,
-      guts: data.guts || 50,
-      slash: data.slash || 50
+      imageUrl: data.imageUrl || '',
+      name: data.name || '',
+      hp: data.hp || 0,
+      burst: data.burst || 0,
+      guts: data.guts || 0,
+      slash: data.slash || 0
     };
 
     console.log('NFC parsing successful:', result);
