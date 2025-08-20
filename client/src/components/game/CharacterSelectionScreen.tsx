@@ -82,23 +82,42 @@ export const CharacterSelectionScreen: React.FC = () => {
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <Button 
-          onClick={() => setGamePhase('preparation')}
+          onClick={() => battleState.currentRound === 1 ? setGamePhase('preparation') : setGamePhase('menu')}
           variant="outline" 
           className="border-purple-500/50 text-purple-200 hover:bg-purple-500/10"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Preparation
+          {battleState.currentRound === 1 ? 'Back to Preparation' : 'Back to Menu'}
         </Button>
         
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-white">Character Selection</h1>
+          <h1 className="text-2xl font-bold text-white">Character Selection - Round {battleState.currentRound}</h1>
           <p className="text-purple-300 text-sm">
-            Each player must choose their character for battle
+            Choose your character for this round
           </p>
         </div>
         
         <Button 
-          onClick={startBattle}
+          onClick={() => {
+            if (bothPlayersSelectedCharacters) {
+              // Set health based on selected characters and go to battle
+              const { battleState, setGamePhase } = useFighting.getState();
+              const updatedPlayers = battleState.players.map(player => ({
+                ...player,
+                health: player.selectedCard!.hp,
+                maxHealth: player.selectedCard!.hp
+              })) as [Player, Player];
+              
+              useFighting.setState({
+                gamePhase: 'battle',
+                battleState: {
+                  ...battleState,
+                  players: updatedPlayers,
+                  phase: 'selecting'
+                }
+              });
+            }
+          }}
           disabled={!bothPlayersSelectedCharacters}
           className={`${
             bothPlayersSelectedCharacters 
@@ -107,7 +126,7 @@ export const CharacterSelectionScreen: React.FC = () => {
           }`}
         >
           <Play className="h-4 w-4 mr-2" />
-          Start Battle
+          Continue to Battle
         </Button>
       </div>
 

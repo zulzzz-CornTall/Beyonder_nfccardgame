@@ -31,7 +31,11 @@ export const PreparationScreen: React.FC = () => {
         </div>
         
         <Button 
-          onClick={startCharacterSelection}
+          onClick={() => {
+            if (bothPlayersHaveCards) {
+              startBattle();
+            }
+          }}
           disabled={!bothPlayersHaveCards}
           className={`${
             bothPlayersHaveCards 
@@ -40,7 +44,7 @@ export const PreparationScreen: React.FC = () => {
           }`}
         >
           <Play className="h-4 w-4 mr-2" />
-          Choose Characters
+          Start Battle
         </Button>
       </div>
 

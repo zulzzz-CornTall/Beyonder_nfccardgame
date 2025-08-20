@@ -55,38 +55,44 @@ export const useFighting = create<FightingState>()(
     
     startCharacterSelection: () => {
       const { battleState } = get();
-      // Only start character selection if both players have at least 1 scanned card
-      const bothPlayersHaveCards = battleState.players.every(p => p.scannedCards.length > 0);
-      
-      if (!bothPlayersHaveCards) {
-        alert('Both players must scan at least one NFC card before character selection!');
-        return;
-      }
+      // Clear selected characters and go to character selection
+      const updatedPlayers = battleState.players.map(player => ({
+        ...player,
+        selectedCard: undefined,
+        selectedAttack: undefined,
+        rpsChoice: undefined
+      })) as [Player, Player];
 
       set({
-        gamePhase: 'character-selection'
+        gamePhase: 'character-selection',
+        battleState: {
+          ...battleState,
+          players: updatedPlayers,
+          phase: 'selecting'
+        }
       });
     },
     
     startBattle: () => {
       const { battleState } = get();
-      // Only start battle if both players have selected their characters
-      const bothPlayersSelectedCharacters = battleState.players.every(p => p.selectedCard);
+      // Only start battle if both players have scanned cards
+      const bothPlayersHaveCards = battleState.players.every(p => p.scannedCards.length > 0);
       
-      if (!bothPlayersSelectedCharacters) {
-        alert('Both players must select their characters before starting the battle!');
+      if (!bothPlayersHaveCards) {
+        alert('Both players must scan at least one NFC card before starting the battle!');
         return;
       }
 
-      // Set health based on selected character's HP
+      // Clear any previously selected characters and start with character selection
       const updatedPlayers = battleState.players.map(player => ({
         ...player,
-        health: player.selectedCard!.hp,
-        maxHealth: player.selectedCard!.hp
+        selectedCard: undefined,
+        health: 100,
+        maxHealth: 100
       })) as [Player, Player];
 
       set({
-        gamePhase: 'battle',
+        gamePhase: 'character-selection',
         battleState: {
           ...battleState,
           players: updatedPlayers,
@@ -196,6 +202,11 @@ export const useFighting = create<FightingState>()(
       
       if (gameWinner) {
         setTimeout(() => set({ gamePhase: 'results' }), 2000);
+      } else {
+        // After damage, go back to character selection for next round
+        setTimeout(() => {
+          get().startCharacterSelection();
+        }, 3000);
       }
     },
     
