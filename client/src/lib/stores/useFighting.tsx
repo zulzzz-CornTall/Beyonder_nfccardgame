@@ -84,16 +84,14 @@ export const useFighting = create<FightingState>()(
         return;
       }
 
-      // Calculate boosted HP and set health based on power card boosts
+      // Use exact HP from character card (no boosts)
       const updatedPlayers = battleState.players.map(player => {
-        const baseHP = player.selectedCharacterCard!.currentHp;
-        const powerCard = player.selectedPowerCard!;
-        const boostedHP = Math.floor(baseHP * (1 + powerCard.hp / 100));
+        const exactHP = player.selectedCharacterCard!.currentHp;
         
         return {
           ...player,
-          health: boostedHP,
-          maxHealth: boostedHP
+          health: exactHP,
+          maxHealth: exactHP
         };
       }) as [Player, Player];
 
