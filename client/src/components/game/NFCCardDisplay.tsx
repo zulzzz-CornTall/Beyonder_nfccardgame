@@ -12,10 +12,13 @@ interface NFCCardDisplayProps {
 }
 
 export const NFCCardDisplay: React.FC<NFCCardDisplayProps> = ({ card, playerId }) => {
-  const { scanNFCCard } = useFighting();
+  const { scanNFCCard, gamePhase } = useFighting();
   
   // Debug logging
   console.log(`NFCCardDisplay for Player ${playerId}:`, card);
+  
+  // Disable scanning during battle
+  const canScan = gamePhase !== 'battle';
 
   if (!card) {
     return (
@@ -23,6 +26,10 @@ export const NFCCardDisplay: React.FC<NFCCardDisplayProps> = ({ card, playerId }
         <p className="text-gray-400 mb-4">No NFC Card Detected</p>
         <Button 
           onClick={async () => {
+            if (!canScan) {
+              alert('Cannot scan cards during battle! Please wait until the battle ends.');
+              return;
+            }
             try {
               console.log(`Starting NFC scan for Player ${playerId}`);
               await scanNFCCard(playerId);
@@ -31,8 +38,12 @@ export const NFCCardDisplay: React.FC<NFCCardDisplayProps> = ({ card, playerId }
               console.error(`NFC scan error for Player ${playerId}:`, error);
             }
           }}
+          disabled={!canScan}
           variant="outline"
-          className="border-purple-500/50 text-purple-200 hover:bg-purple-500/10"
+          className={`${canScan 
+            ? 'border-purple-500/50 text-purple-200 hover:bg-purple-500/10' 
+            : 'border-gray-500/30 text-gray-400 cursor-not-allowed'
+          }`}
         >
           <RefreshCw className="h-4 w-4 mr-2" />
           Scan NFC Card
@@ -102,6 +113,10 @@ export const NFCCardDisplay: React.FC<NFCCardDisplayProps> = ({ card, playerId }
         {/* Rescan Button */}
         <Button 
           onClick={async () => {
+            if (!canScan) {
+              alert('Cannot scan cards during battle! Please wait until the battle ends.');
+              return;
+            }
             try {
               console.log(`Starting NFC rescan for Player ${playerId}`);
               await scanNFCCard(playerId);
@@ -110,9 +125,13 @@ export const NFCCardDisplay: React.FC<NFCCardDisplayProps> = ({ card, playerId }
               console.error(`NFC rescan error for Player ${playerId}:`, error);
             }
           }}
+          disabled={!canScan}
           variant="outline"
           size="sm"
-          className="w-full mt-4 border-white/30 text-white hover:bg-white/10"
+          className={`w-full mt-4 ${canScan 
+            ? 'border-white/30 text-white hover:bg-white/10' 
+            : 'border-gray-500/30 text-gray-400 cursor-not-allowed'
+          }`}
         >
           <RefreshCw className="h-3 w-3 mr-1" />
           Rescan Card

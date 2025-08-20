@@ -5,7 +5,7 @@ import { AttackSelector } from './AttackSelector';
 import { HealthBar } from './HealthBar';
 import { BattleResults } from './BattleResults';
 import { NFCCardDisplay } from './NFCCardDisplay';
-import { RockPaperScissors } from './RockPaperScissors';
+import { InteractiveRPS } from './InteractiveRPS';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { ArrowLeft, RotateCcw } from 'lucide-react';
@@ -51,6 +51,7 @@ export const BattleTest: React.FC = () => {
           <h1 className="text-2xl font-bold text-white">Round {battleState.currentRound}</h1>
           <p className="text-purple-300 text-sm">
             {battleState.phase === 'selecting' && 'Select your attacks'}
+            {battleState.phase === 'rps' && 'Choose Rock, Paper, or Scissors!'}
             {battleState.phase === 'resolving' && 'Determining winner...'}
             {battleState.phase === 'ended' && 'Battle Complete!'}
           </p>
@@ -100,13 +101,13 @@ export const BattleTest: React.FC = () => {
               )}
 
 
-              {/* Rock-Paper-Scissors Display */}
-              {battleState.phase === 'resolving' && player.selectedAttack && (
+              {/* Rock-Paper-Scissors Selection */}
+              {battleState.phase === 'rps' && player.selectedAttack && (
                 <div className="mt-6">
-                  <RockPaperScissors 
+                  <InteractiveRPS 
                     playerId={player.id}
+                    playerName={player.name}
                     selectedAttack={player.selectedAttack}
-                    isResolving={true}
                   />
                 </div>
               )}
@@ -126,9 +127,17 @@ export const BattleTest: React.FC = () => {
         ))}
       </div>
 
-      {/* RPS selection interface */}
-
-      {/* Auto-resolving message when both players selected */}
+      {/* Auto-progress messages */}
+      {battleState.phase === 'rps' && (
+        <div className="text-center mt-6">
+          <div className="p-4 bg-blue-900/30 rounded-lg border border-blue-500/30">
+            <p className="text-blue-300 text-lg font-semibold">
+              🎯 Both attacks selected! Now choose Rock, Paper, or Scissors above.
+            </p>
+          </div>
+        </div>
+      )}
+      
       {battleState.phase === 'resolving' && (
         <div className="text-center mt-6">
           <div className="p-4 bg-yellow-900/30 rounded-lg border border-yellow-500/30">

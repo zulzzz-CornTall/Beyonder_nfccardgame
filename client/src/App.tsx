@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { useFighting } from "@/lib/stores/useFighting";
 import { useAudio } from "@/lib/stores/useAudio";
 import { MainMenu } from "@/components/game/MainMenu";
+import { PreparationScreen } from "@/components/game/PreparationScreen";
 import { BattleTest } from "@/components/game/BattleTest";
 import { RulesModal } from "@/components/game/RulesModal";
 import "@fontsource/inter";
@@ -83,6 +84,7 @@ function App() {
   return (
     <div style={{ width: '100vw', height: '100vh', position: 'relative', overflow: 'hidden' }}>
       {gamePhase === 'menu' && <MainMenu />}
+      {gamePhase === 'preparation' && <PreparationScreen />}
       {gamePhase === 'battle' && <BattleTest />}
       {gamePhase === 'results' && <GameResults />}
       {gamePhase === 'rules' && <RulesModal />}

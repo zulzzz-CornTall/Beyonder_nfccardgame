@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
-import { GamePhase, Player, BattleState, BattleResult, AttackType } from '@/types/game';
+import { GamePhase, Player, BattleState, BattleResult, AttackType, RPSChoice } from '@/types/game';
 import { calculateDamage, determineRoundWinner, createMockNFCCard, getWinReason } from '@/lib/gameLogic';
 import { scanNFCCard, isNFCSupported, requestNFCPermission, createNFCCardFromParsedData, mockNFCScan } from '@/lib/nfc';
 
@@ -10,8 +10,10 @@ interface FightingState {
   
   // Actions
   setGamePhase: (phase: GamePhase) => void;
+  startPreparation: () => void;
   startBattle: () => void;
   selectAttack: (playerId: 1 | 2, attack: AttackType) => void;
+  selectRPS: (playerId: 1 | 2, choice: RPSChoice) => void;
   resolveRound: () => void;
   resetBattle: () => void;
   scanNFCCard: (playerId: 1 | 2) => Promise<void>;
@@ -38,12 +40,31 @@ export const useFighting = create<FightingState>()(
     
     setGamePhase: (phase) => set({ gamePhase: phase }),
     
-    startBattle: () => {
+    startPreparation: () => {
       set({
-        gamePhase: 'battle',
+        gamePhase: 'preparation',
         battleState: {
           ...initialBattleState,
           players: [createInitialPlayer(1), createInitialPlayer(2)]
+        }
+      });
+    },
+    
+    startBattle: () => {
+      const { battleState } = get();
+      // Only start battle if both players have scanned NFC cards
+      const bothPlayersHaveCards = battleState.players.every(p => p.nfcCard);
+      
+      if (!bothPlayersHaveCards) {
+        alert('Both players must scan their NFC cards before starting the battle!');
+        return;
+      }
+
+      set({
+        gamePhase: 'battle',
+        battleState: {
+          ...battleState,
+          phase: 'selecting'
         }
       });
     },
@@ -60,9 +81,33 @@ export const useFighting = create<FightingState>()(
         battleState: {
           ...battleState,
           players: updatedPlayers,
-          phase: bothSelected ? 'resolving' : 'selecting'
+          phase: bothSelected ? 'rps' : 'selecting'
         }
       });
+    },
+
+    selectRPS: (playerId, choice) => {
+      const { battleState } = get();
+      const updatedPlayers = battleState.players.map(player => 
+        player.id === playerId ? { ...player, rpsChoice: choice } : player
+      ) as [Player, Player];
+      
+      const bothSelectedRPS = updatedPlayers.every(p => p.rpsChoice);
+      
+      set({
+        battleState: {
+          ...battleState,
+          players: updatedPlayers,
+          phase: bothSelectedRPS ? 'resolving' : 'rps'
+        }
+      });
+
+      // Auto-resolve after both players select RPS
+      if (bothSelectedRPS) {
+        setTimeout(() => {
+          get().resolveRound();
+        }, 1000);
+      }
     },
     
     
@@ -98,11 +143,13 @@ export const useFighting = create<FightingState>()(
             ...player, 
             health: newHealth,
             selectedAttack: undefined,
+            rpsChoice: undefined,
           };
         }
         return { 
           ...player, 
           selectedAttack: undefined,
+          rpsChoice: undefined,
         };
       }) as [Player, Player];
       

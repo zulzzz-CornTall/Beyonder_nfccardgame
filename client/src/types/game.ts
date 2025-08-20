@@ -1,6 +1,6 @@
 export type AttackType = 'burst' | 'guts' | 'slash';
 
-export type GamePhase = 'menu' | 'battle' | 'results' | 'rules';
+export type GamePhase = 'menu' | 'preparation' | 'battle' | 'results' | 'rules';
 
 export interface Player {
   id: 1 | 2;
@@ -30,7 +30,7 @@ export interface NFCCard {
 export interface BattleState {
   players: [Player, Player];
   currentRound: number;
-  phase: 'selecting' | 'resolving' | 'ended';
+  phase: 'selecting' | 'rps' | 'resolving' | 'ended';
   winner?: 1 | 2;
   lastBattleResult?: BattleResult;
 }

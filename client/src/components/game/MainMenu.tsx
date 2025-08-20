@@ -5,7 +5,7 @@ import { useFighting } from '@/lib/stores/useFighting';
 import { Sword, Info, Settings, Zap } from 'lucide-react';
 
 export const MainMenu: React.FC = () => {
-  const { setGamePhase } = useFighting();
+  const { startPreparation } = useFighting();
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center p-4">
@@ -24,15 +24,15 @@ export const MainMenu: React.FC = () => {
         
         <CardContent className="space-y-4">
           <Button 
-            onClick={() => setGamePhase('battle')}
+            onClick={startPreparation}
             className="w-full h-12 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold"
           >
             <Sword className="h-5 w-5 mr-2" />
-            Battle Test
+            Start Battle
           </Button>
           
           <Button 
-            onClick={() => setGamePhase('rules')}
+            onClick={() => useFighting.getState().setGamePhase('rules')}
             variant="outline"
             className="w-full h-12 border-purple-500/50 text-purple-200 hover:bg-purple-500/10"
           >
