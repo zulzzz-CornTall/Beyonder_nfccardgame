@@ -117,11 +117,11 @@ export const RulesModal: React.FC = () => {
             <section>
               <h2 className="text-2xl font-semibold mb-4 text-yellow-400">✂️ Rock-Paper-Scissors System</h2>
               <div className="space-y-3 text-gray-300">
-                <p>• After both players select attacks, the winner is determined by attack type effectiveness</p>
-                <p>• Each attack type beats one other type: Slash beats Burst, Burst beats Guts, Guts beats Slash</p>
-                <p>• The player with the superior attack type wins the round and deals damage</p>
-                <p>• If both players choose the same attack type, the winner is determined randomly</p>
-                <p>• Strategy is key - try to predict your opponent's choice!</p>
+                <p>• After both players select attacks, they play Rock-Paper-Scissors to determine who becomes the attacker</p>
+                <p>• Rock beats Scissors, Paper beats Rock, Scissors beats Paper</p>
+                <p>• The RPS winner becomes the attacker and deals damage using their selected attack type</p>
+                <p>• If both players choose the same RPS option, the attacker is determined randomly</p>
+                <p>• Attack types (Burst/Guts/Slash) still determine damage effectiveness, but RPS determines who attacks!</p>
               </div>
             </section>
 

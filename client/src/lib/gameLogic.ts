@@ -32,33 +32,7 @@ export function determineRoundWinner(
   player1: Player,
   player2: Player
 ): { winner: Player; loser: Player } | null {
-  if (!player1.selectedAttack || !player2.selectedAttack) {
-    return null;
-  }
-
-  const p1Attack = player1.selectedAttack;
-  const p2Attack = player2.selectedAttack;
-
-  // Rock-paper-scissors logic using attack effectiveness
-  const p1BeatsP2 = EFFECTIVENESS_CHART[p1Attack][p2Attack] > 1;
-  const p2BeatsP1 = EFFECTIVENESS_CHART[p2Attack][p1Attack] > 1;
-
-  if (p1BeatsP2) {
-    return { winner: player1, loser: player2 };
-  } else if (p2BeatsP1) {
-    return { winner: player2, loser: player1 };
-  } else {
-    // Tie - random winner
-    return Math.random() < 0.5 
-      ? { winner: player1, loser: player2 }
-      : { winner: player2, loser: player1 };
-  }
-}
-
-export function determineRPSWinner(
-  player1: Player,
-  player2: Player
-): { winner: Player; loser: Player } | null {
+  // Use RPS choice to determine who becomes the attacker
   if (!player1.rpsChoice || !player2.rpsChoice) {
     return null;
   }
@@ -66,9 +40,9 @@ export function determineRPSWinner(
   const p1Choice = player1.rpsChoice;
   const p2Choice = player2.rpsChoice;
 
-  // Standard rock-paper-scissors logic
+  // Standard rock-paper-scissors logic to determine attacker
   if (p1Choice === p2Choice) {
-    // Tie - random winner
+    // Tie - random attacker
     return Math.random() < 0.5 
       ? { winner: player1, loser: player2 }
       : { winner: player2, loser: player1 };
@@ -82,6 +56,20 @@ export function determineRPSWinner(
   return p1Wins 
     ? { winner: player1, loser: player2 }
     : { winner: player2, loser: player1 };
+}
+
+export function getRPSWinReason(winnerChoice: string, loserChoice: string): string {
+  if (winnerChoice === loserChoice) {
+    return 'Random winner (tie)!';
+  }
+  
+  const reasons = {
+    rock: { scissors: 'Rock crushes Scissors!' },
+    paper: { rock: 'Paper covers Rock!' },
+    scissors: { paper: 'Scissors cuts Paper!' }
+  };
+  
+  return reasons[winnerChoice]?.[loserChoice] || 'RPS Winner!';
 }
 
 export function getAttackName(attack: AttackType): string {
@@ -104,11 +92,8 @@ export function getEffectivenessText(attackType: AttackType, defenseType: Attack
   return 'Normal damage';
 }
 
-export function getWinReason(winnerAttack: AttackType, loserAttack: AttackType): string {
-  if (EFFECTIVENESS_CHART[winnerAttack][loserAttack] > 1) {
-    return `${getAttackName(winnerAttack)} beats ${getAttackName(loserAttack)}!`;
-  }
-  return 'Random winner (tie)!';
+export function getWinReason(winnerRPS: string, loserRPS: string): string {
+  return getRPSWinReason(winnerRPS, loserRPS);
 }
 
 export function createMockNFCCard(playerId: 1 | 2) {
