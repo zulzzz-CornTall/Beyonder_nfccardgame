@@ -11,18 +11,18 @@ export const MainMenu: React.FC = () => {
     <div className="min-h-screen w-full bg-gradient-to-br from-red-900 via-orange-800 to-yellow-700 flex items-center justify-center p-2 sm:p-4">
       <Card className="w-full max-w-sm sm:max-w-md bg-black/80 backdrop-blur-sm border-black/50">
         <CardHeader className="text-center pb-4 sm:pb-6">
-          {/* Logo/PDF Display Section */}
+          {/* Logo Display Section */}
           <div className="mx-auto mb-3 sm:mb-4">
             <div className="p-3 rounded-lg bg-black/20 border border-black/30">
-              <p className="text-yellow-200 text-xs mb-2">Game Logo:</p>
-              <a 
-                href="/logo.pdf" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="inline-flex items-center px-3 py-1 bg-gradient-to-r from-red-500 to-yellow-400 text-black text-xs font-semibold rounded hover:from-red-600 hover:to-yellow-500 transition-all"
-              >
-                📄 View Logo PDF
-              </a>
+              <img 
+                src="/logo.png" 
+                alt="BEYOND! Game Logo"
+                className="w-full max-w-xs mx-auto h-auto"
+                onError={(e) => {
+                  // Fallback if image fails to load
+                  e.currentTarget.style.display = 'none';
+                }}
+              />
             </div>
           </div>
           <CardTitle className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-red-400 to-yellow-400 bg-clip-text text-transparent">
