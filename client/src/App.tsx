@@ -86,6 +86,7 @@ function App() {
     <div style={{ width: '100vw', height: '100vh', position: 'relative', overflow: 'hidden' }}>
       {gamePhase === 'menu' && <MainMenu />}
       {gamePhase === 'preparation' && <PreparationScreen />}
+      {gamePhase === 'character-selection' && <CharacterSelectionScreen />}
       {gamePhase === 'battle' && <BattleTest />}
       {gamePhase === 'results' && <GameResults />}
       {gamePhase === 'rules' && <RulesModal />}
