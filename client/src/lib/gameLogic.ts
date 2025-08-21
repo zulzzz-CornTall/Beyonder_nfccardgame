@@ -18,7 +18,7 @@ function getAttackDamageWithPowerBuff(character: any, powerCard: any, attackType
   
   // Apply power card buff if available
   if (powerCard) {
-    // Power cards have rock, paper, scizor stats that boost corresponding attacks
+    // Power cards have rock, paper, scizor stats that multiply corresponding attacks
     // Map attack types to power card stats
     const powerMapping = {
       'guts': 'rock',     // Guts = Rock
@@ -28,9 +28,9 @@ function getAttackDamageWithPowerBuff(character: any, powerCard: any, attackType
     
     const powerStat = powerMapping[attackType];
     if (powerStat && powerCard[powerStat]) {
-      const powerBoost = powerCard[powerStat];
-      buffedDamage = baseDamage + powerBoost;
-      console.log(`Power buff applied: ${attackType} ${baseDamage} + ${powerBoost} = ${buffedDamage}`);
+      const powerLevel = powerCard[powerStat];
+      buffedDamage = baseDamage * powerLevel;
+      console.log(`Power buff applied: ${attackType} ${baseDamage} x ${powerLevel} = ${buffedDamage}`);
     }
   }
   
@@ -49,10 +49,10 @@ function getHPWithPowerBuff(character: any, powerCard: any): number {
   
   // Apply power card HP buff if available
   if (powerCard && powerCard.hp) {
-    // Power card HP is a percentage boost
-    const hpBoost = Math.floor(baseHP * (powerCard.hp / 100));
+    // Power card HP is added as a percentage of base HP
+    const hpBoost = powerCard.hp;
     buffedHP = baseHP + hpBoost;
-    console.log(`HP buff applied: ${baseHP} + ${hpBoost} (${powerCard.hp}%) = ${buffedHP}`);
+    console.log(`HP buff applied: ${baseHP} + ${hpBoost}% = ${buffedHP}`);
   }
   
   console.log(`HP with power buff: ${buffedHP}`);

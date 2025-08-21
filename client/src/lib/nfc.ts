@@ -31,7 +31,7 @@ export type ParsedNFCData = ParsedCharacterData | ParsedPowerData;
 export function parseNFCText(text: string): ParsedNFCData | null {
   try {
     console.log('Raw NFC text received:', text);
-    
+
     // Clean the text
     const cleanText = text
       .replace(/\r\n/g, '\n')  // Normalize line endings
@@ -140,18 +140,18 @@ export function parseNFCText(text: string): ParsedNFCData | null {
 
 export function createNFCCardFromParsedData(data: ParsedNFCData, playerId: 1 | 2): NFCCard {
   const timestamp = Date.now();
-  
+
   // Check if it's character data or power data
   if ('burst' in data) {
     // Character card
     let element: AttackType = 'burst';
     let highestValue = data.burst;
-    
+
     if (data.guts > highestValue) {
       element = 'guts';
       highestValue = data.guts;
     }
-    
+
     if (data.slash > highestValue) {
       element = 'slash';
     }
@@ -174,15 +174,18 @@ export function createNFCCardFromParsedData(data: ParsedNFCData, playerId: 1 | 2
     };
   } else {
     // Power card
+    // Mock data for power cards if actual NFC data is not available or for testing
+    const powerNames = ['Strength', 'Speed', 'Defense', 'Agility', 'Power']; // Example names
+
     return {
-      id: `power_${playerId}_${timestamp}`,
-      type: 'power',
-      name: data.name,
-      hp: data.hp,  // HP percentage multiplier
-      rock: data.rock,
-      paper: data.paper,
-      scizor: data.scizor,
-      imageUrl: ''  // Power cards might not have images
+      type: 'power' as const,
+      id: `power_${playerId}_${Date.now()}`,
+      name: `${powerNames[Math.floor(Math.random() * powerNames.length)]}`,
+      hp: Math.floor(Math.random() * 30) + 20,  // 20-49 HP boost
+      rock: Math.floor(Math.random() * 3) + 2,  // 2-4x multiplier for guts attacks
+      paper: Math.floor(Math.random() * 3) + 2, // 2-4x multiplier for burst attacks
+      scizor: Math.floor(Math.random() * 3) + 2, // 2-4x multiplier for slash attacks
+      imageUrl: '/textures/sand.jpg'
     };
   }
 }
@@ -201,7 +204,7 @@ export async function requestNFCPermission(): Promise<boolean> {
 
     // Request permission
     const permission = await navigator.permissions.query({ name: 'nfc' as PermissionName });
-    
+
     if (permission.state === 'denied') {
       throw new Error('NFC permission denied');
     }
@@ -221,7 +224,7 @@ export async function scanNFCCard(): Promise<ParsedNFCData | null> {
     }
 
     const ndef = new (window as any).NDEFReader();
-    
+
     // Start scanning
     await ndef.scan();
     console.log('NFC scan started. Please tap your NFC card...');
@@ -239,23 +242,23 @@ export async function scanNFCCard(): Promise<ParsedNFCData | null> {
       ndef.addEventListener('reading', ({ message, serialNumber }: any) => {
         clearTimeout(timeout);
         console.log(`NFC tag read: ${serialNumber}`);
-        
+
         // Parse the NDEF message
         for (const record of message.records) {
           if (record.recordType === 'text') {
             const textDecoder = new TextDecoder(record.encoding || 'utf-8');
             const text = textDecoder.decode(record.data);
-            
+
             console.log('NFC text content:', text);
             const parsedData = parseNFCText(text);
-            
+
             if (parsedData) {
               resolve(parsedData);
               return;
             }
           }
         }
-        
+
         reject(new Error('Could not parse NFC card data. Please check the card format.'));
       });
     });
@@ -278,7 +281,7 @@ export function mockNFCScan(): Promise<ParsedNFCData> {
         guts: 60,
         slash: 80
       };
-      
+
       console.log('Mock NFC data created:', mockData);
       resolve(mockData);
     }, 1000); // Simulate scan delay
