@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 import { GamePhase, Player, BattleState, BattleResult, AttackType, RPSChoice } from '@/types/game';
-import { calculateDamage, determineRoundWinner, createMockNFCCard, getWinReason } from '@/lib/gameLogic';
+import { calculateDamage, determineRoundWinner, createMockNFCCard, getWinReason, calculatePlayerStats } from '@/lib/gameLogic';
 import { scanNFCCard, isNFCSupported, requestNFCPermission, createNFCCardFromParsedData, mockNFCScan } from '@/lib/nfc';
 
 interface FightingState {
@@ -92,14 +92,22 @@ export const useFighting = create<FightingState>()(
         return;
       }
 
-      // Use exact HP from character card (no boosts)
+      // Use HP with power card buffs
       const updatedPlayers = battleState.players.map(player => {
-        const exactHP = player.selectedCharacterCard!.currentHp;
+        const stats = calculatePlayerStats(player);
+        const buffedHP = stats.hp;
+        
+        // Update the selected character card's currentHp to reflect the buffed value
+        const updatedCharacterCard = player.selectedCharacterCard ? {
+          ...player.selectedCharacterCard,
+          currentHp: buffedHP
+        } : undefined;
         
         return {
           ...player,
-          health: exactHP,
-          maxHealth: exactHP
+          health: buffedHP,
+          maxHealth: buffedHP,
+          selectedCharacterCard: updatedCharacterCard
         };
       }) as [Player, Player];
 

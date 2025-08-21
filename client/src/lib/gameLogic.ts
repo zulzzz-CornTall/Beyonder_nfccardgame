@@ -7,26 +7,56 @@ const EFFECTIVENESS_CHART: Record<AttackType, Record<AttackType, number>> = {
   guts: { slash: 2, burst: 1, guts: 1 }
 };
 
-// Use exact attack damage from character card (no multipliers)
-function getExactAttackDamage(character: any, attackType: AttackType): number {
+// Calculate attack damage with power card buffs
+function getAttackDamageWithPowerBuff(character: any, powerCard: any, attackType: AttackType): number {
   if (!character) {
     return 0;
   }
   
-  const exactDamage = character[attackType] || 0;
-  console.log(`Using exact attack damage: ${attackType} = ${exactDamage}`);
-  return exactDamage;
+  const baseDamage = character[attackType] || 0;
+  let buffedDamage = baseDamage;
+  
+  // Apply power card buff if available
+  if (powerCard) {
+    // Power cards have rock, paper, scizor stats that boost corresponding attacks
+    // Map attack types to power card stats
+    const powerMapping = {
+      'guts': 'rock',     // Guts = Rock
+      'burst': 'paper',   // Burst = Paper  
+      'slash': 'scizor'   // Slash = Scissors
+    };
+    
+    const powerStat = powerMapping[attackType];
+    if (powerStat && powerCard[powerStat]) {
+      const powerBoost = powerCard[powerStat];
+      buffedDamage = baseDamage + powerBoost;
+      console.log(`Power buff applied: ${attackType} ${baseDamage} + ${powerBoost} = ${buffedDamage}`);
+    }
+  }
+  
+  console.log(`Attack damage with power buff: ${attackType} = ${buffedDamage}`);
+  return buffedDamage;
 }
 
-// Use exact HP from character card (no boosts)
-function getExactHP(character: any): number {
+// Calculate HP with power card buffs
+function getHPWithPowerBuff(character: any, powerCard: any): number {
   if (!character) {
     return 0;
   }
   
-  const exactHP = character.hp || 0;
-  console.log(`Using exact HP: ${exactHP}`);
-  return exactHP;
+  const baseHP = character.hp || 0;
+  let buffedHP = baseHP;
+  
+  // Apply power card HP buff if available
+  if (powerCard && powerCard.hp) {
+    // Power card HP is a percentage boost
+    const hpBoost = Math.floor(baseHP * (powerCard.hp / 100));
+    buffedHP = baseHP + hpBoost;
+    console.log(`HP buff applied: ${baseHP} + ${hpBoost} (${powerCard.hp}%) = ${buffedHP}`);
+  }
+  
+  console.log(`HP with power buff: ${buffedHP}`);
+  return buffedHP;
 }
 
 export function calculateDamage(
@@ -35,36 +65,45 @@ export function calculateDamage(
   attackerAttack: AttackType,
   defenderAttack: AttackType
 ): BattleResult {
-  // Use exact attack damage from character card (no multipliers)
-  const exactDamage = getExactAttackDamage(
+  // Calculate buffed attack damage
+  const buffedDamage = getAttackDamageWithPowerBuff(
     attacker.selectedCharacterCard, 
+    attacker.selectedPowerCard,
     attackerAttack
   );
 
-  console.log(`Damage calculation: ${attackerAttack} attack deals exactly ${exactDamage} damage`);
+  // Apply type effectiveness multiplier
+  const effectiveness = EFFECTIVENESS_CHART[attackerAttack][defenderAttack];
+  const finalDamage = Math.floor(buffedDamage * effectiveness);
+  
+  const wasEffective = effectiveness > 1;
+  const wasNotVeryEffective = effectiveness < 1;
+  
+  console.log(`Damage calculation: ${attackerAttack} (${buffedDamage}) vs ${defenderAttack} = ${finalDamage} (${effectiveness}x effectiveness)`);
 
   return {
     attacker,
     defender,
-    damage: exactDamage,
-    wasEffective: false, // No effectiveness system, all attacks are normal
+    damage: finalDamage,
+    wasEffective,
     attackerWon: true
   };
 }
 
-// Helper function to get player's exact card stats
+// Helper function to get player's buffed card stats
 export function calculatePlayerStats(player: Player): { hp: number; burst: number; guts: number; slash: number } {
   const character = player.selectedCharacterCard;
+  const powerCard = player.selectedPowerCard;
 
   if (!character) {
     return { hp: 0, burst: 0, guts: 0, slash: 0 };
   }
 
   return {
-    hp: getExactHP(character),
-    burst: getExactAttackDamage(character, 'burst'),
-    guts: getExactAttackDamage(character, 'guts'),
-    slash: getExactAttackDamage(character, 'slash')
+    hp: getHPWithPowerBuff(character, powerCard),
+    burst: getAttackDamageWithPowerBuff(character, powerCard, 'burst'),
+    guts: getAttackDamageWithPowerBuff(character, powerCard, 'guts'),
+    slash: getAttackDamageWithPowerBuff(character, powerCard, 'slash')
   };
 }
 
@@ -130,6 +169,10 @@ export function getEffectivenessText(attackType: AttackType, defenseType: Attack
   if (multiplier > 1) return 'SUPER EFFECTIVE!';
   if (multiplier < 1) return 'Not very effective...';
   return 'Normal damage';
+}
+
+export function getEffectivenessMultiplier(attackType: AttackType, defenseType: AttackType): number {
+  return EFFECTIVENESS_CHART[attackType][defenseType];
 }
 
 export function getWinReason(winnerRPS: string, loserRPS: string): string {
