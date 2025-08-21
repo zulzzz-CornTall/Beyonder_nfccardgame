@@ -83,6 +83,27 @@ export const BattleTest: React.FC = () => {
                 <HealthBar health={player.health} maxHealth={player.maxHealth} />
               </div>
 
+              {/* Character Image Display */}
+              {player.selectedCharacterCard && (
+                <div className="mb-4">
+                  <div className="w-32 h-32 mx-auto mb-2 rounded-lg overflow-hidden border-2 border-yellow-400/50 bg-gray-800">
+                    <img 
+                      src={player.selectedCharacterCard.image} 
+                      alt={player.selectedCharacterCard.name}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        // Fallback to placeholder if image fails to load
+                        e.currentTarget.src = '/textures/sand.jpg';
+                      }}
+                    />
+                  </div>
+                  <div className="text-center">
+                    <p className="text-white font-bold text-lg">{player.selectedCharacterCard.name}</p>
+                    <p className="text-yellow-400 text-sm capitalize">{player.selectedCharacterCard.element} Element</p>
+                  </div>
+                </div>
+              )}
+
               {/* NFC Card Display */}
               <NFCCardDisplay 
                 scannedCardsCount={player.scannedCards.length}
