@@ -76,6 +76,14 @@ export const useFighting = create<FightingState>()(
 
     startBattle: () => {
       const { battleState } = get();
+      
+      // Check if both players have character cards
+      const bothHaveCharacterCards = battleState.players.every(p => p.selectedCharacterCard);
+      if (!bothHaveCharacterCards) {
+        alert('Both players must scan and select a character card before starting the battle!');
+        return;
+      }
+
       // Only start battle if both players have selected both character and power cards
       const bothPlayersReady = battleState.players.every(p => p.selectedCharacterCard && p.selectedPowerCard);
       
@@ -362,9 +370,7 @@ export const useFighting = create<FightingState>()(
           // Check if both players are ready for battle (have both character and power cards)
           const bothPlayersReady = updatedPlayers.every(p => p.selectedCharacterCard && p.selectedPowerCard);
           if (bothPlayersReady) {
-            console.log('Both players ready, starting battle automatically!');
-            // Auto-start battle
-            setTimeout(() => get().startBattle(), 500); // Small delay for UI feedback
+            console.log('Both players ready for battle!');
           }
           
           return;
@@ -415,9 +421,7 @@ export const useFighting = create<FightingState>()(
         // Check if both players are ready for battle (have both character and power cards)
         const bothPlayersReady = updatedPlayers.every(p => p.selectedCharacterCard && p.selectedPowerCard);
         if (bothPlayersReady) {
-          console.log('Both players ready, starting battle automatically!');
-          // Auto-start battle
-          setTimeout(() => get().startBattle(), 500); // Small delay for UI feedback
+          console.log('Both players ready for battle!');
         }
 
         console.log(`NFC card scanned successfully for Player ${playerId}:`, newCard);
