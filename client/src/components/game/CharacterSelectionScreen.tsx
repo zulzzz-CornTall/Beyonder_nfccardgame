@@ -11,6 +11,42 @@ export const CharacterSelectionScreen: React.FC = () => {
   
   const bothPlayersReady = battleState.players.every(p => p.selectedCharacterCard && p.selectedPowerCard);
 
+  // Auto-select cards and start battle if each player has exactly one character and one power card
+  React.useEffect(() => {
+    let allPlayersAutoSelected = true;
+    
+    battleState.players.forEach(player => {
+      const characterCards = player.scannedCards.filter(card => card.type === 'character');
+      const powerCards = player.scannedCards.filter(card => card.type === 'power');
+      
+      // Auto-select character card if player has exactly one and hasn't selected yet
+      if (characterCards.length === 1 && !player.selectedCharacterCard) {
+        const cardIndex = player.scannedCards.findIndex(card => card.id === characterCards[0].id);
+        selectCharacterCard(player.id, cardIndex);
+      }
+      
+      // Auto-select power card if player has exactly one and hasn't selected yet
+      if (powerCards.length === 1 && !player.selectedPowerCard) {
+        const cardIndex = player.scannedCards.findIndex(card => card.id === powerCards[0].id);
+        selectPowerCard(player.id, cardIndex);
+      }
+      
+      // Check if this player can be auto-selected
+      if (characterCards.length !== 1 || powerCards.length !== 1) {
+        allPlayersAutoSelected = false;
+      }
+    });
+    
+    // If all players can be auto-selected and both are ready, start battle automatically
+    if (allPlayersAutoSelected && bothPlayersReady) {
+      const timer = setTimeout(() => {
+        startBattle();
+      }, 1000); // Small delay to show the selection
+      
+      return () => clearTimeout(timer);
+    }
+  }, [battleState.players, bothPlayersReady, selectCharacterCard, selectPowerCard, startBattle]);
+
   const renderCharacterCard = (card: CharacterCard, index: number, playerId: 1 | 2, isSelected: boolean) => {
     const elementColor = getAttackColor(card.element);
     

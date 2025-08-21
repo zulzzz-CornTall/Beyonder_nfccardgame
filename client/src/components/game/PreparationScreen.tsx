@@ -46,7 +46,7 @@ export const PreparationScreen: React.FC = () => {
           }`}
         >
           <Play className="h-4 w-4 mr-2" />
-          Next: Character Selection
+          Start Battle
         </Button>
       </div>
 
@@ -137,9 +137,9 @@ export const PreparationScreen: React.FC = () => {
             <div className="space-y-2 text-purple-200">
               <p>1. Each player must scan at least one character card using the "Scan NFC Card" button</p>
               <p>2. You can scan up to 3 cards total (character and power cards)</p>
-              <p>3. Once both players have character cards, proceed to character selection</p>
-              <p>4. You'll choose which character to use in battle from your scanned cards</p>
-              <p>5. Click the Start Battle button manually when both players are ready</p>
+              <p>3. Once both players have character cards, click "Start Battle"</p>
+              <p>4. If you have exactly one character and one power card, they'll be auto-selected</p>
+              <p>5. Otherwise, you'll choose which cards to use in battle</p>
             </div>
           </CardContent>
         </Card>
