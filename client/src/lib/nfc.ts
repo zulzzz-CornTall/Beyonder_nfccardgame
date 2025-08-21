@@ -173,19 +173,16 @@ export function createNFCCardFromParsedData(data: ParsedNFCData, playerId: 1 | 2
       image: data.imageUrl
     };
   } else {
-    // Power card
-    // Mock data for power cards if actual NFC data is not available or for testing
-    const powerNames = ['Strength', 'Speed', 'Defense', 'Agility', 'Power']; // Example names
-
+    // Power card - use actual NFC data
     return {
       type: 'power' as const,
       id: `power_${playerId}_${Date.now()}`,
-      name: `${powerNames[Math.floor(Math.random() * powerNames.length)]}`,
-      hp: Math.floor(Math.random() * 30) + 20,  // 20-49 HP boost
-      rock: Math.floor(Math.random() * 3) + 2,  // 2-4x multiplier for guts attacks
-      paper: Math.floor(Math.random() * 3) + 2, // 2-4x multiplier for burst attacks
-      scizor: Math.floor(Math.random() * 3) + 2, // 2-4x multiplier for slash attacks
-      imageUrl: '/textures/sand.jpg'
+      name: data.name,
+      hp: data.hp,
+      rock: data.rock,
+      paper: data.paper,
+      scizor: data.scizor,
+      imageUrl: data.imageUrl || '/textures/sand.jpg' // Fallback image if none provided
     };
   }
 }
