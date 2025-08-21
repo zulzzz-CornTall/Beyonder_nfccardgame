@@ -61,9 +61,9 @@ export const CharacterSelectionScreen: React.FC = () => {
         <Card className={`${elementColor} bg-opacity-20 border-2 border-current ${
           isSelected ? 'border-yellow-400' : ''
         }`}>
-          <CardContent className="p-4">
-            <div className="text-center mb-3">
-              <h3 className="font-bold text-white text-lg">{card.name}</h3>
+          <CardContent className="p-3 sm:p-4">
+            <div className="text-center mb-2 sm:mb-3">
+              <h3 className="font-bold text-white text-base sm:text-lg">{card.name}</h3>
               <p className="text-xs text-gray-300">Character Card</p>
               {card.currentHp < card.hp && (
                 <p className="text-red-400 text-xs font-bold mt-1">🩹 DAMAGED</p>
@@ -198,7 +198,7 @@ export const CharacterSelectionScreen: React.FC = () => {
           {characterCards.length === 0 ? (
             <p className="text-gray-400 text-center py-4">No character cards scanned</p>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
               {characterCards.map((card, index) => {
                 const originalIndex = player.scannedCards.findIndex(c => c.id === card.id);
                 const isSelected = player.selectedCharacterCard?.id === card.id;
@@ -217,7 +217,7 @@ export const CharacterSelectionScreen: React.FC = () => {
           {powerCards.length === 0 ? (
             <p className="text-gray-400 text-center py-4">No power cards scanned</p>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
               {powerCards.map((card, index) => {
                 const originalIndex = player.scannedCards.findIndex(c => c.id === card.id);
                 const isSelected = player.selectedPowerCard?.id === card.id;
@@ -250,38 +250,39 @@ export const CharacterSelectionScreen: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-900 via-orange-800 to-yellow-700 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-red-900 via-orange-800 to-yellow-700 p-2 sm:p-4">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        {/* Header - Mobile Responsive */}
+        <div className="flex flex-col sm:flex-row items-center justify-between mb-4 sm:mb-8 gap-3 sm:gap-0">
           <Button
             variant="ghost"
             onClick={() => setGamePhase('preparation')}
-            className="text-white hover:text-gray-300"
+            className="text-white hover:text-gray-300 order-1 sm:order-1"
+            size="sm"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Preparation
           </Button>
           
-          <h1 className="text-3xl font-bold text-white text-center">
+          <h1 className="text-xl sm:text-3xl font-bold text-white text-center order-2 sm:order-2">
             Select Your Cards
           </h1>
           
-          <div className="w-32" /> {/* Spacer */}
+          <div className="hidden sm:block sm:w-32" /> {/* Spacer - Hidden on mobile */}
         </div>
 
         {/* Instructions */}
-        <div className="text-center mb-8">
-          <p className="text-gray-300 text-lg">
+        <div className="text-center mb-4 sm:mb-8">
+          <p className="text-gray-300 text-sm sm:text-lg px-2">
             Each player must select <strong>one character card</strong> and <strong>one power card</strong> to battle.
           </p>
-          <p className="text-gray-400 text-sm mt-2">
+          <p className="text-gray-400 text-xs sm:text-sm mt-2 px-2">
             Power cards will boost your character's attacks and HP during battle.
           </p>
         </div>
 
         {/* Player Sections */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-12 mb-6 sm:mb-8">
           {renderPlayerSection(1)}
           {renderPlayerSection(2)}
         </div>
