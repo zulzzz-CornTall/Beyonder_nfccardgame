@@ -6,6 +6,11 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+// Add basic health check route for debugging
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;
@@ -50,20 +55,27 @@ app.use((req, res, next) => {
   // importantly only setup vite in development and after
   // setting up all the other routes so the catch-all route
   // doesn't interfere with the other routes
-  if (app.get("env") === "development") {
+  const nodeEnv = process.env.NODE_ENV || "development";
+  console.log(`Running in ${nodeEnv} mode`);
+  
+  if (nodeEnv === "development") {
+    console.log("Setting up Vite development server...");
     await setupVite(app, server);
+    console.log("Vite development server setup complete");
   } else {
+    console.log("Setting up static file serving...");
     serveStatic(app);
   }
 
   // ALWAYS serve the app on port 5000
   // this serves both the API and the client
   const port = 5000;
-  server.listen({
-    port,
-    host: "0.0.0.0",
-    reusePort: true,
-  }, () => {
+  server.listen(port, "0.0.0.0", (err?: Error) => {
+    if (err) {
+      console.error("Server failed to start:", err);
+      process.exit(1);
+    }
     log(`serving on port ${port}`);
+    console.log(`Server successfully started on http://0.0.0.0:${port}`);
   });
 })();
