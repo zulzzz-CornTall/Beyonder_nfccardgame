@@ -22,6 +22,7 @@ export const RouletteRPS: React.FC<RouletteRPSProps> = ({
   const [isSpinning, setIsSpinning] = useState(false);
   const [currentOption, setCurrentOption] = useState(0);
   const [hasSpun, setHasSpun] = useState(false);
+  const [spinInterval, setSpinInterval] = useState<NodeJS.Timeout | null>(null);
 
   const getRPSOptions = () => [
     { value: 'rock' as RPSChoice, emoji: '🪨', name: t.rock },
@@ -42,29 +43,39 @@ export const RouletteRPS: React.FC<RouletteRPSProps> = ({
     }
   }, [player?.rpsChoice, hasSpun]);
 
+  // Cleanup interval on unmount
+  useEffect(() => {
+    return () => {
+      if (spinInterval) {
+        clearInterval(spinInterval);
+      }
+    };
+  }, [spinInterval]);
+
   const startRoulette = () => {
     if (isSpinning || player?.rpsChoice) return;
     
     setIsSpinning(true);
     setHasSpun(true);
     
-    // Spin animation
-    let spins = 0;
-    const maxSpins = 15 + Math.floor(Math.random() * 10); // 15-25 spins
-    
-    const spinInterval = setInterval(() => {
+    // Continuous spin animation until manually stopped
+    const interval = setInterval(() => {
       setCurrentOption((prev) => (prev + 1) % 3);
-      spins++;
-      
-      if (spins >= maxSpins) {
-        clearInterval(spinInterval);
-        setIsSpinning(false);
-        
-        // Select the final result
-        const finalChoice = rpsOptions[currentOption].value;
-        selectRPS(playerId, finalChoice);
-      }
     }, 100); // Spin every 100ms
+    
+    setSpinInterval(interval);
+  };
+
+  const stopRoulette = () => {
+    if (!isSpinning || !spinInterval) return;
+    
+    clearInterval(spinInterval);
+    setSpinInterval(null);
+    setIsSpinning(false);
+    
+    // Select the final result based on current option
+    const finalChoice = rpsOptions[currentOption].value;
+    selectRPS(playerId, finalChoice);
   };
 
   // If player already selected, show result
@@ -116,7 +127,7 @@ export const RouletteRPS: React.FC<RouletteRPSProps> = ({
           )}
         </div>
         
-        {/* Start button if not spinning and hasn't spun */}
+        {/* Control buttons */}
         {!isSpinning && !hasSpun && (
           <div className="mt-2">
             <button
@@ -124,6 +135,18 @@ export const RouletteRPS: React.FC<RouletteRPSProps> = ({
               className="w-full py-2 bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold rounded transition-all hover:scale-105"
             >
               🎰 {t.startRoulette}
+            </button>
+          </div>
+        )}
+        
+        {/* Stop button when spinning */}
+        {isSpinning && (
+          <div className="mt-2">
+            <button
+              onClick={stopRoulette}
+              className="w-full py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded transition-all hover:scale-105 animate-pulse"
+            >
+              🛑 Stop!
             </button>
           </div>
         )}
