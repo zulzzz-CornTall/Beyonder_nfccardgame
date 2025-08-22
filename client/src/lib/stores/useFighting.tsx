@@ -77,31 +77,45 @@ export const useFighting = create<FightingState>()(
     startBattle: () => {
       const { battleState } = get();
       
-      // Check if both players have character cards (power cards are optional)
-      const bothHaveCharacterCards = battleState.players.every(p => p.selectedCharacterCard);
-      if (!bothHaveCharacterCards) {
-        alert('Both players must scan and select a character card before starting the battle!');
-        return;
-      }
-
-      // Use HP with power card buffs
+      // Automatically assign first character card from scannedCards to each player
       const updatedPlayers = battleState.players.map(player => {
-        const stats = calculatePlayerStats(player);
+        // Find first character card in scanned cards
+        const firstCharacterCard = player.scannedCards.find(card => card.type === 'character');
+        
+        if (!firstCharacterCard) {
+          alert(`${player.name} must scan at least one character card before starting battle!`);
+          return player;
+        }
+
+        // Automatically assign the first character card
+        const playerWithCharacter = {
+          ...player,
+          selectedCharacterCard: firstCharacterCard
+        };
+
+        // Calculate HP with power card buffs
+        const stats = calculatePlayerStats(playerWithCharacter);
         const buffedHP = stats.hp;
         
         // Update the selected character card's currentHp to reflect the buffed value
-        const updatedCharacterCard = player.selectedCharacterCard ? {
-          ...player.selectedCharacterCard,
+        const updatedCharacterCard = {
+          ...firstCharacterCard,
           currentHp: buffedHP
-        } : undefined;
+        };
         
         return {
-          ...player,
+          ...playerWithCharacter,
           health: buffedHP,
           maxHealth: buffedHP,
           selectedCharacterCard: updatedCharacterCard
         };
       }) as [Player, Player];
+
+      // Check if all players have character cards after auto-assignment
+      const allHaveCharacters = updatedPlayers.every(p => p.selectedCharacterCard);
+      if (!allHaveCharacters) {
+        return; // Alert already shown above
+      }
 
       set({
         gamePhase: 'battle',
