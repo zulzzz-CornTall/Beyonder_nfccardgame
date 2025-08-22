@@ -3,9 +3,19 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useFighting } from '@/lib/stores/useFighting';
 import { Sword, Info, Settings, Zap } from 'lucide-react';
+import { useAudio } from '@/lib/stores/useAudio';
+import { useLanguage } from '@/lib/stores/useLanguage';
+import { LanguageSelector } from '@/components/game/LanguageSelector';
 
 export const MainMenu: React.FC = () => {
   const { startPreparation, setGamePhase } = useFighting();
+  const { playBackgroundMusic } = useAudio();
+  const { t } = useLanguage();
+
+  const handleStartGame = () => {
+    playBackgroundMusic();
+    setGamePhase('preparation');
+  };
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-red-900 via-orange-800 to-yellow-700 flex items-center justify-center p-2 sm:p-4">
@@ -25,20 +35,20 @@ export const MainMenu: React.FC = () => {
           </div>
 
           <CardTitle className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-yellow-400 to-red-500 bg-clip-text text-transparent">
-            🔥 BATTLE ARENA 🔥
+            🔥 {t.mainTitle.split(' ')[0]} 🔥
           </CardTitle>
           <p className="text-gray-300 text-sm">
-            Choose your warrior and enter the ultimate combat challenge!
+            {t.chooseWarrior}
           </p>
         </CardHeader>
 
         <CardContent className="space-y-4">
           <Button 
-            onClick={startPreparation}
+            onClick={handleStartGame}
             className="w-full h-12 font-semibold transition-all bg-gradient-to-r from-red-600 to-yellow-600 hover:from-red-700 hover:to-yellow-700 hover:scale-105 text-white"
           >
             <Sword className="mr-2 h-5 w-5" />
-            Start Battle
+            {t.startGame}
           </Button>
 
           <Button 
@@ -47,7 +57,7 @@ export const MainMenu: React.FC = () => {
             className="w-full h-12 font-semibold border-yellow-500/50 text-yellow-400 hover:bg-yellow-500/10 hover:scale-105 transition-all"
           >
             <Info className="mr-2 h-5 w-5" />
-            Game Rules
+            {t.howToPlay}
           </Button>
 
           <div className="pt-4 border-t border-gray-700">
@@ -57,6 +67,10 @@ export const MainMenu: React.FC = () => {
           </div>
         </CardContent>
       </Card>
+      {/* Language Selector */}
+      <div className="absolute top-4 right-4">
+        <LanguageSelector />
+      </div>
     </div>
   );
 };
