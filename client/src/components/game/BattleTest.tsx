@@ -16,7 +16,6 @@ export const BattleTest: React.FC = () => {
   const { battleState, setGamePhase, resolveRound, resetBattle, startBattle } = useFighting();
   const { playHit } = useAudio();
   const { t } = useLanguage();
-  const [showResults, setShowResults] = useState(false);
   const [currentAttackEffect, setCurrentAttackEffect] = useState<string | null>(null);
 
   useEffect(() => {
@@ -24,22 +23,8 @@ export const BattleTest: React.FC = () => {
       // Show attack effect first
       if (battleState.lastBattleResult.winnerAttack) {
         setCurrentAttackEffect(battleState.lastBattleResult.winnerAttack);
-      }
-      
-      // Show results after attack effect
-      const effectTimer = setTimeout(() => {
-        setShowResults(true);
         playHit();
-      }, 1000);
-
-      const resultsTimer = setTimeout(() => {
-        setShowResults(false);
-      }, 3000);
-
-      return () => {
-        clearTimeout(effectTimer);
-        clearTimeout(resultsTimer);
-      };
+      }
     }
   }, [battleState.lastBattleResult, playHit]);
 
@@ -149,11 +134,6 @@ export const BattleTest: React.FC = () => {
         attack={currentAttackEffect as any}
         onComplete={() => setCurrentAttackEffect(null)}
       />
-
-      {/* Battle Results Overlay */}
-      {showResults && battleState.lastBattleResult && (
-        <BattleResults result={battleState.lastBattleResult} />
-      )}
 
       {/* Main Battle Area - Compact Vertical Layout */}
       <div className="flex flex-col gap-1 max-w-3xl mx-auto h-[60vh]">
