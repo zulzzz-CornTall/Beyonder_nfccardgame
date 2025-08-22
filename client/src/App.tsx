@@ -24,10 +24,11 @@ const GameResults: React.FC = () => {
   const loser = battleState.players.find(p => p.health <= 0);
 
   const announceWinner = () => {
-    if (winner) {
-      const speech = new SpeechSynthesisUtterance(`${winner.name} ${t.wins}`);
-      window.speechSynthesis.speak(speech);
-    }
+    // Text-to-speech disabled
+    // if (winner) {
+    //   const speech = new SpeechSynthesisUtterance(`${winner.name} ${t.wins}`);
+    //   window.speechSynthesis.speak(speech);
+    // }
   };
 
   return (
