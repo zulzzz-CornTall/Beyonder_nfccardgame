@@ -38,7 +38,7 @@ export const MainMenu: React.FC = () => {
             🔥 {t.mainTitle.split(' ')[0]} 🔥
           </CardTitle>
           <p className="text-gray-300 text-sm">
-            {t.chooseWarrior}
+            {t.preparation}
           </p>
         </CardHeader>
 

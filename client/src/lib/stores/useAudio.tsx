@@ -15,6 +15,7 @@ interface AudioState {
   toggleMute: () => void;
   playHit: () => void;
   playSuccess: () => void;
+  playBackgroundMusic: () => void;
 }
 
 export const useAudio = create<AudioState>((set, get) => ({
@@ -68,6 +69,22 @@ export const useAudio = create<AudioState>((set, get) => ({
       successSound.currentTime = 0;
       successSound.play().catch(error => {
         console.log("Success sound play prevented:", error);
+      });
+    }
+  },
+  
+  playBackgroundMusic: () => {
+    const { backgroundMusic, isMuted } = get();
+    if (backgroundMusic) {
+      // If sound is muted, don't play anything
+      if (isMuted) {
+        console.log("Background music skipped (muted)");
+        return;
+      }
+      
+      backgroundMusic.currentTime = 0;
+      backgroundMusic.play().catch(error => {
+        console.log("Background music play prevented:", error);
       });
     }
   }
