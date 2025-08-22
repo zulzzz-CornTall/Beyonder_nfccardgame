@@ -29,7 +29,8 @@ const createInitialPlayer = (id: 1 | 2): Player => ({
   maxHealth: 100,
   scannedCards: [],  // Start with no scanned cards
   selectedCharacterCard: undefined,  // No character selected yet
-  selectedPowerCard: undefined       // No power card selected yet
+  selectedPowerCard: undefined,      // No power card selected yet
+  disabledAttacks: []               // No disabled attacks initially
 });
 
 const initialBattleState: BattleState = {
@@ -61,7 +62,8 @@ export const useFighting = create<FightingState>()(
       const updatedPlayers = battleState.players.map(player => ({
         ...player,
         selectedAttack: undefined,
-        rpsChoice: undefined
+        rpsChoice: undefined,
+        disabledAttacks: []
       })) as [Player, Player];
 
       set({
@@ -129,6 +131,14 @@ export const useFighting = create<FightingState>()(
 
     selectAttack: (playerId, attack) => {
       const { battleState } = get();
+      const player = battleState.players.find(p => p.id === playerId);
+      
+      // Check if attack is disabled for this player
+      if (player?.disabledAttacks?.includes(attack)) {
+        console.log(`Attack ${attack} is disabled for Player ${playerId} this turn`);
+        return;
+      }
+
       const updatedPlayers = battleState.players.map(player => 
         player.id === playerId ? { ...player, selectedAttack: attack } : player
       ) as [Player, Player];
@@ -195,7 +205,7 @@ export const useFighting = create<FightingState>()(
       // Get current health values before any updates
       const [currentPlayer1, currentPlayer2] = battleState.players;
 
-      // Apply damage only to the selected card of the losing player
+      // Apply damage and handle attack cooldowns
       const updatedPlayers = battleState.players.map(player => {
         if (player.id === loser.id) {
           // Update the selected card's health and sync player health
@@ -218,6 +228,9 @@ export const useFighting = create<FightingState>()(
           console.log(`Player ${player.id} (${selectedCard.name}) took ${battleResult.damage} damage. Health: ${selectedCard.currentHp} -> ${newCardHealth}`);
           console.log(`Other cards in Player ${player.id}'s collection remain unaffected`);
           
+          // Disable the attack used by this player for next turn, clear previous disabled attacks
+          const newDisabledAttacks = player.selectedAttack ? [player.selectedAttack] : [];
+          
           return {
             ...player,
             health: newCardHealth,  // Sync player health with selected card
@@ -225,13 +238,19 @@ export const useFighting = create<FightingState>()(
             selectedCharacterCard: updatedSelectedCharacterCard,
             selectedAttack: undefined,
             rpsChoice: undefined,
+            disabledAttacks: newDisabledAttacks
           };
         } else {
           console.log(`Player ${player.id} (${player.selectedCharacterCard?.name}) won and took no damage. Health remains: ${player.selectedCharacterCard?.currentHp}`);
+          
+          // Disable the attack used by this player for next turn, clear previous disabled attacks
+          const newDisabledAttacks = player.selectedAttack ? [player.selectedAttack] : [];
+          
           return {
             ...player,
             selectedAttack: undefined,
             rpsChoice: undefined,
+            disabledAttacks: newDisabledAttacks
           };
         }
       }) as [Player, Player];
@@ -271,7 +290,8 @@ export const useFighting = create<FightingState>()(
           ...player.selectedCharacterCard,
           currentHp: player.selectedCharacterCard.hp
         } : undefined,
-        selectedPowerCard: undefined  // Clear power card selection on reset
+        selectedPowerCard: undefined,  // Clear power card selection on reset
+        disabledAttacks: []           // Clear disabled attacks on reset
       })) as [Player, Player];
 
       set({

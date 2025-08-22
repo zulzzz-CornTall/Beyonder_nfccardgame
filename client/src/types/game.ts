@@ -12,6 +12,7 @@ export interface Player {
   selectedCharacterCard?: CharacterCard;   // The character they chose for battle
   selectedPowerCard?: PowerCard;           // The power card they chose for battle
   rpsChoice?: RPSChoice;
+  disabledAttacks?: AttackType[];  // Attacks disabled for this turn
 }
 
 export type CardType = 'character' | 'power';

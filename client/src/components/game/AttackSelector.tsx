@@ -24,8 +24,11 @@ export const AttackSelector: React.FC<AttackSelectorProps> = ({
   selectedAttack,
   disabled = false
 }) => {
-  const { selectAttack } = useFighting();
+  const { selectAttack, battleState } = useFighting();
   const { t } = useLanguage();
+  
+  const player = battleState.players.find(p => p.id === playerId);
+  const disabledAttacks = player?.disabledAttacks || [];
 
   const getAttackDescription = (attack: AttackType) => {
     switch (attack) {
@@ -60,28 +63,35 @@ export const AttackSelector: React.FC<AttackSelectorProps> = ({
         {attacks.map((attack) => {
           const Icon = ATTACK_ICONS[attack];
           const isSelected = selectedAttack === attack;
+          const isDisabled = disabled || disabledAttacks.includes(attack);
           const baseColor = getAttackColor(attack);
 
           return (
             <Button
               key={attack}
               onClick={() => handleAttackSelect(attack)}
-              disabled={disabled}
+              disabled={isDisabled}
               variant={isSelected ? "default" : "outline"}
               className={`
-                h-16 p-4 flex flex-col items-center justify-center transition-all
+                h-16 p-4 flex flex-col items-center justify-center transition-all relative
                 ${isSelected 
                   ? `${baseColor} text-white hover:opacity-90` 
                   : 'border-purple-500/50 text-purple-200 hover:bg-purple-500/10 hover:border-purple-400'
                 }
-                ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}
+                ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}
+                ${disabledAttacks.includes(attack) ? 'border-red-500/50 bg-red-900/20' : ''}
               `}
             >
               <Icon className="h-5 w-5 mb-1" />
               <span className="font-semibold">
                 {getAttackName(attack)}
               </span>
-              {!isSelected && (
+              {disabledAttacks.includes(attack) && (
+                <span className="text-xs text-red-300 mt-1 text-center leading-tight">
+                  🚫 Cooldown
+                </span>
+              )}
+              {!isSelected && !disabledAttacks.includes(attack) && (
                 <span className="text-xs opacity-75 mt-1 text-center leading-tight">
                   {getAttackDescription(attack)}
                 </span>
