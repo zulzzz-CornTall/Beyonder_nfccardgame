@@ -34,67 +34,59 @@ export const BattleTest: React.FC = () => {
 
   const renderPlayerCard = (player: any, isRotated: boolean) => (
     <Card className="bg-black/50 backdrop-blur-sm border-black/50 h-full">
-      <CardContent className={`p-1 sm:p-2 h-full ${isRotated ? 'transform rotate-180' : ''}`}>
-        {/* Player Header */}
-        <div className="text-center mb-1">
-          <h2 className="text-xs sm:text-sm font-bold text-white mb-1">{player.name}</h2>
-          <HealthBar health={player.health} maxHealth={player.maxHealth} />
+      <CardContent className={`p-1 h-full ${isRotated ? 'transform rotate-180' : ''}`}>
+        {/* Compact Player Info - Single Line */}
+        <div className="flex items-center justify-between mb-1">
+          <div className="flex-1">
+            <h2 className="text-xs font-bold text-white truncate">{player.name}</h2>
+            <HealthBar health={player.health} maxHealth={player.maxHealth} />
+          </div>
+          
+          {/* Character Image - Very Compact */}
+          {player.selectedCharacterCard && (
+            <div className="flex items-center gap-1 ml-2">
+              <div className="w-8 h-8 rounded border border-yellow-400/50 bg-gray-800 overflow-hidden flex-shrink-0">
+                <img 
+                  src={player.selectedCharacterCard.image} 
+                  alt={player.selectedCharacterCard.name}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src = '/textures/sand.jpg';
+                  }}
+                />
+              </div>
+              <div className="text-xs">
+                <p className="text-white font-semibold leading-none">{player.selectedCharacterCard.name}</p>
+                <p className="text-yellow-400 leading-none capitalize">{player.selectedCharacterCard.element}</p>
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Character Image Display - Compact */}
-        {player.selectedCharacterCard && (
-          <div className="mb-1">
-            <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-1 rounded-lg overflow-hidden border border-yellow-400/50 bg-gray-800">
-              <img 
-                src={player.selectedCharacterCard.image} 
-                alt={player.selectedCharacterCard.name}
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  // Fallback to placeholder if image fails to load
-                  e.currentTarget.src = '/textures/sand.jpg';
-                }}
-              />
-            </div>
-            <div className="text-center">
-              <p className="text-white font-semibold text-xs">{player.selectedCharacterCard.name}</p>
-              <p className="text-yellow-400 text-xs capitalize">{player.selectedCharacterCard.element}</p>
-            </div>
-          </div>
-        )}
-
-        {/* NFC Card Display */}
-        <NFCCardDisplay 
-          scannedCardsCount={player.scannedCards.length}
-          playerId={player.id}
-        />
-
-        {/* Attack Selection */}
-        {battleState.phase === 'selecting' && (
-          <div className="mt-1">
+        {/* Compact Action Area */}
+        <div className="space-y-1">
+          {/* Attack Selection */}
+          {battleState.phase === 'selecting' && (
             <AttackSelector 
               playerId={player.id}
               selectedAttack={player.selectedAttack}
               disabled={battleState.phase !== 'selecting'}
             />
-          </div>
-        )}
+          )}
 
-        {/* Rock-Paper-Scissors Roulette */}
-        {battleState.phase === 'rps' && player.selectedAttack && (
-          <div className="mt-1">
+          {/* Rock-Paper-Scissors Roulette */}
+          {battleState.phase === 'rps' && player.selectedAttack && (
             <RouletteRPS 
               playerId={player.id}
               playerName={player.name}
               selectedAttack={player.selectedAttack}
             />
-          </div>
-        )}
+          )}
 
-        {/* Battle Phase Status */}
-        <div className="mt-1 text-center">
+          {/* Battle Phase Status - Compact */}
           {player.selectedAttack && (
-            <p className="text-xs text-yellow-300">
-              {t.attack}: <span className="font-semibold text-white">
+            <p className="text-xs text-yellow-300 text-center">
+              <span className="font-semibold text-white">
                 {player.selectedAttack.charAt(0).toUpperCase() + player.selectedAttack.slice(1)}
               </span>
             </p>
@@ -144,8 +136,8 @@ export const BattleTest: React.FC = () => {
         <BattleResults result={battleState.lastBattleResult} />
       )}
 
-      {/* Main Battle Area - Vertical Layout with Player 1 Bottom, Player 2 Top */}
-      <div className="flex flex-col gap-2 max-w-4xl mx-auto h-[50vh]">
+      {/* Main Battle Area - Compact Vertical Layout */}
+      <div className="flex flex-col gap-1 max-w-3xl mx-auto h-[60vh]">
         {/* Player 2 - Top (Rotated 180 degrees) */}
         {battleState.players.filter(p => p.id === 2).map((player) => (
           <div key={player.id} className="flex-1">
@@ -161,11 +153,11 @@ export const BattleTest: React.FC = () => {
         ))}
       </div>
 
-      {/* Auto-progress messages */}
+      {/* Auto-progress messages - Compact */}
       {battleState.phase === 'rps' && (
-        <div className="text-center mt-4 sm:mt-6 px-2">
-          <div className="p-3 sm:p-4 bg-blue-900/30 rounded-lg border border-blue-500/30">
-            <p className="text-blue-300 text-base sm:text-lg font-semibold">
+        <div className="text-center mt-2 px-2">
+          <div className="p-2 bg-blue-900/30 rounded border border-blue-500/30">
+            <p className="text-blue-300 text-sm font-semibold">
               🎯 {t.selectAttack}! {t.chooserps}
             </p>
           </div>
@@ -173,9 +165,9 @@ export const BattleTest: React.FC = () => {
       )}
 
       {battleState.phase === 'resolving' && (
-        <div className="text-center mt-4 sm:mt-6 px-2">
-          <div className="p-3 sm:p-4 bg-yellow-900/30 rounded-lg border border-yellow-500/30">
-            <p className="text-yellow-300 text-base sm:text-lg font-semibold animate-pulse">
+        <div className="text-center mt-2 px-2">
+          <div className="p-2 bg-yellow-900/30 rounded border border-yellow-500/30">
+            <p className="text-yellow-300 text-sm font-semibold animate-pulse">
               ⚔️ {t.determiningWinner}
             </p>
           </div>

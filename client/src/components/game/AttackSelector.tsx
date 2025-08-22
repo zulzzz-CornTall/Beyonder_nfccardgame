@@ -26,7 +26,7 @@ export const AttackSelector: React.FC<AttackSelectorProps> = ({
 }) => {
   const { selectAttack } = useFighting();
   const { t } = useLanguage();
-  
+
   const getAttackDescription = (attack: AttackType) => {
     switch (attack) {
       case 'burst': return t.burstDescription;
@@ -35,7 +35,7 @@ export const AttackSelector: React.FC<AttackSelectorProps> = ({
       default: return '';
     }
   };
-  
+
   const getAttackName = (attack: AttackType) => {
     switch (attack) {
       case 'burst': return t.burst;
@@ -61,7 +61,7 @@ export const AttackSelector: React.FC<AttackSelectorProps> = ({
           const Icon = ATTACK_ICONS[attack];
           const isSelected = selectedAttack === attack;
           const baseColor = getAttackColor(attack);
-          
+
           return (
             <Button
               key={attack}
@@ -90,7 +90,7 @@ export const AttackSelector: React.FC<AttackSelectorProps> = ({
           );
         })}
       </div>
-      
+
       {selectedAttack && (
         <div className="text-center p-3 bg-green-900/30 rounded-lg border border-green-500/30">
           <p className="text-green-300 text-sm">
