@@ -32,3 +32,26 @@ canvas {
 .bg-gradient-radial {
   background: radial-gradient(circle, var(--tw-gradient-stops));
 }
+
+@keyframes gradient-radial {
+  0% { transform: scale(0); opacity: 1; }
+  100% { transform: scale(2); opacity: 0; }
+}
+
+@keyframes rumble {
+  0% { transform: translate(0); }
+  10% { transform: translate(-2px, -1px); }
+  20% { transform: translate(2px, 1px); }
+  30% { transform: translate(-1px, 2px); }
+  40% { transform: translate(1px, -2px); }
+  50% { transform: translate(-2px, 1px); }
+  60% { transform: translate(2px, -1px); }
+  70% { transform: translate(-1px, -2px); }
+  80% { transform: translate(1px, 2px); }
+  90% { transform: translate(-2px, -1px); }
+  100% { transform: translate(0); }
+}
+
+.animate-rumble {
+  animation: rumble 0.5s ease-in-out infinite;
+}
