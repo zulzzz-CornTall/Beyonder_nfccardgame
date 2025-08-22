@@ -1,5 +1,6 @@
 import React from 'react';
 import { useFighting } from '@/lib/stores/useFighting';
+import { useLanguage } from '@/lib/stores/useLanguage';
 import { Button } from '@/components/ui/button';
 import { AttackType } from '@/types/game';
 import { getAttackColor } from '@/lib/gameLogic';
@@ -17,11 +18,6 @@ const ATTACK_ICONS = {
   slash: Sword
 };
 
-const ATTACK_DESCRIPTIONS = {
-  burst: 'Explosive energy attack - Strong vs Guts',
-  guts: 'Defensive power strike - Strong vs Slash', 
-  slash: 'Swift cutting attack - Strong vs Burst'
-};
 
 export const AttackSelector: React.FC<AttackSelectorProps> = ({
   playerId,
@@ -29,6 +25,25 @@ export const AttackSelector: React.FC<AttackSelectorProps> = ({
   disabled = false
 }) => {
   const { selectAttack } = useFighting();
+  const { t } = useLanguage();
+  
+  const getAttackDescription = (attack: AttackType) => {
+    switch (attack) {
+      case 'burst': return t.burstDescription;
+      case 'guts': return t.gutsDescription;
+      case 'slash': return t.slashDescription;
+      default: return '';
+    }
+  };
+  
+  const getAttackName = (attack: AttackType) => {
+    switch (attack) {
+      case 'burst': return t.burst;
+      case 'guts': return t.guts;
+      case 'slash': return t.slash;
+      default: return attack;
+    }
+  };
 
   const handleAttackSelect = (attack: AttackType) => {
     if (!disabled) {
@@ -40,7 +55,7 @@ export const AttackSelector: React.FC<AttackSelectorProps> = ({
 
   return (
     <div className="space-y-3">
-      <h3 className="text-lg font-semibold text-white text-center">Choose Your Attack</h3>
+      <h3 className="text-lg font-semibold text-white text-center">{t.selectYourAttacks}</h3>
       <div className="grid gap-3">
         {attacks.map((attack) => {
           const Icon = ATTACK_ICONS[attack];
@@ -64,11 +79,11 @@ export const AttackSelector: React.FC<AttackSelectorProps> = ({
             >
               <Icon className="h-5 w-5 mb-1" />
               <span className="font-semibold">
-                {attack.charAt(0).toUpperCase() + attack.slice(1)}
+                {getAttackName(attack)}
               </span>
               {!isSelected && (
                 <span className="text-xs opacity-75 mt-1 text-center leading-tight">
-                  {ATTACK_DESCRIPTIONS[attack]}
+                  {getAttackDescription(attack)}
                 </span>
               )}
             </Button>
@@ -79,8 +94,8 @@ export const AttackSelector: React.FC<AttackSelectorProps> = ({
       {selectedAttack && (
         <div className="text-center p-3 bg-green-900/30 rounded-lg border border-green-500/30">
           <p className="text-green-300 text-sm">
-            ✓ Attack selected: <span className="font-semibold text-green-200">
-              {selectedAttack.charAt(0).toUpperCase() + selectedAttack.slice(1)}
+            ✓ {t.attack} {t.selected}: <span className="font-semibold text-green-200">
+              {getAttackName(selectedAttack)}
             </span>
           </p>
         </div>

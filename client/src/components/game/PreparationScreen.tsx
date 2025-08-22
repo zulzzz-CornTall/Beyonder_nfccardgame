@@ -2,11 +2,13 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useFighting } from '@/lib/stores/useFighting';
+import { useLanguage } from '@/lib/stores/useLanguage';
 import { NFCCardDisplay } from './NFCCardDisplay';
 import { ArrowLeft, Play } from 'lucide-react';
 
 export const PreparationScreen: React.FC = () => {
   const { battleState, setGamePhase, startCharacterSelection, startBattle } = useFighting();
+  const { t } = useLanguage();
 
   const bothPlayersHaveCharacterCards = battleState.players.every(p => 
     p.scannedCards.some(card => card.type === 'character')
@@ -23,13 +25,13 @@ export const PreparationScreen: React.FC = () => {
           size="sm"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Menu
+          {t.backToMenu}
         </Button>
 
         <div className="text-center order-2 sm:order-2">
-          <h1 className="text-xl sm:text-2xl font-bold text-white">Preparation Phase</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-white">{t.preparationPhase}</h1>
           <p className="text-yellow-300 text-xs sm:text-sm">
-            Both players must scan their NFC cards before battle
+            {t.bothPlayersMustScan}
           </p>
         </div>
 
@@ -48,8 +50,8 @@ export const PreparationScreen: React.FC = () => {
           size="sm"
         >
           <Play className="h-4 w-4 mr-2" />
-          <span className="hidden sm:inline">Start Battle!</span>
-          <span className="sm:hidden">Battle</span>
+          <span className="hidden sm:inline">{t.clickStartBattle}</span>
+          <span className="sm:hidden">{t.battle}</span>
         </Button>
       </div>
 
@@ -64,8 +66,8 @@ export const PreparationScreen: React.FC = () => {
             bothPlayersHaveCharacterCards ? 'text-red-400' : 'text-yellow-400'
           }`}>
             {bothPlayersHaveCharacterCards 
-              ? '⚔️ Both players ready - Click Start Battle to begin fighting!' 
-              : '⏳ Waiting for both players to scan at least one character card each'
+              ? `⚔️ ${t.bothPlayersReady}` 
+              : `⏳ ${t.waitingForPlayers}`
             }
           </p>
         </div>
@@ -85,10 +87,10 @@ export const PreparationScreen: React.FC = () => {
                     : 'bg-black/20 text-yellow-400 border border-yellow-500/50'
                 }`}>
                   {player.scannedCards.some(card => card.type === 'character') 
-                    ? `✅ ${player.scannedCards.length} Cards (Character Ready)` 
+                    ? `✅ ${player.scannedCards.length} ${t.cardsReady}` 
                     : player.scannedCards.length > 0 
-                      ? `⚠️ ${player.scannedCards.length} Cards (Need Character)` 
-                      : '❌ No Cards'
+                      ? `⚠️ ${player.scannedCards.length} ${t.needCharacter}` 
+                      : `❌ ${t.noCards}`
                   }
                 </div>
               </div>
@@ -108,7 +110,7 @@ export const PreparationScreen: React.FC = () => {
                   </div>
                 ) : (
                   <div className="text-center p-6 border-2 border-dashed border-gray-600 rounded">
-                    <p className="text-gray-400 mb-4">No Cards Scanned</p>
+                    <p className="text-gray-400 mb-4">{t.noCardsScanned}</p>
                   </div>
                 )}
 
@@ -123,7 +125,7 @@ export const PreparationScreen: React.FC = () => {
               {!player.scannedCards.some(card => card.type === 'character') && (
                 <div className="mt-4 p-3 bg-blue-900/30 rounded-lg border border-blue-500/30">
                   <p className="text-blue-300 text-sm text-center">
-                    🔵 Scan at least one character card to proceed
+                    🔵 {t.eachPlayerMustScan}
                   </p>
                 </div>
               )}
@@ -136,13 +138,13 @@ export const PreparationScreen: React.FC = () => {
       <div className="mt-8 max-w-4xl mx-auto">
         <Card className="bg-black/30 border-purple-500/30">
           <CardContent className="p-6">
-            <h3 className="text-lg font-bold text-white mb-3">How to Prepare:</h3>
+            <h3 className="text-lg font-bold text-white mb-3">{t.howToPrepare}</h3>
             <div className="space-y-2 text-purple-200">
-              <p>1. Each player must scan at least one character card using the "Scan NFC Card" button</p>
-              <p>2. You can scan up to 3 cards total (character and power cards)</p>
-              <p>3. Once both players have character cards, click "Start Battle" to begin!</p>
-              <p>4. Your first scanned character card will be automatically used in battle</p>
-              <p>5. Battle will begin immediately with roulette-based combat</p>
+              <p>1. {t.eachPlayerMustScan}</p>
+              <p>2. {t.youCanScanUpTo}</p>
+              <p>3. {t.onceBothPlayersHave}</p>
+              <p>4. {t.yourFirstScanned}</p>
+              <p>5. {t.battleWillBegin}</p>
             </div>
           </CardContent>
         </Card>

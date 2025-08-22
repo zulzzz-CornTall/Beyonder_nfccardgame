@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { useFighting } from '@/lib/stores/useFighting';
+import { useLanguage } from '@/lib/stores/useLanguage';
 import { RefreshCw } from 'lucide-react';
 
 interface NFCCardDisplayProps {
@@ -10,6 +11,7 @@ interface NFCCardDisplayProps {
 
 export const NFCCardDisplay: React.FC<NFCCardDisplayProps> = ({ playerId, scannedCardsCount }) => {
   const { scanNFCCard, gamePhase } = useFighting();
+  const { t } = useLanguage();
 
   // Disable scanning during battle or when max cards reached
   const canScan = gamePhase !== 'battle' && scannedCardsCount < 3;
@@ -17,17 +19,17 @@ export const NFCCardDisplay: React.FC<NFCCardDisplayProps> = ({ playerId, scanne
   return (
     <div className="text-center p-4">
       <p className="text-gray-400 mb-4">
-        {scannedCardsCount === 0 && 'No cards scanned yet'}
-        {scannedCardsCount > 0 && scannedCardsCount < 3 && `${scannedCardsCount}/3 cards scanned`}
-        {scannedCardsCount === 3 && '3/3 cards scanned (maximum reached)'}
+        {scannedCardsCount === 0 && t.noCardsScanned}
+        {scannedCardsCount > 0 && scannedCardsCount < 3 && `${scannedCardsCount}/3 ${t.cardsScanned}`}
+        {scannedCardsCount === 3 && `3/3 ${t.maximumReached}`}
       </p>
       <Button
         onClick={async () => {
           if (!canScan) {
             if (gamePhase === 'battle') {
-              alert('Cannot scan cards during battle! Please wait until the battle ends.');
+              alert(t.cannotScanDuringBattle);
             } else if (scannedCardsCount >= 3) {
-              alert('You can only scan up to 3 cards per player!');
+              alert(t.maxCardsReached);
             }
             return;
           }
@@ -47,7 +49,7 @@ export const NFCCardDisplay: React.FC<NFCCardDisplayProps> = ({ playerId, scanne
         }`}
       >
         <RefreshCw className="h-4 w-4 mr-2" />
-        {scannedCardsCount === 0 ? 'Scan First Card' : scannedCardsCount < 3 ? 'Scan Another Card' : 'Max Cards Reached'}
+        {scannedCardsCount === 0 ? t.scanFirstCard : scannedCardsCount < 3 ? t.scanAnotherCard : t.maxCardsReached}
       </Button>
     </div>
   );

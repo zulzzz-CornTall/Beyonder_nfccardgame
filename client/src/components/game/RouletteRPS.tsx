@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { useFighting } from '@/lib/stores/useFighting';
+import { useLanguage } from '@/lib/stores/useLanguage';
 import { RPSChoice } from '@/types/game';
 
 interface RouletteRPSProps {
@@ -15,17 +16,20 @@ export const RouletteRPS: React.FC<RouletteRPSProps> = ({
   selectedAttack 
 }) => {
   const { battleState, selectRPS } = useFighting();
+  const { t } = useLanguage();
   const player = battleState.players.find(p => p.id === playerId);
   
   const [isSpinning, setIsSpinning] = useState(false);
   const [currentOption, setCurrentOption] = useState(0);
   const [hasSpun, setHasSpun] = useState(false);
 
-  const rpsOptions: { value: RPSChoice; emoji: string; name: string }[] = [
-    { value: 'rock', emoji: '🪨', name: 'Rock' },
-    { value: 'paper', emoji: '📄', name: 'Paper' },
-    { value: 'scissors', emoji: '✂️', name: 'Scissors' }
+  const getRPSOptions = () => [
+    { value: 'rock' as RPSChoice, emoji: '🪨', name: t.rock },
+    { value: 'paper' as RPSChoice, emoji: '📄', name: t.paper },
+    { value: 'scissors' as RPSChoice, emoji: '✂️', name: t.scissors }
   ];
+  
+  const rpsOptions = getRPSOptions();
 
   // Auto-start roulette when component mounts
   useEffect(() => {
@@ -70,12 +74,12 @@ export const RouletteRPS: React.FC<RouletteRPSProps> = ({
       <Card className="bg-black/50 border-green-500/50">
         <CardContent className="p-3 text-center">
           <h3 className="text-sm font-bold text-white mb-1">{playerName}</h3>
-          <p className="text-green-300 text-xs mb-2">Attack: {selectedAttack}</p>
+          <p className="text-green-300 text-xs mb-2">{t.attack}: {selectedAttack}</p>
           <div className="text-3xl mb-1">
             {selectedOption?.emoji}
           </div>
           <p className="text-green-300 font-semibold text-xs">
-            {selectedOption?.name} Selected!
+            {selectedOption?.name} {t.selected}!
           </p>
         </CardContent>
       </Card>
@@ -87,11 +91,11 @@ export const RouletteRPS: React.FC<RouletteRPSProps> = ({
       <CardContent className="p-3">
         <div className="text-center mb-2">
           <h3 className="text-sm font-bold text-white mb-1">{playerName}</h3>
-          <p className="text-yellow-300 text-xs mb-2">Attack: {selectedAttack}</p>
+          <p className="text-yellow-300 text-xs mb-2">{t.attack}: {selectedAttack}</p>
           {isSpinning ? (
-            <p className="text-yellow-300 font-semibold text-xs">🎲 Spinning Roulette...</p>
+            <p className="text-yellow-300 font-semibold text-xs">🎲 {t.spinningRoulette}...</p>
           ) : (
-            <p className="text-yellow-300 font-semibold text-xs">🎯 Ready to spin!</p>
+            <p className="text-yellow-300 font-semibold text-xs">🎯 {t.readyToSpin}!</p>
           )}
         </div>
         
@@ -119,7 +123,7 @@ export const RouletteRPS: React.FC<RouletteRPSProps> = ({
               onClick={startRoulette}
               className="w-full py-2 bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold rounded transition-all hover:scale-105"
             >
-              🎰 Start Roulette
+              🎰 {t.startRoulette}
             </button>
           </div>
         )}

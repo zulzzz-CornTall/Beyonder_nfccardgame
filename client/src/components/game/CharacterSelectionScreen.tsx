@@ -2,12 +2,14 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useFighting } from '@/lib/stores/useFighting';
+import { useLanguage } from '@/lib/stores/useLanguage';
 import { CharacterCard, PowerCard } from '@/types/game';
 import { getAttackColor, getAttackName } from '@/lib/gameLogic';
 import { ArrowLeft, Play, Shield, Zap } from 'lucide-react';
 
 export const CharacterSelectionScreen: React.FC = () => {
   const { battleState, setGamePhase, startBattle, selectCharacterCard, selectPowerCard } = useFighting();
+  const { t } = useLanguage();
 
   const bothPlayersReady = battleState.players.every(p => p.selectedCharacterCard && p.selectedPowerCard);
 
@@ -64,12 +66,12 @@ export const CharacterSelectionScreen: React.FC = () => {
           <CardContent className="p-3 sm:p-4">
             <div className="text-center mb-2 sm:mb-3">
               <h3 className="font-bold text-white text-base sm:text-lg">{card.name}</h3>
-              <p className="text-xs text-gray-300">Character Card</p>
+              <p className="text-xs text-gray-300">{t.characterCard}</p>
               {card.currentHp < card.hp && (
                 <p className="text-red-400 text-xs font-bold mt-1">🩹 DAMAGED</p>
               )}
               {isSelected && (
-                <p className="text-yellow-400 text-sm font-bold mt-1">✅ SELECTED</p>
+                <p className="text-yellow-400 text-sm font-bold mt-1">✅ {t.selected.toUpperCase()}</p>
               )}
             </div>
 
@@ -135,9 +137,9 @@ export const CharacterSelectionScreen: React.FC = () => {
           <CardContent className="p-4">
             <div className="text-center mb-3">
               <h3 className="font-bold text-white text-lg">{card.name}</h3>
-              <p className="text-xs text-gray-300">Power Card</p>
+              <p className="text-xs text-gray-300">{t.powerCard}</p>
               {isSelected && (
-                <p className="text-red-400 text-sm font-bold mt-1">✅ SELECTED</p>
+                <p className="text-red-400 text-sm font-bold mt-1">✅ {t.selected.toUpperCase()}</p>
               )}
             </div>
 
