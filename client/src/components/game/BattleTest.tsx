@@ -22,6 +22,7 @@ export const BattleTest: React.FC = () => {
     if (battleState.lastBattleResult) {
       // Show attack effect first
       if (battleState.lastBattleResult.winnerAttack) {
+        console.log('Setting attack effect:', battleState.lastBattleResult.winnerAttack);
         setCurrentAttackEffect(battleState.lastBattleResult.winnerAttack);
         playHit();
       }

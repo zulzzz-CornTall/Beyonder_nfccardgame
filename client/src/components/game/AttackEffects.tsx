@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { AttackType } from '@/types/game';
 
 interface AttackEffectsProps {
-  attack: AttackType | null;
+  attack: AttackType | string | null;
   onComplete: () => void;
 }
 
@@ -12,6 +12,7 @@ export const AttackEffects: React.FC<AttackEffectsProps> = ({ attack, onComplete
 
   useEffect(() => {
     if (attack) {
+      console.log('Attack effect triggered:', attack);
       setIsVisible(true);
       const timer = setTimeout(() => {
         setIsVisible(false);
@@ -22,10 +23,15 @@ export const AttackEffects: React.FC<AttackEffectsProps> = ({ attack, onComplete
     }
   }, [attack, onComplete]);
 
-  if (!attack || !isVisible) return null;
+  if (!attack || !isVisible) {
+    console.log('Attack effect not showing:', { attack, isVisible });
+    return null;
+  }
+
+  const attackType = attack as AttackType;
 
   const getAttackColor = () => {
-    switch (attack) {
+    switch (attackType) {
       case 'burst': return 'bg-red-500/50';
       case 'guts': return 'bg-green-500/50';
       case 'slash': return 'bg-blue-500/50';
@@ -34,7 +40,7 @@ export const AttackEffects: React.FC<AttackEffectsProps> = ({ attack, onComplete
   };
 
   const getAttackName = () => {
-    switch (attack) {
+    switch (attackType) {
       case 'burst': return '💥 BURST!';
       case 'guts': return '💚 GUTS!';
       case 'slash': return '⚔️ SLASH!';
