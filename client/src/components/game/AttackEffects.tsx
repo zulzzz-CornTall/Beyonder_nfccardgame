@@ -17,7 +17,7 @@ export const AttackEffects: React.FC<AttackEffectsProps> = ({ attack, onComplete
       const timer = setTimeout(() => {
         setIsVisible(false);
         onComplete();
-      }, 2000); // Show effect for 2 seconds
+      }, 5000); // Show effect for 5 seconds
 
       return () => clearTimeout(timer);
     }
