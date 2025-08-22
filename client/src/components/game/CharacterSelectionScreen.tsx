@@ -8,48 +8,48 @@ import { ArrowLeft, Play, Shield, Zap } from 'lucide-react';
 
 export const CharacterSelectionScreen: React.FC = () => {
   const { battleState, setGamePhase, startBattle, selectCharacterCard, selectPowerCard } = useFighting();
-  
+
   const bothPlayersReady = battleState.players.every(p => p.selectedCharacterCard && p.selectedPowerCard);
 
   // Auto-select cards and start battle if each player has exactly one character and one power card
   React.useEffect(() => {
     let allPlayersAutoSelected = true;
-    
+
     battleState.players.forEach(player => {
       const characterCards = player.scannedCards.filter(card => card.type === 'character');
       const powerCards = player.scannedCards.filter(card => card.type === 'power');
-      
+
       // Auto-select character card if player has exactly one and hasn't selected yet
       if (characterCards.length === 1 && !player.selectedCharacterCard) {
         const cardIndex = player.scannedCards.findIndex(card => card.id === characterCards[0].id);
         selectCharacterCard(player.id, cardIndex);
       }
-      
+
       // Auto-select power card if player has exactly one and hasn't selected yet
       if (powerCards.length === 1 && !player.selectedPowerCard) {
         const cardIndex = player.scannedCards.findIndex(card => card.id === powerCards[0].id);
         selectPowerCard(player.id, cardIndex);
       }
-      
+
       // Check if this player can be auto-selected
       if (characterCards.length !== 1 || powerCards.length !== 1) {
         allPlayersAutoSelected = false;
       }
     });
-    
+
     // If all players can be auto-selected and both are ready, start battle automatically
     if (allPlayersAutoSelected && bothPlayersReady) {
       const timer = setTimeout(() => {
         startBattle();
       }, 1000); // Small delay to show the selection
-      
+
       return () => clearTimeout(timer);
     }
   }, [battleState.players, bothPlayersReady, selectCharacterCard, selectPowerCard, startBattle]);
 
   const renderCharacterCard = (card: CharacterCard, index: number, playerId: 1 | 2, isSelected: boolean) => {
     const elementColor = getAttackColor(card.element);
-    
+
     return (
       <div 
         key={card.id}
@@ -188,7 +188,7 @@ export const CharacterSelectionScreen: React.FC = () => {
         <h2 className="text-2xl font-bold text-white text-center">
           Player {playerId}
         </h2>
-        
+
         {/* Character Cards Section */}
         <div>
           <h3 className="text-lg font-semibold text-white mb-3 flex items-center">
@@ -263,18 +263,18 @@ export const CharacterSelectionScreen: React.FC = () => {
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Preparation
           </Button>
-          
+
           <h1 className="text-xl sm:text-3xl font-bold text-white text-center order-2 sm:order-2">
             Select Your Cards
           </h1>
-          
+
           <div className="hidden sm:block sm:w-32" /> {/* Spacer - Hidden on mobile */}
         </div>
 
         {/* Instructions */}
         <div className="text-center mb-4 sm:mb-8">
           <p className="text-gray-300 text-sm sm:text-lg px-2">
-            Each player must select <strong>one character card</strong> and <strong>one power card</strong> to battle.
+            Each player must select <strong>one character card</strong> to battle. <strong>Power cards are optional</strong> but recommended.
           </p>
           <p className="text-gray-400 text-xs sm:text-sm mt-2 px-2">
             Power cards will boost your character's attacks and HP during battle.
@@ -292,20 +292,16 @@ export const CharacterSelectionScreen: React.FC = () => {
           <Button
             onClick={startBattle}
             disabled={!bothPlayersReady}
-            className={`px-8 py-4 text-xl font-bold ${
-              bothPlayersReady 
-                ? 'bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white' 
+            size="lg"
+            className={`px-8 py-4 text-lg font-semibold ${
+              bothPlayersReady
+                ? 'bg-green-600 hover:bg-green-700 text-white'
                 : 'bg-gray-600 text-gray-400 cursor-not-allowed'
             }`}
           >
-            <Play className="h-6 w-6 mr-2" />
-            {bothPlayersReady ? 'Start Battle!' : 'Select Cards to Continue'}
+            <Play className="h-5 w-5 mr-2" />
+            {bothPlayersReady ? 'Start Battle!' : 'Waiting for character card selections...'}
           </Button>
-          {!bothPlayersReady && (
-            <p className="text-gray-400 text-sm mt-2">
-              Both players need to select a character card AND a power card
-            </p>
-          )}
         </div>
       </div>
     </div>

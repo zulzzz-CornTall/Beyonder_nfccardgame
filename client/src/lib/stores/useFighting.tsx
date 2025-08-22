@@ -77,18 +77,10 @@ export const useFighting = create<FightingState>()(
     startBattle: () => {
       const { battleState } = get();
       
-      // Check if both players have character cards
+      // Check if both players have character cards (power cards are optional)
       const bothHaveCharacterCards = battleState.players.every(p => p.selectedCharacterCard);
       if (!bothHaveCharacterCards) {
         alert('Both players must scan and select a character card before starting the battle!');
-        return;
-      }
-
-      // Only start battle if both players have selected both character and power cards
-      const bothPlayersReady = battleState.players.every(p => p.selectedCharacterCard && p.selectedPowerCard);
-      
-      if (!bothPlayersReady) {
-        alert('Both players must select a character card AND a power card before starting the battle!');
         return;
       }
 
