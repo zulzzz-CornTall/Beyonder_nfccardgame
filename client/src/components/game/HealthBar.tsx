@@ -27,10 +27,10 @@ export const HealthBar: React.FC<HealthBarProps> = ({ health, maxHealth }) => {
       <div className="relative">
         <Progress 
           value={healthPercentage} 
-          className="h-4 bg-gray-700"
+          className="h-3 bg-gray-700"
         />
         <div 
-          className={`absolute top-0 left-0 h-4 rounded-full transition-all duration-300 ${getHealthColor()}`}
+          className={`absolute top-0 left-0 h-3 rounded-full transition-all duration-300 ${getHealthColor()}`}
           style={{ width: `${healthPercentage}%` }}
         />
       </div>

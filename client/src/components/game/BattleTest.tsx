@@ -152,7 +152,7 @@ export const BattleTest: React.FC = () => {
             {renderPlayerCard(player, true)}
           </div>
         ))}
-        
+
         {/* Player 1 - Bottom */}
         {battleState.players.filter(p => p.id === 1).map((player) => (
           <div key={player.id} className="flex-1">
