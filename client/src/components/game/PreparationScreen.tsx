@@ -36,7 +36,7 @@ export const PreparationScreen: React.FC = () => {
         <Button 
           onClick={() => {
             if (bothPlayersHaveCharacterCards) {
-              startCharacterSelection();
+              startBattle();
             }
           }}
           disabled={!bothPlayersHaveCharacterCards}
@@ -48,8 +48,8 @@ export const PreparationScreen: React.FC = () => {
           size="sm"
         >
           <Play className="h-4 w-4 mr-2" />
-          <span className="hidden sm:inline">Next: Character Selection</span>
-          <span className="sm:hidden">Next</span>
+          <span className="hidden sm:inline">Start Battle!</span>
+          <span className="sm:hidden">Battle</span>
         </Button>
       </div>
 
@@ -64,7 +64,7 @@ export const PreparationScreen: React.FC = () => {
             bothPlayersHaveCharacterCards ? 'text-red-400' : 'text-yellow-400'
           }`}>
             {bothPlayersHaveCharacterCards 
-              ? '✅ Both players have character cards - Click Next to select characters!' 
+              ? '⚔️ Both players ready - Click Start Battle to begin fighting!' 
               : '⏳ Waiting for both players to scan at least one character card each'
             }
           </p>
@@ -140,9 +140,9 @@ export const PreparationScreen: React.FC = () => {
             <div className="space-y-2 text-purple-200">
               <p>1. Each player must scan at least one character card using the "Scan NFC Card" button</p>
               <p>2. You can scan up to 3 cards total (character and power cards)</p>
-              <p>3. Once both players have character cards, click "Start Battle"</p>
-              <p>4. If you have exactly one character and one power card, they'll be auto-selected</p>
-              <p>5. Otherwise, you'll choose which cards to use in battle</p>
+              <p>3. Once both players have character cards, click "Start Battle" to begin!</p>
+              <p>4. Your first scanned character card will be automatically used in battle</p>
+              <p>5. Battle will begin immediately with roulette-based combat</p>
             </div>
           </CardContent>
         </Card>
