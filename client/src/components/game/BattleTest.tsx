@@ -5,7 +5,7 @@ import { AttackSelector } from './AttackSelector';
 import { HealthBar } from './HealthBar';
 import { BattleResults } from './BattleResults';
 import { NFCCardDisplay } from './NFCCardDisplay';
-import { InteractiveRPS } from './InteractiveRPS';
+import { RouletteRPS } from './RouletteRPS';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { ArrowLeft, RotateCcw } from 'lucide-react';
@@ -72,21 +72,21 @@ export const BattleTest: React.FC = () => {
         <BattleResults result={battleState.lastBattleResult} />
       )}
 
-      {/* Main Battle Area */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 max-w-6xl mx-auto">
+      {/* Main Battle Area - Compact Side by Side */}
+      <div className="grid grid-cols-2 gap-2 sm:gap-4 max-w-4xl mx-auto">
         {battleState.players.map((player) => (
           <Card key={player.id} className="bg-black/50 backdrop-blur-sm border-black/50">
-            <CardContent className="p-4 sm:p-6">
+            <CardContent className="p-2 sm:p-3">
               {/* Player Header */}
-              <div className="text-center mb-3 sm:mb-4">
-                <h2 className="text-lg sm:text-xl font-bold text-white mb-2">{player.name}</h2>
+              <div className="text-center mb-2">
+                <h2 className="text-sm sm:text-lg font-bold text-white mb-1">{player.name}</h2>
                 <HealthBar health={player.health} maxHealth={player.maxHealth} />
               </div>
 
-              {/* Character Image Display */}
+              {/* Character Image Display - Compact */}
               {player.selectedCharacterCard && (
-                <div className="mb-4">
-                  <div className="w-32 h-32 mx-auto mb-2 rounded-lg overflow-hidden border-2 border-yellow-400/50 bg-gray-800">
+                <div className="mb-2">
+                  <div className="w-16 h-16 sm:w-24 sm:h-24 mx-auto mb-1 rounded-lg overflow-hidden border-2 border-yellow-400/50 bg-gray-800">
                     <img 
                       src={player.selectedCharacterCard.image} 
                       alt={player.selectedCharacterCard.name}
@@ -98,8 +98,8 @@ export const BattleTest: React.FC = () => {
                     />
                   </div>
                   <div className="text-center">
-                    <p className="text-white font-bold text-lg">{player.selectedCharacterCard.name}</p>
-                    <p className="text-yellow-400 text-sm capitalize">{player.selectedCharacterCard.element} Element</p>
+                    <p className="text-white font-bold text-xs sm:text-sm">{player.selectedCharacterCard.name}</p>
+                    <p className="text-yellow-400 text-xs capitalize">{player.selectedCharacterCard.element}</p>
                   </div>
                 </div>
               )}
@@ -112,7 +112,7 @@ export const BattleTest: React.FC = () => {
 
               {/* Attack Selection */}
               {battleState.phase === 'selecting' && (
-                <div className="mt-4 sm:mt-6">
+                <div className="mt-2">
                   <AttackSelector 
                     playerId={player.id}
                     selectedAttack={player.selectedAttack}
@@ -122,10 +122,10 @@ export const BattleTest: React.FC = () => {
               )}
 
 
-              {/* Rock-Paper-Scissors Selection */}
+              {/* Rock-Paper-Scissors Roulette */}
               {battleState.phase === 'rps' && player.selectedAttack && (
-                <div className="mt-4 sm:mt-6">
-                  <InteractiveRPS 
+                <div className="mt-2">
+                  <RouletteRPS 
                     playerId={player.id}
                     playerName={player.name}
                     selectedAttack={player.selectedAttack}
@@ -134,10 +134,10 @@ export const BattleTest: React.FC = () => {
               )}
 
               {/* Battle Phase Status */}
-              <div className="mt-3 sm:mt-4 text-center">
+              <div className="mt-1 text-center">
                 {player.selectedAttack && (
-                  <p className="text-xs sm:text-sm text-yellow-300">
-                    Selected: <span className="font-semibold text-white">
+                  <p className="text-xs text-yellow-300">
+                    Attack: <span className="font-semibold text-white">
                       {player.selectedAttack.charAt(0).toUpperCase() + player.selectedAttack.slice(1)}
                     </span>
                   </p>
