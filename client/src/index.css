@@ -27,3 +27,8 @@ canvas {
   height: 100% !important;
   touch-action: none;
 }
+
+/* Custom gradient for attack effects */
+.bg-gradient-radial {
+  background: radial-gradient(circle, var(--tw-gradient-stops));
+}

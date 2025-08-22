@@ -7,6 +7,7 @@ import { HealthBar } from './HealthBar';
 import { BattleResults } from './BattleResults';
 import { NFCCardDisplay } from './NFCCardDisplay';
 import { RouletteRPS } from './RouletteRPS';
+import { AttackEffects } from './AttackEffects';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { ArrowLeft, RotateCcw } from 'lucide-react';
@@ -16,17 +17,29 @@ export const BattleTest: React.FC = () => {
   const { playHit } = useAudio();
   const { t } = useLanguage();
   const [showResults, setShowResults] = useState(false);
+  const [currentAttackEffect, setCurrentAttackEffect] = useState<string | null>(null);
 
   useEffect(() => {
     if (battleState.lastBattleResult) {
-      setShowResults(true);
-      playHit();
+      // Show attack effect first
+      if (battleState.lastBattleResult.winnerAttack) {
+        setCurrentAttackEffect(battleState.lastBattleResult.winnerAttack);
+      }
+      
+      // Show results after attack effect
+      const effectTimer = setTimeout(() => {
+        setShowResults(true);
+        playHit();
+      }, 1000);
 
-      const timer = setTimeout(() => {
+      const resultsTimer = setTimeout(() => {
         setShowResults(false);
-      }, 2000);
+      }, 3000);
 
-      return () => clearTimeout(timer);
+      return () => {
+        clearTimeout(effectTimer);
+        clearTimeout(resultsTimer);
+      };
     }
   }, [battleState.lastBattleResult, playHit]);
 
@@ -130,6 +143,12 @@ export const BattleTest: React.FC = () => {
           {t.reset}
         </Button>
       </div>
+
+      {/* Attack Effects */}
+      <AttackEffects 
+        attack={currentAttackEffect as any}
+        onComplete={() => setCurrentAttackEffect(null)}
+      />
 
       {/* Battle Results Overlay */}
       {showResults && battleState.lastBattleResult && (
