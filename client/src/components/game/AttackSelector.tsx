@@ -24,11 +24,15 @@ export const AttackSelector: React.FC<AttackSelectorProps> = ({
   selectedAttack,
   disabled = false
 }) => {
-  const { selectAttack, battleState } = useFighting();
+  const { selectAttack, battleState, getCurrentTurnPlayer, getPlayerTurnOrder } = useFighting();
   const { t } = useLanguage();
   
   const player = battleState.players.find(p => p.id === playerId);
   const disabledAttacks = player?.disabledAttacks || [];
+  const currentTurnPlayer = getCurrentTurnPlayer();
+  const turnOrder = getPlayerTurnOrder();
+  const isPlayerTurn = currentTurnPlayer?.id === playerId;
+  const playerTurnIndex = turnOrder.findIndex(p => p.id === playerId) + 1;
 
   const getAttackDescription = (attack: AttackType) => {
     switch (attack) {
@@ -58,12 +62,33 @@ export const AttackSelector: React.FC<AttackSelectorProps> = ({
 
   return (
     <div className="space-y-3">
-      <h3 className="text-lg font-semibold text-white text-center">{t.selectYourAttacks}</h3>
+      <div className="text-center">
+        <h3 className="text-lg font-semibold text-white">{t.selectYourAttacks}</h3>
+        <div className="mt-2">
+          {currentTurnPlayer && (
+            <div className={`inline-block px-3 py-1 rounded-full text-sm font-semibold ${
+              isPlayerTurn 
+                ? 'bg-green-600 text-white' 
+                : 'bg-gray-600 text-gray-300'
+            }`}>
+              {isPlayerTurn 
+                ? `🎯 Your Turn (Player ${playerTurnIndex})` 
+                : `⏳ Player ${currentTurnPlayer.id}'s Turn`
+              }
+            </div>
+          )}
+          {!currentTurnPlayer && battleState.phase === 'selecting' && (
+            <div className="inline-block px-3 py-1 rounded-full text-sm font-semibold bg-blue-600 text-white">
+              ✅ Both attacks selected
+            </div>
+          )}
+        </div>
+      </div>
       <div className="grid gap-3">
         {attacks.map((attack) => {
           const Icon = ATTACK_ICONS[attack];
           const isSelected = selectedAttack === attack;
-          const isDisabled = disabled || disabledAttacks.includes(attack);
+          const isDisabled = disabled || disabledAttacks.includes(attack) || !isPlayerTurn;
           const baseColor = getAttackColor(attack);
 
           return (
@@ -91,9 +116,14 @@ export const AttackSelector: React.FC<AttackSelectorProps> = ({
                   🚫 Cooldown
                 </span>
               )}
-              {!isSelected && !disabledAttacks.includes(attack) && (
+              {!isSelected && !disabledAttacks.includes(attack) && isPlayerTurn && (
                 <span className="text-xs opacity-75 mt-1 text-center leading-tight">
                   {getAttackDescription(attack)}
+                </span>
+              )}
+              {!isSelected && !disabledAttacks.includes(attack) && !isPlayerTurn && (
+                <span className="text-xs opacity-75 mt-1 text-center leading-tight">
+                  Wait for your turn
                 </span>
               )}
             </Button>

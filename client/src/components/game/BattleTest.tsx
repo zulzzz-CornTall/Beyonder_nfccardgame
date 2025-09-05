@@ -30,6 +30,9 @@ export const BattleTest: React.FC = () => {
   }, [battleState.lastBattleResult, playHit]);
 
   const allPlayersSelectedAttacks = battleState.players.every(p => p.selectedAttack);
+  const { getCurrentTurnPlayer, getPlayerTurnOrder } = useFighting();
+  const turnOrder = getPlayerTurnOrder();
+  const currentTurnPlayer = getCurrentTurnPlayer();
 
   const renderPlayerCard = (player: any, isRotated: boolean) => (
     <Card className="bg-black/50 backdrop-blur-sm border-black/50 h-full">

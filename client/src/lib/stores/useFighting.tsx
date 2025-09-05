@@ -20,6 +20,8 @@ interface FightingState {
   scanNFCCard: (playerId: 1 | 2) => Promise<void>;
   selectCharacterCard: (playerId: 1 | 2, cardIndex: number) => void;
   selectPowerCard: (playerId: 1 | 2, cardIndex: number) => void;
+  getCurrentTurnPlayer: () => Player | null;
+  getPlayerTurnOrder: () => Player[];
 }
 
 const createInitialPlayer = (id: 1 | 2): Player => ({
@@ -136,6 +138,13 @@ export const useFighting = create<FightingState>()(
       // Check if attack is disabled for this player
       if (player?.disabledAttacks?.includes(attack)) {
         console.log(`Attack ${attack} is disabled for Player ${playerId} this turn`);
+        return;
+      }
+
+      // Check if it's this player's turn to select
+      const currentTurnPlayer = get().getCurrentTurnPlayer();
+      if (currentTurnPlayer && currentTurnPlayer.id !== playerId) {
+        console.log(`It's not Player ${playerId}'s turn to select an attack`);
         return;
       }
 
@@ -496,6 +505,51 @@ export const useFighting = create<FightingState>()(
           }
         });
       }
+    },
+
+    getCurrentTurnPlayer: () => {
+      const { battleState } = get();
+      
+      // If both players have selected attacks, no one's turn
+      if (battleState.players.every(p => p.selectedAttack)) {
+        return null;
+      }
+
+      // Get players ordered by highest total attack power
+      const playersWithAttackPower = battleState.players.map(player => {
+        const stats = calculatePlayerStats(player);
+        const totalAttackPower = stats.burst + stats.guts + stats.slash;
+        return { player, totalAttackPower };
+      }).sort((a, b) => b.totalAttackPower - a.totalAttackPower);
+
+      // First player (highest attack) goes first
+      const firstPlayer = playersWithAttackPower[0].player;
+      const secondPlayer = playersWithAttackPower[1].player;
+
+      // If first player hasn't selected, it's their turn
+      if (!firstPlayer.selectedAttack) {
+        return firstPlayer;
+      }
+
+      // If first player has selected but second hasn't, it's second player's turn
+      if (!secondPlayer.selectedAttack) {
+        return secondPlayer;
+      }
+
+      return null;
+    },
+
+    getPlayerTurnOrder: () => {
+      const { battleState } = get();
+      
+      // Get players ordered by highest total attack power
+      const playersWithAttackPower = battleState.players.map(player => {
+        const stats = calculatePlayerStats(player);
+        const totalAttackPower = stats.burst + stats.guts + stats.slash;
+        return { player, totalAttackPower };
+      }).sort((a, b) => b.totalAttackPower - a.totalAttackPower);
+
+      return playersWithAttackPower.map(p => p.player);
     }
   }))
 );
