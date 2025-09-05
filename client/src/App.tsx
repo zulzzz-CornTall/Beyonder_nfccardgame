@@ -85,31 +85,49 @@ function App() {
     playMainTheme
   } = useAudio();
 
-  // Initialize audio on app start
+  // Initialize audio and set up user interaction for autoplay
   useEffect(() => {
-    // Load audio files
+    const { setBackgroundMusic, setMainTheme, setHitSound, setSuccessSound } = useAudio.getState();
+
     const backgroundMusic = new Audio('/sounds/background.mp3');
     const mainTheme = new Audio('/sounds/main-theme.mp3');
     const hitSound = new Audio('/sounds/hit.mp3');
     const successSound = new Audio('/sounds/success.mp3');
-    
+
     // Preload the main theme
     mainTheme.preload = 'auto';
 
     backgroundMusic.loop = true;
     backgroundMusic.volume = 0.3;
 
-    // Set them in the store
     setBackgroundMusic(backgroundMusic);
     setMainTheme(mainTheme);
     setHitSound(hitSound);
     setSuccessSound(successSound);
 
-    // Auto-play main theme after a short delay
-    setTimeout(() => {
-      playMainTheme();
-    }, 1000);
-  }, [setBackgroundMusic, setMainTheme, setHitSound, setSuccessSound, playMainTheme]);
+    // Handle user interaction for autoplay
+    const handleFirstUserInteraction = () => {
+      console.log('User interaction detected, starting main theme...');
+      useAudio.getState().playMainTheme();
+
+      // Remove the event listeners after first interaction
+      document.removeEventListener('click', handleFirstUserInteraction);
+      document.removeEventListener('keydown', handleFirstUserInteraction);
+      document.removeEventListener('touchstart', handleFirstUserInteraction);
+    };
+
+    // Add event listeners for user interaction
+    document.addEventListener('click', handleFirstUserInteraction);
+    document.addEventListener('keydown', handleFirstUserInteraction);
+    document.addEventListener('touchstart', handleFirstUserInteraction);
+
+    return () => {
+      // Cleanup event listeners
+      document.removeEventListener('click', handleFirstUserInteraction);
+      document.removeEventListener('keydown', handleFirstUserInteraction);
+      document.removeEventListener('touchstart', handleFirstUserInteraction);
+    };
+  }, []);
 
   return (
     <div className="w-full min-h-screen overflow-x-hidden">
