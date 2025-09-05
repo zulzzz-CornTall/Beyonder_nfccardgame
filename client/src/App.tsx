@@ -102,7 +102,8 @@ function App() {
 
     setBackgroundMusic(backgroundMusic);
     setMainTheme(mainTheme);
-    setHitSound(hitSound);soundsssetSuccessSound(successSound);
+    setHitSound(hitSound);
+    setSuccessSound(successSound);
 
     // Handle user interaction for autoplay
     const handleFirstUserInteraction = () => {
