@@ -5,6 +5,7 @@ interface AudioState {
   mainTheme: HTMLAudioElement | null;
   hitSound: HTMLAudioElement | null;
   successSound: HTMLAudioElement | null;
+  clickSound: HTMLAudioElement | null;
   isMuted: boolean;
   
   // Setter functions
@@ -12,6 +13,7 @@ interface AudioState {
   setMainTheme: (music: HTMLAudioElement) => void;
   setHitSound: (sound: HTMLAudioElement) => void;
   setSuccessSound: (sound: HTMLAudioElement) => void;
+  setClickSound: (sound: HTMLAudioElement) => void;
   
   // Control functions
   toggleMute: () => void;
@@ -19,6 +21,7 @@ interface AudioState {
   playSuccess: () => void;
   playBackgroundMusic: () => void;
   playMainTheme: () => void;
+  playClick: () => void;
 }
 
 export const useAudio = create<AudioState>((set, get) => ({
@@ -26,12 +29,14 @@ export const useAudio = create<AudioState>((set, get) => ({
   mainTheme: null,
   hitSound: null,
   successSound: null,
+  clickSound: null,
   isMuted: false, // Start unmuted by default
   
   setBackgroundMusic: (music) => set({ backgroundMusic: music }),
   setMainTheme: (music) => set({ mainTheme: music }),
   setHitSound: (sound) => set({ hitSound: sound }),
   setSuccessSound: (sound) => set({ successSound: sound }),
+  setClickSound: (sound) => set({ clickSound: sound }),
   
   toggleMute: () => {
     const { isMuted } = get();
@@ -108,6 +113,24 @@ export const useAudio = create<AudioState>((set, get) => ({
       mainTheme.currentTime = 0;
       mainTheme.play().catch(error => {
         console.log("Main theme play prevented:", error);
+      });
+    }
+  },
+  
+  playClick: () => {
+    const { clickSound, isMuted } = get();
+    if (clickSound) {
+      // If sound is muted, don't play anything
+      if (isMuted) {
+        console.log("Click sound skipped (muted)");
+        return;
+      }
+      
+      // Clone the sound to allow overlapping playback
+      const soundClone = clickSound.cloneNode() as HTMLAudioElement;
+      soundClone.volume = 0.2;
+      soundClone.play().catch(error => {
+        console.log("Click sound play prevented:", error);
       });
     }
   }

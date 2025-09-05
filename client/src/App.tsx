@@ -82,17 +82,18 @@ function App() {
     setMainTheme,
     setHitSound, 
     setSuccessSound,
-    playMainTheme
+    setClickSound
   } = useAudio();
 
   // Initialize audio and set up user interaction for autoplay
   useEffect(() => {
-    const { setBackgroundMusic, setMainTheme, setHitSound, setSuccessSound } = useAudio.getState();
+    const { setBackgroundMusic, setMainTheme, setHitSound, setSuccessSound, setClickSound } = useAudio.getState();
 
-    const backgroundMusic = new Audio('/attached_assets/Raise your cards, the battle’s near,_1757069968911.mp3,');
+    const backgroundMusic = new Audio('/attached_assets/Raise your cards, the battle\'s near,_1757069968911.mp3,');
     const mainTheme = new Audio('/sounds/main-theme.mp3');
     const hitSound = new Audio('/sounds/hit.mp3');
     const successSound = new Audio('/sounds/success.mp3');
+    const clickSound = new Audio('/sounds/hit.mp3'); // Using hit sound as click sound
 
     // Preload the main theme
     mainTheme.preload = 'auto';
@@ -104,6 +105,7 @@ function App() {
     setMainTheme(mainTheme);
     setHitSound(hitSound);
     setSuccessSound(successSound);
+    setClickSound(clickSound); // Set the click sound
 
     // Handle user interaction for autoplay
     const handleFirstUserInteraction = () => {

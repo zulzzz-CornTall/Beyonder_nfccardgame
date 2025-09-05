@@ -14,7 +14,7 @@ import { ArrowLeft, RotateCcw } from 'lucide-react';
 
 export const BattleTest: React.FC = () => {
   const { battleState, setGamePhase, resolveRound, resetBattle, startBattle } = useFighting();
-  const { playHit } = useAudio();
+  const { playHit, playClick } = useAudio();
   const { t } = useLanguage();
   const [currentAttackEffect, setCurrentAttackEffect] = useState<string | null>(null);
 
@@ -43,13 +43,13 @@ export const BattleTest: React.FC = () => {
             <h2 className="text-xs font-bold text-white truncate">{player.name}</h2>
             <HealthBar health={player.health} maxHealth={player.maxHealth} />
           </div>
-          
+
           {/* Character Image - Very Compact */}
           {player.selectedCharacterCard && (
             <div className="flex items-center gap-1 ml-2">
               <div className="w-8 h-8 rounded border border-yellow-400/50 bg-gray-800 overflow-hidden flex-shrink-0">
-                <img 
-                  src={player.selectedCharacterCard.image} 
+                <img
+                  src={player.selectedCharacterCard.image}
                   alt={player.selectedCharacterCard.name}
                   className="w-full h-full object-cover"
                   onError={(e) => {
@@ -69,7 +69,7 @@ export const BattleTest: React.FC = () => {
         <div className="space-y-1">
           {/* Attack Selection */}
           {battleState.phase === 'selecting' && (
-            <AttackSelector 
+            <AttackSelector
               playerId={player.id}
               selectedAttack={player.selectedAttack}
               disabled={battleState.phase !== 'selecting'}
@@ -78,7 +78,7 @@ export const BattleTest: React.FC = () => {
 
           {/* Rock-Paper-Scissors Roulette */}
           {battleState.phase === 'rps' && player.selectedAttack && (
-            <RouletteRPS 
+            <RouletteRPS
               playerId={player.id}
               playerName={player.name}
               selectedAttack={player.selectedAttack}
@@ -102,9 +102,12 @@ export const BattleTest: React.FC = () => {
     <div className="min-h-screen w-full bg-gradient-to-br from-red-900 via-orange-800 to-yellow-700 p-2 sm:p-4">
       {/* Header */}
       <div className="flex justify-between items-center mb-2 sm:mb-3">
-        <Button 
-          onClick={() => setGamePhase('menu')}
-          variant="outline" 
+        <Button
+          onClick={() => {
+            playClick();
+            setGamePhase('menu');
+          }}
+          variant="outline"
           size="sm"
           className="border-black/50 text-yellow-200 hover:bg-black/20"
         >
@@ -122,9 +125,12 @@ export const BattleTest: React.FC = () => {
           </p>
         </div>
 
-        <Button 
-          onClick={resetBattle}
-          variant="outline" 
+        <Button
+          onClick={() => {
+            playClick();
+            resetBattle();
+          }}
+          variant="outline"
           size="sm"
           className="border-black/50 text-yellow-200 hover:bg-black/20"
         >
@@ -134,7 +140,7 @@ export const BattleTest: React.FC = () => {
       </div>
 
       {/* Attack Effects */}
-      <AttackEffects 
+      <AttackEffects
         attack={currentAttackEffect as any}
         onComplete={() => setCurrentAttackEffect(null)}
       />

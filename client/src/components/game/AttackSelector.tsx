@@ -1,6 +1,7 @@
 import React from 'react';
 import { useFighting } from '@/lib/stores/useFighting';
 import { useLanguage } from '@/lib/stores/useLanguage';
+import { useAudio } from '@/lib/stores/useAudio';
 import { Button } from '@/components/ui/button';
 import { AttackType } from '@/types/game';
 import { getAttackColor } from '@/lib/gameLogic';
@@ -26,6 +27,7 @@ export const AttackSelector: React.FC<AttackSelectorProps> = ({
 }) => {
   const { selectAttack, battleState, getCurrentTurnPlayer, getPlayerTurnOrder } = useFighting();
   const { t } = useLanguage();
+  const { playClick } = useAudio();
   
   const player = battleState.players.find(p => p.id === playerId);
   const disabledAttacks = player?.disabledAttacks || [];
@@ -54,6 +56,7 @@ export const AttackSelector: React.FC<AttackSelectorProps> = ({
 
   const handleAttackSelect = (attack: AttackType) => {
     if (!disabled) {
+      playClick();
       selectAttack(playerId, attack);
     }
   };

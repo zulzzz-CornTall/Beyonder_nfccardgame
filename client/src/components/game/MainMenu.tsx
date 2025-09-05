@@ -8,12 +8,12 @@ import { useLanguage } from '@/lib/stores/useLanguage';
 import { LanguageSelector } from '@/components/game/LanguageSelector';
 
 export const MainMenu: React.FC = () => {
-  const { startPreparation, setGamePhase } = useFighting();
-  const { playBackgroundMusic } = useAudio();
+  const { setGamePhase } = useFighting();
   const { t } = useLanguage();
+  const { playClick, toggleMute, isMuted } = useAudio();
 
   const handleStartGame = () => {
-    playBackgroundMusic();
+    playClick();
     setGamePhase('preparation');
   };
 
@@ -23,9 +23,9 @@ export const MainMenu: React.FC = () => {
         <CardHeader className="text-center space-y-4">
           {/* Logo Image */}
           <div className="flex justify-center mb-4">
-            <img 
-              src="/title-logo.png" 
-              alt="Game Logo" 
+            <img
+              src="/title-logo.png"
+              alt="Game Logo"
               className="w-32 h-32 sm:w-40 sm:h-40 object-contain rounded-lg"
               onError={(e) => {
                 console.log('Logo failed to load');
@@ -43,17 +43,23 @@ export const MainMenu: React.FC = () => {
         </CardHeader>
 
         <CardContent className="space-y-4">
-          <Button 
-            onClick={handleStartGame}
+          <Button
+            onClick={() => {
+              playClick();
+              setGamePhase('preparation');
+            }}
             className="w-full h-12 font-semibold transition-all bg-gradient-to-r from-red-600 to-yellow-600 hover:from-red-700 hover:to-yellow-700 hover:scale-105 text-white"
           >
             <Sword className="mr-2 h-5 w-5" />
             {t.startGame}
           </Button>
 
-          <Button 
+          <Button
             variant="outline"
-            onClick={() => setGamePhase('rules')}
+            onClick={() => {
+              playClick();
+              setGamePhase('rules');
+            }}
             className="w-full h-12 font-semibold border-yellow-500/50 text-yellow-400 hover:bg-yellow-500/10 hover:scale-105 transition-all"
           >
             <Info className="mr-2 h-5 w-5" />
@@ -67,9 +73,20 @@ export const MainMenu: React.FC = () => {
           </div>
         </CardContent>
       </Card>
-      {/* Language Selector */}
-      <div className="absolute top-4 right-4">
+      {/* Language Selector and Mute Button */}
+      <div className="absolute top-4 right-4 flex items-center space-x-4">
         <LanguageSelector />
+        <Button
+          onClick={() => {
+            playClick();
+            toggleMute();
+          }}
+          variant="outline"
+          size="icon"
+          className="bg-gray-800/50 border-gray-600 text-gray-300 hover:bg-gray-700/50"
+        >
+          {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+        </Button>
       </div>
     </div>
   );
