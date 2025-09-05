@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useFighting } from '@/lib/stores/useFighting';
-import { Sword, Info, Settings, Zap } from 'lucide-react';
+import { Sword, Info, Settings, Zap, Volume2, VolumeX } from 'lucide-react';
 import { useAudio } from '@/lib/stores/useAudio';
 import { useLanguage } from '@/lib/stores/useLanguage';
 import { LanguageSelector } from '@/components/game/LanguageSelector';
