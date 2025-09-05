@@ -92,6 +92,9 @@ function App() {
     const mainTheme = new Audio('/sounds/main-theme.mp3');
     const hitSound = new Audio('/sounds/hit.mp3');
     const successSound = new Audio('/sounds/success.mp3');
+    
+    // Preload the main theme
+    mainTheme.preload = 'auto';
 
     backgroundMusic.loop = true;
     backgroundMusic.volume = 0.3;
