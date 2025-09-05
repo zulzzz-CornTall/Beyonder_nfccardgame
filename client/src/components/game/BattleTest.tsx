@@ -13,10 +13,19 @@ import { Card, CardContent } from '@/components/ui/card';
 import { ArrowLeft, RotateCcw } from 'lucide-react';
 
 export const BattleTest: React.FC = () => {
-  const { battleState, setGamePhase, resolveRound, resetBattle, startBattle } = useFighting();
+  const { battleState, setGamePhase, resolveRound, resetBattle, startBattle, makeRobotDecision } = useFighting();
   const { playHit, playClick } = useAudio();
   const { t } = useLanguage();
   const [currentAttackEffect, setCurrentAttackEffect] = useState<string | null>(null);
+
+  // Handle robot decisions
+  useEffect(() => {
+    battleState.players.forEach(player => {
+      if (player.isRobot) {
+        makeRobotDecision(player.id);
+      }
+    });
+  }, [battleState.phase, battleState.players.map(p => p.selectedAttack).join(','), battleState.players.map(p => p.rpsChoice).join(','), makeRobotDecision]);
 
   useEffect(() => {
     if (battleState.lastBattleResult) {

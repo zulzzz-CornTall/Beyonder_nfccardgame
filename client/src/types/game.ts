@@ -2,6 +2,8 @@ export type AttackType = 'burst' | 'guts' | 'slash';
 
 export type GamePhase = 'menu' | 'preparation' | 'character-selection' | 'battle' | 'results' | 'rules';
 
+export type GameMode = 'pvp' | 'vs-robot';
+
 export interface Player {
   id: 1 | 2;
   name: string;
@@ -13,6 +15,7 @@ export interface Player {
   selectedPowerCard?: PowerCard;           // The power card they chose for battle
   rpsChoice?: RPSChoice;
   disabledAttacks?: AttackType[];  // Attacks disabled for this turn
+  isRobot?: boolean;  // True if this player is controlled by AI
 }
 
 export type CardType = 'character' | 'power';
@@ -53,6 +56,7 @@ export interface BattleState {
   phase: 'selecting' | 'rps' | 'resolving' | 'ended';
   winner?: 1 | 2;
   lastBattleResult?: BattleResult;
+  gameMode: GameMode;
 }
 
 export interface BattleResult {

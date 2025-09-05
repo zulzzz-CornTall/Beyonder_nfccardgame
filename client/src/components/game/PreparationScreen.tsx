@@ -8,13 +8,27 @@ import { NFCCardDisplay } from './NFCCardDisplay';
 import { ArrowLeft, Play } from 'lucide-react';
 
 export const PreparationScreen: React.FC = () => {
-  const { battleState, setGamePhase, startCharacterSelection, startBattle } = useFighting();
+  const { battleState, setGamePhase, startCharacterSelection, startBattle, scanNFCCard } = useFighting();
   const { t } = useLanguage();
   const { playClick } = useAudio();
 
   const bothPlayersHaveCharacterCards = battleState.players.every(p => 
     p.scannedCards.some(card => card.type === 'character')
   );
+
+  const isVsRobot = battleState.gameMode === 'vs-robot';
+  const humanPlayer = battleState.players.find(p => !p.isRobot);
+  const robotPlayer = battleState.players.find(p => p.isRobot);
+
+  // Auto-scan cards for robot when human player scans
+  React.useEffect(() => {
+    if (isVsRobot && humanPlayer && robotPlayer && humanPlayer.scannedCards.length > 0) {
+      // Robot should have at least one card for each card the human has
+      if (robotPlayer.scannedCards.length < humanPlayer.scannedCards.length) {
+        scanNFCCard(robotPlayer.id);
+      }
+    }
+  }, [humanPlayer?.scannedCards.length, robotPlayer?.scannedCards.length, isVsRobot, scanNFCCard]);
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-red-900 via-orange-800 to-yellow-700 p-2 sm:p-4">
@@ -34,9 +48,11 @@ export const PreparationScreen: React.FC = () => {
         </Button>
 
         <div className="text-center order-2 sm:order-2">
-          <h1 className="text-xl sm:text-2xl font-bold text-white">{t.preparationPhase}</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-white">
+            {isVsRobot ? 'VS Robot Mode' : t.preparationPhase}
+          </h1>
           <p className="text-yellow-300 text-xs sm:text-sm">
-            {t.bothPlayersMustScan}
+            {isVsRobot ? 'Scan cards for yourself - Robot will use copies!' : t.bothPlayersMustScan}
           </p>
         </div>
 
@@ -86,7 +102,9 @@ export const PreparationScreen: React.FC = () => {
             <CardContent className="p-6">
               {/* Player Header */}
               <div className="text-center mb-4">
-                <h2 className="text-xl font-bold text-white mb-2">{player.name}</h2>
+                <h2 className="text-xl font-bold text-white mb-2">
+                  {player.isRobot ? '🤖 Robot Player' : player.name}
+                </h2>
                 <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
                   player.scannedCards.some(card => card.type === 'character')
                     ? 'bg-black/30 text-red-400 border border-red-500/50' 

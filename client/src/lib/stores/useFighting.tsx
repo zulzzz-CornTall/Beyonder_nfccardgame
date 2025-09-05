@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
-import { GamePhase, Player, BattleState, BattleResult, AttackType, RPSChoice } from '@/types/game';
+import { GamePhase, Player, BattleState, BattleResult, AttackType, RPSChoice, GameMode } from '@/types/game';
 import { calculateDamage, determineRoundWinner, createMockNFCCard, getWinReason, calculatePlayerStats } from '@/lib/gameLogic';
 import { scanNFCCard, isNFCSupported, requestNFCPermission, createNFCCardFromParsedData, mockNFCScan } from '@/lib/nfc';
 
@@ -10,7 +10,8 @@ interface FightingState {
 
   // Actions
   setGamePhase: (phase: GamePhase) => void;
-  startPreparation: () => void;
+  setGameMode: (mode: GameMode) => void;
+  startPreparation: (mode?: GameMode) => void;
   startCharacterSelection: () => void;
   startBattle: () => void;
   selectAttack: (playerId: 1 | 2, attack: AttackType) => void;
@@ -22,23 +23,26 @@ interface FightingState {
   selectPowerCard: (playerId: 1 | 2, cardIndex: number) => void;
   getCurrentTurnPlayer: () => Player | null;
   getPlayerTurnOrder: () => Player[];
+  makeRobotDecision: (playerId: 1 | 2) => void;
 }
 
-const createInitialPlayer = (id: 1 | 2): Player => ({
+const createInitialPlayer = (id: 1 | 2, isRobot?: boolean): Player => ({
   id,
-  name: `Player ${id}`,
+  name: isRobot ? `Robot ${id}` : `Player ${id}`,
   health: 100,
   maxHealth: 100,
   scannedCards: [],  // Start with no scanned cards
   selectedCharacterCard: undefined,  // No character selected yet
   selectedPowerCard: undefined,      // No power card selected yet
-  disabledAttacks: []               // No disabled attacks initially
+  disabledAttacks: [],              // No disabled attacks initially
+  isRobot: isRobot || false
 });
 
 const initialBattleState: BattleState = {
   players: [createInitialPlayer(1), createInitialPlayer(2)],
   currentRound: 1,
-  phase: 'selecting'
+  phase: 'selecting',
+  gameMode: 'pvp'
 };
 
 export const useFighting = create<FightingState>()(
@@ -48,12 +52,27 @@ export const useFighting = create<FightingState>()(
 
     setGamePhase: (phase) => set({ gamePhase: phase }),
 
-    startPreparation: () => {
+    setGameMode: (mode) => {
+      const { battleState } = get();
+      set({
+        battleState: {
+          ...battleState,
+          gameMode: mode
+        }
+      });
+    },
+
+    startPreparation: (mode = 'pvp') => {
+      const players: [Player, Player] = mode === 'vs-robot'
+        ? [createInitialPlayer(1, false), createInitialPlayer(2, true)]
+        : [createInitialPlayer(1, false), createInitialPlayer(2, false)];
+        
       set({
         gamePhase: 'preparation',
         battleState: {
           ...initialBattleState,
-          players: [createInitialPlayer(1), createInitialPlayer(2)]
+          gameMode: mode,
+          players
         }
       });
     },
@@ -66,13 +85,17 @@ export const useFighting = create<FightingState>()(
         selectedAttack: undefined,
         rpsChoice: undefined,
         disabledAttacks: []
-      })) as [Player, Player];
+      }));
+      
+      if (updatedPlayers.length !== 2) {
+        throw new Error('Expected exactly 2 players');
+      }
 
       set({
         gamePhase: 'character-selection',
         battleState: {
           ...battleState,
-          players: updatedPlayers,
+          players: updatedPlayers as [Player, Player],
           phase: 'selecting'
         }
       });
@@ -550,6 +573,33 @@ export const useFighting = create<FightingState>()(
       }).sort((a, b) => b.totalAttackPower - a.totalAttackPower);
 
       return playersWithAttackPower.map(p => p.player);
+    },
+
+    makeRobotDecision: (playerId) => {
+      const { battleState, selectAttack, selectRPS } = get();
+      const robot = battleState.players.find(p => p.id === playerId && p.isRobot);
+      
+      if (!robot) return;
+
+      // Robot attack selection logic
+      if (battleState.phase === 'selecting' && !robot.selectedAttack) {
+        const allAttacks: AttackType[] = ['burst', 'guts', 'slash'];
+        const availableAttacks = allAttacks
+          .filter(attack => !robot.disabledAttacks?.includes(attack));
+        
+        if (availableAttacks.length > 0) {
+          // Simple AI: randomly choose from available attacks
+          const randomAttack = availableAttacks[Math.floor(Math.random() * availableAttacks.length)];
+          setTimeout(() => selectAttack(playerId, randomAttack), 1000 + Math.random() * 2000);
+        }
+      }
+      
+      // Robot RPS selection logic
+      if (battleState.phase === 'rps' && !robot.rpsChoice) {
+        const rpsChoices: RPSChoice[] = ['rock', 'paper', 'scissors'];
+        const randomChoice = rpsChoices[Math.floor(Math.random() * rpsChoices.length)];
+        setTimeout(() => selectRPS(playerId, randomChoice), 1500 + Math.random() * 1500);
+      }
     }
   }))
 );

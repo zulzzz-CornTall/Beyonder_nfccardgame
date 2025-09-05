@@ -73,10 +73,14 @@ export const AttackSelector: React.FC<AttackSelectorProps> = ({
             <div className={`inline-block px-3 py-1 rounded-full text-sm font-semibold ${
               isPlayerTurn 
                 ? 'bg-green-600 text-white' 
+                : currentTurnPlayer.isRobot
+                ? 'bg-blue-600 text-white'
                 : 'bg-gray-600 text-gray-300'
             }`}>
               {isPlayerTurn 
                 ? `🎯 Your Turn (Player ${playerTurnIndex})` 
+                : currentTurnPlayer.isRobot
+                ? `🤖 Robot is thinking...`
                 : `⏳ Player ${currentTurnPlayer.id}'s Turn`
               }
             </div>
