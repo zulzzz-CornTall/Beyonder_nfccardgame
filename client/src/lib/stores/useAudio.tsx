@@ -26,7 +26,7 @@ export const useAudio = create<AudioState>((set, get) => ({
   mainTheme: null,
   hitSound: null,
   successSound: null,
-  isMuted: true, // Start muted by default
+  isMuted: false, // Start unmuted by default
   
   setBackgroundMusic: (music) => set({ backgroundMusic: music }),
   setMainTheme: (music) => set({ mainTheme: music }),
