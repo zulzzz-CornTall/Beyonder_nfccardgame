@@ -1,16 +1,18 @@
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
-import { GamePhase, Player, BattleState, BattleResult, AttackType, RPSChoice, GameMode } from '@/types/game';
+import { GamePhase, Player, BattleState, BattleResult, AttackType, RPSChoice, GameMode, AIOpponent } from '@/types/game';
 import { calculateDamage, determineRoundWinner, createMockNFCCard, getWinReason, calculatePlayerStats } from '@/lib/gameLogic';
 import { scanNFCCard, isNFCSupported, requestNFCPermission, createNFCCardFromParsedData, mockNFCScan } from '@/lib/nfc';
 
 interface FightingState {
   gamePhase: GamePhase;
   battleState: BattleState;
+  aiOpponent: AIOpponent | null;
 
   // Actions
   setGamePhase: (phase: GamePhase) => void;
   setGameMode: (mode: GameMode) => void;
+  setAIOpponent: (opponent: AIOpponent) => void;
   startPreparation: (mode?: GameMode) => void;
   startCharacterSelection: () => void;
   startBattle: () => void;
@@ -24,6 +26,7 @@ interface FightingState {
   getCurrentTurnPlayer: () => Player | null;
   getPlayerTurnOrder: () => Player[];
   makeRobotDecision: (playerId: 1 | 2) => void;
+  showDialogue: (type: 'intro' | 'battle1' | 'battle2' | 'win' | 'lose') => string;
 }
 
 const createInitialPlayer = (id: 1 | 2, isRobot?: boolean): Player => ({
@@ -49,6 +52,7 @@ export const useFighting = create<FightingState>()(
   subscribeWithSelector((set, get) => ({
     gamePhase: 'menu',
     battleState: initialBattleState,
+    aiOpponent: null,
 
     setGamePhase: (phase) => set({ gamePhase: phase }),
 
@@ -62,10 +66,27 @@ export const useFighting = create<FightingState>()(
       });
     },
 
+    setAIOpponent: (opponent) => {
+      set({ aiOpponent: opponent });
+    },
+
     startPreparation: (mode = 'pvp') => {
-      const players: [Player, Player] = mode === 'vs-robot'
-        ? [createInitialPlayer(1, false), createInitialPlayer(2, true)]
-        : [createInitialPlayer(1, false), createInitialPlayer(2, false)];
+      const { aiOpponent } = get();
+      let players: [Player, Player];
+      
+      if (mode === 'character-battle' && aiOpponent) {
+        // Character battle with AI opponent
+        const aiPlayer = createInitialPlayer(2, true);
+        aiPlayer.aiOpponent = aiOpponent;
+        aiPlayer.scannedCards = [aiOpponent.character, aiOpponent.power];
+        aiPlayer.selectedCharacterCard = aiOpponent.character;
+        aiPlayer.selectedPowerCard = aiOpponent.power;
+        players = [createInitialPlayer(1, false), aiPlayer];
+      } else if (mode === 'vs-robot') {
+        players = [createInitialPlayer(1, false), createInitialPlayer(2, true)];
+      } else {
+        players = [createInitialPlayer(1, false), createInitialPlayer(2, false)];
+      }
         
       set({
         gamePhase: 'preparation',
@@ -599,6 +620,20 @@ export const useFighting = create<FightingState>()(
         const rpsChoices: RPSChoice[] = ['rock', 'paper', 'scissors'];
         const randomChoice = rpsChoices[Math.floor(Math.random() * rpsChoices.length)];
         setTimeout(() => selectRPS(playerId, randomChoice), 1500 + Math.random() * 1500);
+      }
+    },
+
+    showDialogue: (type) => {
+      const { aiOpponent } = get();
+      if (!aiOpponent) return '';
+      
+      switch (type) {
+        case 'intro': return aiOpponent.dialogues.intro;
+        case 'battle1': return aiOpponent.dialogues.battle1;
+        case 'battle2': return aiOpponent.dialogues.battle2;
+        case 'win': return aiOpponent.dialogues.win;
+        case 'lose': return aiOpponent.dialogues.lose;
+        default: return '';
       }
     }
   }))

@@ -7,6 +7,7 @@ import { PreparationScreen } from "@/components/game/PreparationScreen";
 import { CharacterSelectionScreen } from "@/components/game/CharacterSelectionScreen";
 import { BattleTest } from "@/components/game/BattleTest";
 import { RulesModal } from "@/components/game/RulesModal";
+import { CharacterBattleScreen } from "@/components/game/CharacterBattleScreen";
 import "@fontsource/inter";
 
 // Game results component
@@ -167,6 +168,7 @@ function App() {
       {gamePhase === 'battle' && <BattleTest />}
       {gamePhase === 'results' && <GameResults />}
       {gamePhase === 'rules' && <RulesModal />}
+      {gamePhase === 'character-battle' && <CharacterBattleScreen />}
     </div>
   );
 }

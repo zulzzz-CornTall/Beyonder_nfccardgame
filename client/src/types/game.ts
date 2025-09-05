@@ -1,8 +1,8 @@
 export type AttackType = 'burst' | 'guts' | 'slash';
 
-export type GamePhase = 'menu' | 'preparation' | 'character-selection' | 'battle' | 'results' | 'rules';
+export type GamePhase = 'menu' | 'preparation' | 'character-selection' | 'battle' | 'results' | 'rules' | 'character-battle';
 
-export type GameMode = 'pvp' | 'vs-robot';
+export type GameMode = 'pvp' | 'vs-robot' | 'character-battle';
 
 export interface Player {
   id: 1 | 2;
@@ -16,6 +16,21 @@ export interface Player {
   rpsChoice?: RPSChoice;
   disabledAttacks?: AttackType[];  // Attacks disabled for this turn
   isRobot?: boolean;  // True if this player is controlled by AI
+  aiOpponent?: AIOpponent;  // AI opponent data from AZTEC code
+}
+
+export interface AIOpponent {
+  name: string;
+  imageUrl: string;
+  character: CharacterCard;
+  power: PowerCard;
+  dialogues: {
+    intro: string;
+    battle1: string;
+    battle2: string;
+    win: string;
+    lose: string;
+  };
 }
 
 export type CardType = 'character' | 'power';

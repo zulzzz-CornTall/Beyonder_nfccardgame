@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useFighting } from '@/lib/stores/useFighting';
-import { Sword, Info, Settings, Zap, Volume2, VolumeX, Bot } from 'lucide-react';
+import { Sword, Info, Settings, Zap, Volume2, VolumeX, Bot, Camera } from 'lucide-react';
 import { useAudio } from '@/lib/stores/useAudio';
 import { useLanguage } from '@/lib/stores/useLanguage';
 import { LanguageSelector } from '@/components/game/LanguageSelector';
@@ -63,6 +63,17 @@ export const MainMenu: React.FC = () => {
           >
             <Bot className="mr-2 h-5 w-5" />
             VS AI Player
+          </Button>
+
+          <Button
+            onClick={() => {
+              playClick();
+              setGamePhase('character-battle');
+            }}
+            className="w-full h-12 font-semibold transition-all bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 hover:scale-105 text-white"
+          >
+            <Camera className="mr-2 h-5 w-5" />
+            Character Battle
           </Button>
 
           <Button

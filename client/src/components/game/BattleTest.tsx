@@ -8,6 +8,7 @@ import { BattleResults } from './BattleResults';
 import { NFCCardDisplay } from './NFCCardDisplay';
 import { RouletteRPS } from './RouletteRPS';
 import { AttackEffects } from './AttackEffects';
+import { DialogueDisplay } from './DialogueDisplay';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { ArrowLeft, RotateCcw } from 'lucide-react';
@@ -17,6 +18,32 @@ export const BattleTest: React.FC = () => {
   const { playHit, playClick } = useAudio();
   const { t } = useLanguage();
   const [currentAttackEffect, setCurrentAttackEffect] = useState<string | null>(null);
+  const [showingDialogue, setShowingDialogue] = useState<'intro' | 'battle1' | 'battle2' | 'win' | 'lose' | null>(null);
+  const [dialogueStep, setDialogueStep] = useState(0);
+
+  // Show intro dialogue when battle starts
+  useEffect(() => {
+    if (battleState.phase === 'selecting' && dialogueStep === 0) {
+      const aiPlayer = battleState.players.find(p => p.aiOpponent);
+      if (aiPlayer?.aiOpponent) {
+        setShowingDialogue('intro');
+        setDialogueStep(1);
+      }
+    }
+  }, [battleState.phase, dialogueStep]);
+  
+  // Show battle dialogues during combat
+  useEffect(() => {
+    if (battleState.phase === 'rps' && dialogueStep === 1) {
+      const aiPlayer = battleState.players.find(p => p.aiOpponent);
+      if (aiPlayer?.aiOpponent) {
+        setTimeout(() => {
+          setShowingDialogue('battle1');
+          setDialogueStep(2);
+        }, 1000);
+      }
+    }
+  }, [battleState.phase, dialogueStep]);
 
   // Handle robot decisions
   useEffect(() => {
@@ -30,13 +57,16 @@ export const BattleTest: React.FC = () => {
   useEffect(() => {
     if (battleState.lastBattleResult) {
       // Show attack effect first
-      if (battleState.lastBattleResult.winnerAttack) {
-        console.log('Setting attack effect:', battleState.lastBattleResult.winnerAttack);
-        setCurrentAttackEffect(battleState.lastBattleResult.winnerAttack);
-        playHit();
+      if (battleState.lastBattleResult.winner) {
+        const winnerPlayer = battleState.players.find(p => p.id === battleState.lastBattleResult?.winner);
+        if (winnerPlayer?.selectedAttack) {
+          console.log('Setting attack effect:', winnerPlayer.selectedAttack);
+          setCurrentAttackEffect(winnerPlayer.selectedAttack);
+          playHit();
+        }
       }
     }
-  }, [battleState.lastBattleResult, playHit]);
+  }, [battleState.lastBattleResult, playHit, battleState.players]);
 
   const allPlayersSelectedAttacks = battleState.players.every(p => p.selectedAttack);
   const { getCurrentTurnPlayer, getPlayerTurnOrder } = useFighting();
@@ -190,6 +220,16 @@ export const BattleTest: React.FC = () => {
             </p>
           </div>
         </div>
+      )}
+      
+      {/* AI Dialogue Display */}
+      {showingDialogue && (
+        <DialogueDisplay
+          type={showingDialogue}
+          onComplete={() => setShowingDialogue(null)}
+          autoHide={true}
+          duration={3000}
+        />
       )}
     </div>
   );
