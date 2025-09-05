@@ -27,7 +27,7 @@ export const AttackSelector: React.FC<AttackSelectorProps> = ({
 }) => {
   const { selectAttack, battleState, getCurrentTurnPlayer, getPlayerTurnOrder } = useFighting();
   const { t } = useLanguage();
-  const { playClick } = useAudio();
+  const { playClick, playAttack } = useAudio();
   
   const player = battleState.players.find(p => p.id === playerId);
   const disabledAttacks = player?.disabledAttacks || [];
@@ -57,6 +57,7 @@ export const AttackSelector: React.FC<AttackSelectorProps> = ({
   const handleAttackSelect = (attack: AttackType) => {
     if (!disabled) {
       playClick();
+      playAttack(); // Add attack sound effect
       selectAttack(playerId, attack);
     }
   };

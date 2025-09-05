@@ -3,6 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useFighting } from '@/lib/stores/useFighting';
 import { useLanguage } from '@/lib/stores/useLanguage';
+import { useAudio } from '@/lib/stores/useAudio';
 import { CharacterCard, PowerCard } from '@/types/game';
 import { getAttackColor, getAttackName } from '@/lib/gameLogic';
 import { ArrowLeft, Play, Shield, Zap } from 'lucide-react';
@@ -10,6 +11,7 @@ import { ArrowLeft, Play, Shield, Zap } from 'lucide-react';
 export const CharacterSelectionScreen: React.FC = () => {
   const { battleState, setGamePhase, startBattle, selectCharacterCard, selectPowerCard } = useFighting();
   const { t } = useLanguage();
+  const { playClick, playCardSelect } = useAudio();
 
   const bothPlayersReady = battleState.players.every(p => p.selectedCharacterCard && p.selectedPowerCard);
 
@@ -58,7 +60,10 @@ export const CharacterSelectionScreen: React.FC = () => {
         className={`cursor-pointer transform transition-all duration-200 hover:scale-105 ${
           isSelected ? 'ring-4 ring-yellow-400 scale-105' : ''
         }`}
-        onClick={() => selectCharacterCard(playerId, index)}
+        onClick={() => {
+          playCardSelect();
+          selectCharacterCard(playerId, index);
+        }}
       >
         <Card className={`${elementColor} bg-opacity-20 border-2 border-current ${
           isSelected ? 'border-yellow-400' : ''

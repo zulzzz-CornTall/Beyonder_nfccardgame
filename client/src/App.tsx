@@ -12,13 +12,13 @@ import "@fontsource/inter";
 // Game results component
 const GameResults: React.FC = () => {
   const { battleState, resetBattle } = useFighting();
-  const { playSuccess } = useAudio();
+  const { playSuccess, playVictory, playClick } = useAudio();
   const { t } = useLanguage();
 
   useEffect(() => {
-    playSuccess();
+    playVictory(); // Play victory sound instead of success
     announceWinner(); // Announce the winner when the component is mounted
-  }, [playSuccess]);
+  }, [playVictory]);
 
   const winner = battleState.players.find(p => p.health > 0);
   const loser = battleState.players.find(p => p.health <= 0);
@@ -64,7 +64,10 @@ const GameResults: React.FC = () => {
         </div>
 
         <button
-          onClick={resetBattle}
+          onClick={() => {
+            playClick();
+            resetBattle();
+          }}
           className="px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-red-600 to-yellow-600 hover:from-red-700 hover:to-yellow-700 text-black font-semibold rounded-lg text-base sm:text-lg transition-all hover:scale-105 w-full sm:w-auto"
         >
           {t.playAgain}
@@ -82,30 +85,55 @@ function App() {
     setMainTheme,
     setHitSound, 
     setSuccessSound,
-    setClickSound
+    setClickSound,
+    setAttackSound,
+    setRouletteSpinSound,
+    setRpsSelectSound,
+    setVictorySound,
+    setDefeatSound,
+    setCardSelectSound
   } = useAudio();
 
   // Initialize audio and set up user interaction for autoplay
   useEffect(() => {
-    const { setBackgroundMusic, setMainTheme, setHitSound, setSuccessSound, setClickSound } = useAudio.getState();
+    const { 
+      setBackgroundMusic, setMainTheme, setHitSound, setSuccessSound, setClickSound,
+      setAttackSound, setRouletteSpinSound, setRpsSelectSound, setVictorySound, setDefeatSound, setCardSelectSound
+    } = useAudio.getState();
 
-    const backgroundMusic = new Audio('/attached_assets/Raise your cards, the battle\'s near,_1757069968911.mp3');
-    const mainTheme = new Audio('/sounds/main-theme.mp3');
+    // Use the latest uploaded background music
+    const backgroundMusic = new Audio('/attached_assets/Raise your cards, the battle\'s near,_1757076397428.mp3');
+    const mainTheme = new Audio('/attached_assets/Raise your cards, the battle\'s near,_1757076397428.mp3');
     const hitSound = new Audio('/sounds/hit.mp3');
     const successSound = new Audio('/sounds/success.mp3');
     const clickSound = new Audio('/sounds/hit.mp3'); // Using hit sound as click sound
+    const attackSound = new Audio('/sounds/hit.mp3'); // Using hit sound for attacks
+    const rouletteSpinSound = new Audio('/sounds/success.mp3'); // Using success sound for roulette
+    const rpsSelectSound = new Audio('/sounds/hit.mp3'); // Using hit sound for RPS selection
+    const victorySound = new Audio('/sounds/success.mp3'); // Using success sound for victory
+    const defeatSound = new Audio('/sounds/hit.mp3'); // Using hit sound for defeat
+    const cardSelectSound = new Audio('/sounds/success.mp3'); // Using success sound for card selection
 
-    // Preload the main theme
+    // Preload and configure the main theme
     mainTheme.preload = 'auto';
-
+    mainTheme.loop = true;
+    mainTheme.volume = 0.4;
+    
     backgroundMusic.loop = true;
-    backgroundMusic.volume = 0.3;
+    backgroundMusic.volume = 0.4;
 
+    // Set all audio elements
     setBackgroundMusic(backgroundMusic);
     setMainTheme(mainTheme);
     setHitSound(hitSound);
     setSuccessSound(successSound);
-    setClickSound(clickSound); // Set the click sound
+    setClickSound(clickSound);
+    setAttackSound(attackSound);
+    setRouletteSpinSound(rouletteSpinSound);
+    setRpsSelectSound(rpsSelectSound);
+    setVictorySound(victorySound);
+    setDefeatSound(defeatSound);
+    setCardSelectSound(cardSelectSound);
 
     // Handle user interaction for autoplay
     const handleFirstUserInteraction = () => {

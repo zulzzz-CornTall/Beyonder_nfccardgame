@@ -3,12 +3,14 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useFighting } from '@/lib/stores/useFighting';
 import { useLanguage } from '@/lib/stores/useLanguage';
+import { useAudio } from '@/lib/stores/useAudio';
 import { NFCCardDisplay } from './NFCCardDisplay';
 import { ArrowLeft, Play } from 'lucide-react';
 
 export const PreparationScreen: React.FC = () => {
   const { battleState, setGamePhase, startCharacterSelection, startBattle } = useFighting();
   const { t } = useLanguage();
+  const { playClick } = useAudio();
 
   const bothPlayersHaveCharacterCards = battleState.players.every(p => 
     p.scannedCards.some(card => card.type === 'character')
@@ -19,7 +21,10 @@ export const PreparationScreen: React.FC = () => {
       {/* Header - Mobile Responsive */}
       <div className="flex flex-col sm:flex-row justify-between items-center mb-4 sm:mb-6 gap-3 sm:gap-0">
         <Button 
-          onClick={() => setGamePhase('menu')}
+          onClick={() => {
+            playClick();
+            setGamePhase('menu');
+          }}
           variant="outline" 
           className="border-black/50 text-yellow-200 hover:bg-black/20 order-1 sm:order-1"
           size="sm"
@@ -38,6 +43,7 @@ export const PreparationScreen: React.FC = () => {
         <Button 
           onClick={() => {
             if (bothPlayersHaveCharacterCards) {
+              playClick();
               startBattle();
             }
           }}

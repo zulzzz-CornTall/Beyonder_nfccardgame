@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { useFighting } from '@/lib/stores/useFighting';
 import { useLanguage } from '@/lib/stores/useLanguage';
+import { useAudio } from '@/lib/stores/useAudio';
 import { RPSChoice } from '@/types/game';
 
 interface RouletteRPSProps {
@@ -17,6 +18,7 @@ export const RouletteRPS: React.FC<RouletteRPSProps> = ({
 }) => {
   const { battleState, selectRPS } = useFighting();
   const { t } = useLanguage();
+  const { playRouletteSpinning, playRpsSelect } = useAudio();
   const player = battleState.players.find(p => p.id === playerId);
   
   const [isSpinning, setIsSpinning] = useState(false);
@@ -57,6 +59,7 @@ export const RouletteRPS: React.FC<RouletteRPSProps> = ({
     
     setIsSpinning(true);
     setHasSpun(true);
+    playRouletteSpinning(); // Add spinning sound effect
     
     // Continuous spin animation until manually stopped
     const interval = setInterval(() => {
@@ -73,7 +76,8 @@ export const RouletteRPS: React.FC<RouletteRPSProps> = ({
     setSpinInterval(null);
     setIsSpinning(false);
     
-    // Select the final result based on current option
+    // Play selection sound and select the final result
+    playRpsSelect();
     const finalChoice = rpsOptions[currentOption].value;
     selectRPS(playerId, finalChoice);
   };
