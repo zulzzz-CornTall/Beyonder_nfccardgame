@@ -89,7 +89,7 @@ function App() {
   useEffect(() => {
     const { setBackgroundMusic, setMainTheme, setHitSound, setSuccessSound } = useAudio.getState();
 
-    const backgroundMusic = new Audio('/sounds/background.mp3');
+    const backgroundMusic = new Audio('/attached_assets/Raise your cards, the battle’s near,_1757069968911.mp3,');
     const mainTheme = new Audio('/sounds/main-theme.mp3');
     const hitSound = new Audio('/sounds/hit.mp3');
     const successSound = new Audio('/sounds/success.mp3');
@@ -102,8 +102,7 @@ function App() {
 
     setBackgroundMusic(backgroundMusic);
     setMainTheme(mainTheme);
-    setHitSound(hitSound);
-    setSuccessSound(successSound);
+    setHitSound(hitSound);soundsssetSuccessSound(successSound);
 
     // Handle user interaction for autoplay
     const handleFirstUserInteraction = () => {
