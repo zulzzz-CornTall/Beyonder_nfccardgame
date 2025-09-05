@@ -17,18 +17,6 @@ export const PreparationScreen: React.FC = () => {
   );
 
   const isVsRobot = battleState.gameMode === 'vs-robot';
-  const humanPlayer = battleState.players.find(p => !p.isRobot);
-  const robotPlayer = battleState.players.find(p => p.isRobot);
-
-  // Auto-scan cards for robot when human player scans
-  React.useEffect(() => {
-    if (isVsRobot && humanPlayer && robotPlayer && humanPlayer.scannedCards.length > 0) {
-      // Robot should have at least one card for each card the human has
-      if (robotPlayer.scannedCards.length < humanPlayer.scannedCards.length) {
-        scanNFCCard(robotPlayer.id);
-      }
-    }
-  }, [humanPlayer?.scannedCards.length, robotPlayer?.scannedCards.length, isVsRobot, scanNFCCard]);
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-red-900 via-orange-800 to-yellow-700 p-2 sm:p-4">
@@ -49,10 +37,10 @@ export const PreparationScreen: React.FC = () => {
 
         <div className="text-center order-2 sm:order-2">
           <h1 className="text-xl sm:text-2xl font-bold text-white">
-            {isVsRobot ? 'VS Robot Mode' : t.preparationPhase}
+            {isVsRobot ? 'VS AI Mode' : t.preparationPhase}
           </h1>
           <p className="text-yellow-300 text-xs sm:text-sm">
-            {isVsRobot ? 'Scan cards for yourself - Robot will use copies!' : t.bothPlayersMustScan}
+            {isVsRobot ? 'Both players scan cards - AI will play as Player 2' : t.bothPlayersMustScan}
           </p>
         </div>
 
@@ -103,7 +91,7 @@ export const PreparationScreen: React.FC = () => {
               {/* Player Header */}
               <div className="text-center mb-4">
                 <h2 className="text-xl font-bold text-white mb-2">
-                  {player.isRobot ? '🤖 Robot Player' : player.name}
+                  {player.isRobot ? '🤖 ' + player.name : player.name}
                 </h2>
                 <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
                   player.scannedCards.some(card => card.type === 'character')

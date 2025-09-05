@@ -51,7 +51,7 @@ export const MainMenu: React.FC = () => {
             className="w-full h-12 font-semibold transition-all bg-gradient-to-r from-red-600 to-yellow-600 hover:from-red-700 hover:to-yellow-700 hover:scale-105 text-white"
           >
             <Sword className="mr-2 h-5 w-5" />
-            Player vs Player
+            {t.startGame}
           </Button>
 
           <Button
@@ -62,7 +62,7 @@ export const MainMenu: React.FC = () => {
             className="w-full h-12 font-semibold transition-all bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 hover:scale-105 text-white"
           >
             <Bot className="mr-2 h-5 w-5" />
-            VS Robot
+            VS AI Player
           </Button>
 
           <Button

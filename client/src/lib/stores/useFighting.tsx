@@ -28,7 +28,7 @@ interface FightingState {
 
 const createInitialPlayer = (id: 1 | 2, isRobot?: boolean): Player => ({
   id,
-  name: isRobot ? `Robot ${id}` : `Player ${id}`,
+  name: isRobot ? `AI Player` : `Player ${id}`,
   health: 100,
   maxHealth: 100,
   scannedCards: [],  // Start with no scanned cards

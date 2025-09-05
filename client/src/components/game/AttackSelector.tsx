@@ -80,7 +80,7 @@ export const AttackSelector: React.FC<AttackSelectorProps> = ({
               {isPlayerTurn 
                 ? `🎯 Your Turn (Player ${playerTurnIndex})` 
                 : currentTurnPlayer.isRobot
-                ? `🤖 Robot is thinking...`
+                ? `🤖 AI is thinking...`
                 : `⏳ Player ${currentTurnPlayer.id}'s Turn`
               }
             </div>
