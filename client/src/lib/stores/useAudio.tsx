@@ -2,12 +2,14 @@ import { create } from "zustand";
 
 interface AudioState {
   backgroundMusic: HTMLAudioElement | null;
+  mainTheme: HTMLAudioElement | null;
   hitSound: HTMLAudioElement | null;
   successSound: HTMLAudioElement | null;
   isMuted: boolean;
   
   // Setter functions
   setBackgroundMusic: (music: HTMLAudioElement) => void;
+  setMainTheme: (music: HTMLAudioElement) => void;
   setHitSound: (sound: HTMLAudioElement) => void;
   setSuccessSound: (sound: HTMLAudioElement) => void;
   
@@ -16,15 +18,18 @@ interface AudioState {
   playHit: () => void;
   playSuccess: () => void;
   playBackgroundMusic: () => void;
+  playMainTheme: () => void;
 }
 
 export const useAudio = create<AudioState>((set, get) => ({
   backgroundMusic: null,
+  mainTheme: null,
   hitSound: null,
   successSound: null,
   isMuted: true, // Start muted by default
   
   setBackgroundMusic: (music) => set({ backgroundMusic: music }),
+  setMainTheme: (music) => set({ mainTheme: music }),
   setHitSound: (sound) => set({ hitSound: sound }),
   setSuccessSound: (sound) => set({ successSound: sound }),
   
@@ -85,6 +90,24 @@ export const useAudio = create<AudioState>((set, get) => ({
       backgroundMusic.currentTime = 0;
       backgroundMusic.play().catch(error => {
         console.log("Background music play prevented:", error);
+      });
+    }
+  },
+  
+  playMainTheme: () => {
+    const { mainTheme, isMuted } = get();
+    if (mainTheme) {
+      // If sound is muted, don't play anything
+      if (isMuted) {
+        console.log("Main theme skipped (muted)");
+        return;
+      }
+      
+      mainTheme.loop = true;
+      mainTheme.volume = 0.6;
+      mainTheme.currentTime = 0;
+      mainTheme.play().catch(error => {
+        console.log("Main theme play prevented:", error);
       });
     }
   }

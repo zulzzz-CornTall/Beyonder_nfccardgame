@@ -14,7 +14,7 @@ const GameResults: React.FC = () => {
   const { battleState, resetBattle } = useFighting();
   const { playSuccess } = useAudio();
   const { t } = useLanguage();
-  
+
   useEffect(() => {
     playSuccess();
     announceWinner(); // Announce the winner when the component is mounted
@@ -42,7 +42,7 @@ const GameResults: React.FC = () => {
             {winner?.name} {t.wins}
           </h2>
         </div>
-        
+
         <div className="space-y-3 sm:space-y-4 text-white">
           <div className="p-4 sm:p-6 bg-black/50 rounded-lg">
             <h3 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">{t.finalStats}</h3>
@@ -59,10 +59,10 @@ const GameResults: React.FC = () => {
               </div>
             </div>
           </div>
-          
+
           <p className="text-sm sm:text-lg">{t.battleLasted} {battleState.currentRound - 1} {t.rounds}</p>
         </div>
-        
+
         <button
           onClick={resetBattle}
           className="px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-red-600 to-yellow-600 hover:from-red-700 hover:to-yellow-700 text-black font-semibold rounded-lg text-base sm:text-lg transition-all hover:scale-105 w-full sm:w-auto"
@@ -77,21 +77,36 @@ const GameResults: React.FC = () => {
 // Main App component
 function App() {
   const { gamePhase } = useFighting();
-  const { setBackgroundMusic, setHitSound, setSuccessSound } = useAudio();
+  const { 
+    setBackgroundMusic, 
+    setMainTheme,
+    setHitSound, 
+    setSuccessSound,
+    playMainTheme
+  } = useAudio();
 
   // Initialize audio on app start
   useEffect(() => {
-    const bgMusic = new Audio('/sounds/background.mp3');
+    // Load audio files
+    const backgroundMusic = new Audio('/sounds/background.mp3');
+    const mainTheme = new Audio('/sounds/main-theme.mp3');
     const hitSound = new Audio('/sounds/hit.mp3');
     const successSound = new Audio('/sounds/success.mp3');
-    
-    bgMusic.loop = true;
-    bgMusic.volume = 0.3;
-    
-    setBackgroundMusic(bgMusic);
+
+    backgroundMusic.loop = true;
+    backgroundMusic.volume = 0.3;
+
+    // Set them in the store
+    setBackgroundMusic(backgroundMusic);
+    setMainTheme(mainTheme);
     setHitSound(hitSound);
     setSuccessSound(successSound);
-  }, [setBackgroundMusic, setHitSound, setSuccessSound]);
+
+    // Auto-play main theme after a short delay
+    setTimeout(() => {
+      playMainTheme();
+    }, 1000);
+  }, [setBackgroundMusic, setMainTheme, setHitSound, setSuccessSound, playMainTheme]);
 
   return (
     <div className="w-full min-h-screen overflow-x-hidden">
