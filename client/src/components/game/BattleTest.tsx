@@ -15,11 +15,21 @@ import { ArrowLeft, RotateCcw } from 'lucide-react';
 
 export const BattleTest: React.FC = () => {
   const { battleState, setGamePhase, resolveRound, resetBattle, startBattle, makeRobotDecision } = useFighting();
-  const { playHit, playClick } = useAudio();
+  const { playHit, playClick, playBattleTheme, stopBattleTheme } = useAudio();
   const { t } = useLanguage();
   const [currentAttackEffect, setCurrentAttackEffect] = useState<string | null>(null);
   const [showingDialogue, setShowingDialogue] = useState<'intro' | 'battle1' | 'battle2' | 'win' | 'lose' | null>(null);
   const [dialogueStep, setDialogueStep] = useState(0);
+
+  // Start battle theme music when component mounts
+  useEffect(() => {
+    playBattleTheme();
+    
+    // Cleanup: stop battle theme when component unmounts
+    return () => {
+      stopBattleTheme();
+    };
+  }, [playBattleTheme, stopBattleTheme]);
 
   // Show intro dialogue when battle starts
   useEffect(() => {

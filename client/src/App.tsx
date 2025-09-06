@@ -97,16 +97,20 @@ function App() {
 
   // Initialize audio and set up user interaction for autoplay
   useEffect(() => {
-    const { 
-      setBackgroundMusic, setMainTheme, setHitSound, setSuccessSound, setClickSound,
-      setAttackSound, setRouletteSpinSound, setRpsSelectSound, setVictorySound, setDefeatSound, setCardSelectSound
-    } = useAudio.getState();
+    // Load audio files
+    const mainTheme = new Audio('/sounds/background.mp3');
+    const battleTheme = new Audio('/attached_assets/Raise your cards, the battle\'s near,_1757069634307.mp3');
+    const hit = new Audio('/sounds/hit.mp3');
+    const success = new Audio('/sounds/success.mp3');
+
+    setMainTheme(mainTheme);
+    setBattleTheme(battleTheme);
+    setHitSound(hit);
+    setSuccessSound(success);
 
     // Use the latest uploaded background music
-    const backgroundMusic = new Audio('/attached_assets/Raise your cards, the battle\'s near,_1757131910467.mp3');
-    const mainTheme = new Audio('/attached_assets/Raise your cards, the battle\'s near,_1757131910467.mp3');
-    const hitSound = new Audio('/sounds/hit.mp3');
-    const successSound = new Audio('/sounds/success.mp3');
+    const backgroundMusic = new Audio('/attached_assets/Raise your cards, the battle\'s near,_1757069634307.mp3');
+    
     const clickSound = new Audio('/sounds/hit.mp3'); // Using hit sound as click sound
     const attackSound = new Audio('/sounds/hit.mp3'); // Using hit sound for attacks
     const rouletteSpinSound = new Audio('/sounds/success.mp3'); // Using success sound for roulette
@@ -119,15 +123,15 @@ function App() {
     mainTheme.preload = 'auto';
     mainTheme.loop = true;
     mainTheme.volume = 0.4;
-    
+
     backgroundMusic.loop = true;
     backgroundMusic.volume = 0.4;
 
     // Set all audio elements
     setBackgroundMusic(backgroundMusic);
-    setMainTheme(mainTheme);
-    setHitSound(hitSound);
-    setSuccessSound(successSound);
+    // setMainTheme(mainTheme); // Already set above
+    setHitSound(hit);
+    setSuccessSound(success);
     setClickSound(clickSound);
     setAttackSound(attackSound);
     setRouletteSpinSound(rouletteSpinSound);
@@ -140,6 +144,7 @@ function App() {
     const handleFirstUserInteraction = () => {
       console.log('User interaction detected, starting background music...');
       useAudio.getState().playMainTheme();
+      useAudio.getState().playBattleTheme(); // Play the battle theme
 
       // Remove the event listeners after first interaction
       document.removeEventListener('click', handleFirstUserInteraction);
