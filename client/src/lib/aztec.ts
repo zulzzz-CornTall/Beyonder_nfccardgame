@@ -27,88 +27,133 @@ export interface AztecData {
 
 export function parseAztecCode(data: string): AIOpponent | null {
   try {
-    const lines = data.trim().split('\n');
+    const lines = data.trim().split('\n').filter(line => line.trim() !== '');
     const parsed: any = {};
+    let currentSection = 'main';
     
-    for (const line of lines) {
-      const [key, ...valueParts] = line.split(': ');
-      const value = valueParts.join(': ');
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+      if (!line) continue;
       
-      if (key.toLowerCase().includes('character:')) {
-        // Parse character section
-        const charLines = lines.slice(lines.indexOf(line));
-        const character: any = {};
-        
-        for (const charLine of charLines) {
-          if (charLine.startsWith('Power:')) break;
-          
-          const [charKey, charValue] = charLine.split(': ');
-          if (charKey === 'Imgurl') character.imgurl = charValue;
-          if (charKey === 'Name') character.name = charValue;
-          if (charKey === 'HP') character.hp = parseInt(charValue);
-          if (charKey === 'B') character.b = parseInt(charValue);
-          if (charKey === 'G') character.g = parseInt(charValue);
-          if (charKey === 'S') character.s = parseInt(charValue);
-        }
-        parsed.character = character;
+      // Check for section headers
+      if (line.startsWith('Character:')) {
+        currentSection = 'character';
+        parsed.character = {};
         continue;
       }
       
-      if (key.toLowerCase().includes('power:')) {
-        // Parse power section
-        const powerLines = lines.slice(lines.indexOf(line));
-        const power: any = {};
-        
-        for (const powerLine of powerLines) {
-          if (powerLine.startsWith('Dialouge')) break;
-          
-          const [powerKey, powerValue] = powerLine.split(': ');
-          if (powerKey === 'Name') power.name = powerValue;
-          if (powerKey === 'Hp') power.hp = powerValue;
-          if (powerKey === 'Rock') power.rock = parseInt(powerValue);
-          if (powerKey === 'Paper') power.paper = parseInt(powerValue);
-          if (powerKey === 'Scizor') power.scizor = parseInt(powerValue);
-        }
-        parsed.power = power;
+      if (line.startsWith('Power:')) {
+        currentSection = 'power';
+        parsed.power = {};
         continue;
       }
       
-      // Parse simple key-value pairs
-      if (key === 'Name') parsed.name = value;
-      if (key === 'Imageurl') parsed.imageurl = value;
-      if (key === 'DialougeIntro') parsed.dialougeIntro = value;
-      if (key === 'Dialouge1') parsed.dialouge1 = value;
-      if (key === 'Dialouge2') parsed.dialouge2 = value;
-      if (key === 'DialougeWin') parsed.dialougeWin = value;
-      if (key === 'DialougeLose') parsed.dialougeLose = value;
+      // Parse key-value pairs
+      const colonIndex = line.indexOf(': ');
+      if (colonIndex === -1) continue;
+      
+      const key = line.substring(0, colonIndex).trim();
+      const value = line.substring(colonIndex + 2).trim();
+      
+      if (currentSection === 'character') {
+        switch (key) {
+          case 'Imgurl':
+            parsed.character.imgurl = value;
+            break;
+          case 'Name':
+            parsed.character.name = value;
+            break;
+          case 'HP':
+            parsed.character.hp = parseInt(value);
+            break;
+          case 'B':
+            parsed.character.b = parseInt(value);
+            break;
+          case 'G':
+            parsed.character.g = parseInt(value);
+            break;
+          case 'S':
+            parsed.character.s = parseInt(value);
+            break;
+        }
+      } else if (currentSection === 'power') {
+        switch (key) {
+          case 'Name':
+            parsed.power.name = value;
+            break;
+          case 'Hp':
+            parsed.power.hp = value;
+            break;
+          case 'Rock':
+            parsed.power.rock = parseInt(value);
+            break;
+          case 'Paper':
+            parsed.power.paper = parseInt(value);
+            break;
+          case 'Scizor':
+            parsed.power.scizor = parseInt(value);
+            break;
+        }
+      } else {
+        // Main section
+        switch (key) {
+          case 'Name':
+            parsed.name = value;
+            break;
+          case 'Imageurl':
+            parsed.imageurl = value;
+            break;
+          case 'DialougeIntro':
+            parsed.dialougeIntro = value;
+            break;
+          case 'Dialouge1':
+            parsed.dialouge1 = value;
+            break;
+          case 'Dialouge2':
+            parsed.dialouge2 = value;
+            break;
+          case 'DialougeWin':
+            parsed.dialougeWin = value;
+            break;
+          case 'DialougeLose':
+            parsed.dialougeLose = value;
+            break;
+        }
+      }
+    }
+    
+    // Validate required data
+    if (!parsed.character || !parsed.power || !parsed.name) {
+      console.error('Missing required data in AZTEC code:', parsed);
+      return null;
     }
     
     // Convert to AIOpponent format
     const characterCard: CharacterCard = {
       id: `ai_char_${Date.now()}`,
       type: 'character',
-      name: parsed.character.name,
-      hp: parsed.character.hp,
-      currentHp: parsed.character.hp,
-      burst: parsed.character.b,
-      guts: parsed.character.g,
-      slash: parsed.character.s,
-      imageUrl: parsed.character.imgurl,
+      name: parsed.character.name || 'Unknown Character',
+      hp: parsed.character.hp || 1000,
+      currentHp: parsed.character.hp || 1000,
+      burst: parsed.character.b || 100,
+      guts: parsed.character.g || 100,
+      slash: parsed.character.s || 100,
+      imageUrl: parsed.character.imgurl || '',
       element: 'burst', // Default element
-      attack: parsed.character.b,
+      attack: parsed.character.b || 100,
       defense: 0,
-      image: parsed.character.imgurl
+      image: parsed.character.imgurl || ''
     };
     
     const powerCard: PowerCard = {
       id: `ai_power_${Date.now()}`,
       type: 'power',
-      name: parsed.power.name,
-      hp: parseInt(parsed.power.hp.replace('%', '')),
-      rock: parsed.power.rock,
-      paper: parsed.power.paper,
-      scizor: parsed.power.scizor,
-      imageUrl: parsed.imageurl
+      name: parsed.power.name || 'Unknown Power',
+      hp: parseInt((parsed.power.hp || '50%').replace('%', '')),
+      rock: parsed.power.rock || 1,
+      paper: parsed.power.paper || 1,
+      scizor: parsed.power.scizor || 1,
+      imageUrl: parsed.imageurl || ''
     };
     
     return {
@@ -200,9 +245,14 @@ export async function scanAztecFromCamera(): Promise<string | null> {
       overlay.appendChild(closeButton);
       document.body.appendChild(overlay);
 
+      let isCleanedUp = false;
       const cleanup = () => {
+        if (isCleanedUp) return;
+        isCleanedUp = true;
         stream.getTracks().forEach(track => track.stop());
-        document.body.removeChild(overlay);
+        if (overlay && overlay.parentNode) {
+          overlay.parentNode.removeChild(overlay);
+        }
       };
 
       closeButton.onclick = () => {
