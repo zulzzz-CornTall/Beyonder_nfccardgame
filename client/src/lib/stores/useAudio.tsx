@@ -3,7 +3,6 @@ import { create } from "zustand";
 interface AudioState {
   backgroundMusic: HTMLAudioElement | null;
   mainTheme: HTMLAudioElement | null;
-  battleTheme: HTMLAudioElement | null;
   hitSound: HTMLAudioElement | null;
   successSound: HTMLAudioElement | null;
   clickSound: HTMLAudioElement | null;
@@ -18,7 +17,6 @@ interface AudioState {
   // Setter functions
   setBackgroundMusic: (music: HTMLAudioElement) => void;
   setMainTheme: (music: HTMLAudioElement) => void;
-  setBattleTheme: (music: HTMLAudioElement) => void;
   setHitSound: (sound: HTMLAudioElement) => void;
   setSuccessSound: (sound: HTMLAudioElement) => void;
   setClickSound: (sound: HTMLAudioElement) => void;
@@ -35,8 +33,6 @@ interface AudioState {
   playSuccess: () => void;
   playBackgroundMusic: () => void;
   playMainTheme: () => void;
-  playBattleTheme: () => void;
-  stopBattleTheme: () => void;
   playClick: () => void;
   playAttack: () => void;
   playRouletteSpinning: () => void;
@@ -49,7 +45,6 @@ interface AudioState {
 export const useAudio = create<AudioState>((set, get) => ({
   backgroundMusic: null,
   mainTheme: null,
-  battleTheme: null,
   hitSound: null,
   successSound: null,
   clickSound: null,
@@ -63,7 +58,6 @@ export const useAudio = create<AudioState>((set, get) => ({
   
   setBackgroundMusic: (music) => set({ backgroundMusic: music }),
   setMainTheme: (music) => set({ mainTheme: music }),
-  setBattleTheme: (music) => set({ battleTheme: music }),
   setHitSound: (sound) => set({ hitSound: sound }),
   setSuccessSound: (sound) => set({ successSound: sound }),
   setClickSound: (sound) => set({ clickSound: sound }),
@@ -161,32 +155,6 @@ export const useAudio = create<AudioState>((set, get) => ({
       mainTheme.play().catch(error => {
         console.log("Main theme play prevented:", error);
       });
-    }
-  },
-
-  playBattleTheme: () => {
-    const { battleTheme, isMuted } = get();
-    if (battleTheme) {
-      // If sound is muted, don't play anything
-      if (isMuted) {
-        console.log("Battle theme skipped (muted)");
-        return;
-      }
-      
-      battleTheme.loop = true;
-      battleTheme.volume = 0.4;
-      battleTheme.currentTime = 0;
-      battleTheme.play().catch(error => {
-        console.log("Battle theme play prevented:", error);
-      });
-    }
-  },
-
-  stopBattleTheme: () => {
-    const { battleTheme } = get();
-    if (battleTheme) {
-      battleTheme.pause();
-      battleTheme.currentTime = 0;
     }
   },
   
