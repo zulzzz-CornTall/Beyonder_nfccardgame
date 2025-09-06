@@ -20,6 +20,8 @@ export const BattleTest: React.FC = () => {
   const [currentAttackEffect, setCurrentAttackEffect] = useState<string | null>(null);
   const [showingDialogue, setShowingDialogue] = useState<'intro' | 'battle1' | 'battle2' | 'win' | 'lose' | null>(null);
   const [dialogueStep, setDialogueStep] = useState(0);
+  const [attackingPlayer, setAttackingPlayer] = useState<number | null>(null);
+  const [attackAnimation, setAttackAnimation] = useState<'idle' | 'attacking' | 'hit'>('idle');
 
   // Show intro dialogue when battle starts
   useEffect(() => {
@@ -56,13 +58,26 @@ export const BattleTest: React.FC = () => {
 
   useEffect(() => {
     if (battleState.lastBattleResult) {
-      // Show attack effect first
+      // Show attack animation sequence
       if (battleState.lastBattleResult.winner) {
         const winnerPlayer = battleState.players.find(p => p.id === battleState.lastBattleResult?.winner);
         if (winnerPlayer?.selectedAttack) {
-          console.log('Setting attack effect:', winnerPlayer.selectedAttack);
-          setCurrentAttackEffect(winnerPlayer.selectedAttack);
-          playHit();
+          console.log('Starting attack sequence:', winnerPlayer.selectedAttack);
+          setAttackingPlayer(winnerPlayer.id);
+          setAttackAnimation('attacking');
+          
+          // Play attack sound and show dash animation
+          setTimeout(() => {
+            playHit();
+            setCurrentAttackEffect(winnerPlayer.selectedAttack);
+            setAttackAnimation('hit');
+          }, 500);
+          
+          // Return to idle position
+          setTimeout(() => {
+            setAttackAnimation('idle');
+            setAttackingPlayer(null);
+          }, 1500);
         }
       }
     }
@@ -73,66 +88,90 @@ export const BattleTest: React.FC = () => {
   const turnOrder = getPlayerTurnOrder();
   const currentTurnPlayer = getCurrentTurnPlayer();
 
-  const renderPlayerCard = (player: any, isRotated: boolean) => (
-    <Card className="bg-black/50 backdrop-blur-sm border-black/50 h-full">
-      <CardContent className={`p-1 h-full ${isRotated ? 'transform rotate-180' : ''}`}>
-        {/* Compact Player Info - Single Line */}
-        <div className="flex items-center justify-between mb-1">
-          <div className="flex-1">
-            <h2 className="text-xs font-bold text-white truncate">{player.name}</h2>
-            <HealthBar health={player.health} maxHealth={player.maxHealth} />
+  const renderCharacterCard = (player: any, isPlayer2: boolean) => {
+    const isAttacking = attackingPlayer === player.id && attackAnimation === 'attacking';
+    const isBeingHit = attackingPlayer !== player.id && attackAnimation === 'hit';
+    
+    return (
+      <div className={`relative transition-all duration-500 ${
+        isPlayer2 
+          ? (isAttacking ? 'transform translate-x-20' : 'transform translate-x-0') 
+          : (isAttacking ? 'transform -translate-x-20' : 'transform translate-x-0')
+      } ${isBeingHit ? 'animate-bounce' : ''}`}>
+        {/* Character Image - Large and Prominent */}
+        <div className={`relative ${
+          isPlayer2 ? 'transform scale-x-[-1]' : ''
+        }`}>
+          <div className="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 rounded-full border-4 border-yellow-400 bg-gradient-to-br from-orange-600 to-red-700 shadow-2xl overflow-hidden">
+            {player.selectedCharacterCard && (
+              <img
+                src={player.selectedCharacterCard.image}
+                alt={player.selectedCharacterCard.name}
+                className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
+                onError={(e) => {
+                  e.currentTarget.src = '/textures/sand.jpg';
+                }}
+              />
+            )}
           </div>
-
-          {/* Character Image - Very Compact */}
-          {player.selectedCharacterCard && (
-            <div className="flex items-center gap-1 ml-2">
-              <div className="w-8 h-8 rounded border border-yellow-400/50 bg-gray-800 overflow-hidden flex-shrink-0">
-                <img
-                  src={player.selectedCharacterCard.image}
-                  alt={player.selectedCharacterCard.name}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.currentTarget.src = '/textures/sand.jpg';
-                  }}
-                />
-              </div>
-              <div className="text-xs">
-                <p className="text-white font-semibold leading-none">{player.selectedCharacterCard.name}</p>
-                <p className="text-yellow-400 leading-none capitalize">{player.selectedCharacterCard.element}</p>
-              </div>
-            </div>
+          
+          {/* Attack Effect Overlay */}
+          {isAttacking && (
+            <div className="absolute inset-0 bg-yellow-400/30 rounded-full animate-ping"></div>
           )}
+          
+          {/* Character Info */}
+          <div className={`absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-center ${
+            isPlayer2 ? 'transform scale-x-[-1]' : ''
+          }`}>
+            <h3 className="text-lg font-bold text-white bg-black/70 px-2 py-1 rounded">
+              {player.selectedCharacterCard?.name || player.name}
+            </h3>
+          </div>
         </div>
+        
+        {/* Health Bar - Prominent */}
+        <div className="mt-12 mb-4">
+          <div className="text-center mb-2">
+            <span className="text-white font-bold text-lg">{player.name}</span>
+          </div>
+          <HealthBar health={player.health} maxHealth={player.maxHealth} />
+        </div>
+      </div>
+    );
+  };
+  
+  const renderControlPanel = (player: any) => (
+    <Card className="bg-black/70 backdrop-blur-sm border-yellow-400/50">
+      <CardContent className="p-4">
+        {/* Attack Selection */}
+        {battleState.phase === 'selecting' && (
+          <AttackSelector
+            playerId={player.id}
+            selectedAttack={player.selectedAttack}
+            disabled={battleState.phase !== 'selecting'}
+          />
+        )}
 
-        {/* Compact Action Area */}
-        <div className="space-y-1">
-          {/* Attack Selection */}
-          {battleState.phase === 'selecting' && (
-            <AttackSelector
-              playerId={player.id}
-              selectedAttack={player.selectedAttack}
-              disabled={battleState.phase !== 'selecting'}
-            />
-          )}
+        {/* Rock-Paper-Scissors Roulette */}
+        {battleState.phase === 'rps' && player.selectedAttack && (
+          <RouletteRPS
+            playerId={player.id}
+            playerName={player.name}
+            selectedAttack={player.selectedAttack}
+          />
+        )}
 
-          {/* Rock-Paper-Scissors Roulette */}
-          {battleState.phase === 'rps' && player.selectedAttack && (
-            <RouletteRPS
-              playerId={player.id}
-              playerName={player.name}
-              selectedAttack={player.selectedAttack}
-            />
-          )}
-
-          {/* Battle Phase Status - Compact */}
-          {player.selectedAttack && (
-            <p className="text-xs text-yellow-300 text-center">
-              <span className="font-semibold text-white">
-                {player.selectedAttack.charAt(0).toUpperCase() + player.selectedAttack.slice(1)}
+        {/* Battle Phase Status */}
+        {player.selectedAttack && (
+          <div className="text-center mt-2">
+            <p className="text-sm text-yellow-300">
+              <span className="font-semibold text-white text-lg">
+                {player.selectedAttack.charAt(0).toUpperCase() + player.selectedAttack.slice(1)} Attack!
               </span>
             </p>
-          )}
-        </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
@@ -178,27 +217,61 @@ export const BattleTest: React.FC = () => {
         </Button>
       </div>
 
-      {/* Attack Effects */}
+      {/* Enhanced Attack Effects */}
       <AttackEffects
         attack={currentAttackEffect as any}
         onComplete={() => setCurrentAttackEffect(null)}
       />
+      
+      {/* Additional Visual Effects */}
+      {attackAnimation !== 'idle' && (
+        <div className="fixed inset-0 z-40 pointer-events-none">
+          <div className="absolute inset-0 bg-gradient-radial from-white/10 via-transparent to-transparent animate-ping"></div>
+        </div>
+      )}
 
-      {/* Main Battle Area - Compact Vertical Layout */}
-      <div className="flex flex-col gap-1 max-w-3xl mx-auto h-[60vh]">
-        {/* Player 2 - Top (Rotated 180 degrees) */}
-        {battleState.players.filter(p => p.id === 2).map((player) => (
-          <div key={player.id} className="flex-1">
-            {renderPlayerCard(player, true)}
+      {/* Main Battle Arena */}
+      <div className="relative max-w-6xl mx-auto">
+        {/* Battle Background Effects */}
+        <div className="absolute inset-0 bg-gradient-radial from-yellow-400/20 via-transparent to-transparent rounded-full animate-pulse"></div>
+        
+        {/* Character Face-off Area */}
+        <div className="relative h-[400px] flex items-center justify-between px-8 md:px-16">
+          {/* Player 1 */}
+          {battleState.players.filter(p => p.id === 1).map((player) => (
+            <div key={player.id} className="flex flex-col items-center">
+              {renderCharacterCard(player, false)}
+            </div>
+          ))}
+          
+          {/* VS Indicator */}
+          <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
+            <div className="text-6xl font-bold text-yellow-400 animate-pulse drop-shadow-2xl">
+              VS
+            </div>
+            <div className="text-center mt-2">
+              <div className="text-white font-bold text-lg bg-black/70 px-3 py-1 rounded-full">
+                Round {battleState.currentRound}
+              </div>
+            </div>
           </div>
-        ))}
-
-        {/* Player 1 - Bottom */}
-        {battleState.players.filter(p => p.id === 1).map((player) => (
-          <div key={player.id} className="flex-1">
-            {renderPlayerCard(player, false)}
-          </div>
-        ))}
+          
+          {/* Player 2 */}
+          {battleState.players.filter(p => p.id === 2).map((player) => (
+            <div key={player.id} className="flex flex-col items-center">
+              {renderCharacterCard(player, true)}
+            </div>
+          ))}
+        </div>
+        
+        {/* Control Panels */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+          {battleState.players.map((player) => (
+            <div key={player.id}>
+              {renderControlPanel(player)}
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Auto-progress messages - Compact */}
