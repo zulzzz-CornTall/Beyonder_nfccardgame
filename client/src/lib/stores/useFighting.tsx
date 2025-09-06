@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
-import { GamePhase, Player, BattleState, BattleResult, AttackType, RPSChoice, GameMode, AIOpponent } from '@/types/game';
+import { GamePhase, Player, BattleState, BattleResult, AttackType, RPSChoice, GameMode, AIOpponent, CharacterCard } from '@/types/game';
 import { calculateDamage, determineRoundWinner, createMockNFCCard, getWinReason, calculatePlayerStats } from '@/lib/gameLogic';
 import { scanNFCCard, isNFCSupported, requestNFCPermission, createNFCCardFromParsedData, mockNFCScan } from '@/lib/nfc';
 
@@ -81,7 +81,19 @@ export const useFighting = create<FightingState>()(
         aiPlayer.scannedCards = [aiOpponent.character, aiOpponent.power];
         aiPlayer.selectedCharacterCard = aiOpponent.character;
         aiPlayer.selectedPowerCard = aiOpponent.power;
-        players = [createInitialPlayer(1, false), aiPlayer];
+        
+        // Give Player 1 a default character in character-battle mode
+        const humanPlayer = createInitialPlayer(1, false);
+        const defaultCharacter = createMockNFCCard(1);
+        const defaultCharacterCard: CharacterCard = {
+          ...defaultCharacter,
+          type: 'character' as const,
+          currentHp: defaultCharacter.hp
+        };
+        humanPlayer.scannedCards = [defaultCharacterCard];
+        humanPlayer.selectedCharacterCard = defaultCharacterCard;
+        
+        players = [humanPlayer, aiPlayer];
       } else if (mode === 'vs-robot') {
         players = [createInitialPlayer(1, false), createInitialPlayer(2, true)];
       } else {
