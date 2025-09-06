@@ -217,17 +217,17 @@ export const BattleTest: React.FC = () => {
                   {/* Right: Player Info and Actions */}
                   <div className="flex-1 flex flex-col justify-between">
                     {/* Player Name and Health */}
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
+                    <div className="mb-2">
+                      <div className="flex items-center justify-between mb-1">
                         <h3 className="text-sm font-bold text-white">
                           {player.name} {player.isRobot && '🤖'}
                         </h3>
-                        <HealthBar
-                          current={player.health}
-                          max={player.maxHealth}
-                          compact={true}
-                        />
                       </div>
+                      <HealthBar
+                        current={player.health}
+                        max={player.maxHealth}
+                        compact={true}
+                      />
                     </div>
 
                     {/* Action Area */}
@@ -300,17 +300,17 @@ export const BattleTest: React.FC = () => {
                   {/* Right: Player Info and Actions */}
                   <div className="flex-1 flex flex-col justify-between">
                     {/* Player Name and Health */}
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
+                    <div className="mb-2">
+                      <div className="flex items-center justify-between mb-1">
                         <h3 className="text-sm font-bold text-white">
                           {player.name} {player.isRobot && '🤖'}
                         </h3>
-                        <HealthBar
-                          current={player.health}
-                          max={player.maxHealth}
-                          compact={true}
-                        />
                       </div>
+                      <HealthBar
+                        current={player.health}
+                        max={player.maxHealth}
+                        compact={true}
+                      />
                     </div>
 
                     {/* Action Area */}
