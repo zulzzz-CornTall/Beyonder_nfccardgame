@@ -138,7 +138,7 @@ function App() {
 
     // Handle user interaction for autoplay
     const handleFirstUserInteraction = () => {
-      console.log('User interaction detected, starting main theme...');
+      console.log('User interaction detected, starting background music...');
       useAudio.getState().playMainTheme();
 
       // Remove the event listeners after first interaction
