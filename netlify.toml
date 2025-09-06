@@ -1,0 +1,22 @@
+[build]
+  publish = "dist/public"
+  command = "npm run build"
+
+[build.environment]
+  NODE_VERSION = "20"
+  NPM_FLAGS = "--prefer-offline --no-audit"
+
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/server/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Netlify Functions (for serverless deployment)
+[functions]
+  directory = "dist/"
+  node_bundler = "esbuild"
