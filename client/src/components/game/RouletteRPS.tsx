@@ -86,15 +86,13 @@ export const RouletteRPS: React.FC<RouletteRPSProps> = ({
   if (player?.rpsChoice) {
     const selectedOption = rpsOptions.find(opt => opt.value === player.rpsChoice);
     return (
-      <Card className="bg-black/50 border-green-500/50">
-        <CardContent className="p-3 text-center">
-          <h3 className="text-sm font-bold text-white mb-1">{playerName}</h3>
-          <p className="text-green-300 text-xs mb-2">{t.attack}: {selectedAttack}</p>
+      <Card className="bg-black/50 border-green-500/50 w-full max-w-xs">
+        <CardContent className="p-2 text-center">
           <div className="text-3xl mb-1">
             {selectedOption?.emoji}
           </div>
           <p className="text-green-300 font-semibold text-xs">
-            {selectedOption?.name} {t.selected}!
+            {selectedOption?.name} ✓
           </p>
         </CardContent>
       </Card>
@@ -102,22 +100,20 @@ export const RouletteRPS: React.FC<RouletteRPSProps> = ({
   }
 
   return (
-    <Card className="bg-black/50 border-yellow-500/50">
-      <CardContent className="p-3">
-        <div className="text-center mb-2">
-          <h3 className="text-sm font-bold text-white mb-1">{playerName}</h3>
-          <p className="text-yellow-300 text-xs mb-2">{t.attack}: {selectedAttack}</p>
+    <Card className="bg-black/50 border-yellow-500/50 w-full max-w-xs">
+      <CardContent className="p-2">
+        <div className="text-center mb-1">
           {isSpinning ? (
-            <p className="text-yellow-300 font-semibold text-xs">🎲 {t.spinningRoulette}...</p>
+            <p className="text-yellow-300 font-semibold text-xs">🎲 Spinning...</p>
           ) : (
-            <p className="text-yellow-300 font-semibold text-xs">🎯 {t.readyToSpin}!</p>
+            <p className="text-yellow-300 font-semibold text-xs">🎯 Ready!</p>
           )}
         </div>
         
         {/* Roulette Display */}
         <div className="relative">
           <div className={`text-center transition-all duration-100 ${isSpinning ? 'scale-110' : 'scale-100'}`}>
-            <div className="text-4xl mb-1 transform transition-transform duration-100">
+            <div className="text-3xl mb-1 transform transition-transform duration-100">
               {rpsOptions[currentOption].emoji}
             </div>
             <div className={`text-xs font-semibold text-white ${isSpinning ? 'opacity-60' : 'opacity-100'}`}>
@@ -133,22 +129,22 @@ export const RouletteRPS: React.FC<RouletteRPSProps> = ({
         
         {/* Control buttons */}
         {!isSpinning && !hasSpun && (
-          <div className="mt-2">
+          <div className="mt-1">
             <button
               onClick={startRoulette}
-              className="w-full py-2 bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold rounded transition-all hover:scale-105"
+              className="w-full py-1 bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold rounded transition-all hover:scale-105"
             >
-              🎰 {t.startRoulette}
+              🎰 Start
             </button>
           </div>
         )}
         
         {/* Stop button when spinning */}
         {isSpinning && (
-          <div className="mt-2">
+          <div className="mt-1">
             <button
               onClick={stopRoulette}
-              className="w-full py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded transition-all hover:scale-105 animate-pulse"
+              className="w-full py-1 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded transition-all hover:scale-105 animate-pulse"
             >
               🛑 Stop!
             </button>

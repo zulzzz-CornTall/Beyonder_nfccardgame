@@ -65,12 +65,11 @@ export const AttackSelector: React.FC<AttackSelectorProps> = ({
   const attacks: AttackType[] = ['burst', 'guts', 'slash'];
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       <div className="text-center">
-        <h3 className="text-lg font-semibold text-white">{t.selectYourAttacks}</h3>
-        <div className="mt-2">
+        <div className="mb-1">
           {currentTurnPlayer && (
-            <div className={`inline-block px-3 py-1 rounded-full text-sm font-semibold ${
+            <div className={`inline-block px-2 py-1 rounded-full text-xs font-semibold ${
               isPlayerTurn 
                 ? 'bg-green-600 text-white' 
                 : currentTurnPlayer.isRobot
@@ -78,21 +77,22 @@ export const AttackSelector: React.FC<AttackSelectorProps> = ({
                 : 'bg-gray-600 text-gray-300'
             }`}>
               {isPlayerTurn 
-                ? `🎯 Your Turn (Player ${playerTurnIndex})` 
+                ? `🎯 Your Turn` 
                 : currentTurnPlayer.isRobot
-                ? `🤖 AI is thinking...`
+                ? `🤖 AI thinking...`
                 : `⏳ Player ${currentTurnPlayer.id}'s Turn`
               }
             </div>
           )}
           {!currentTurnPlayer && battleState.phase === 'selecting' && (
-            <div className="inline-block px-3 py-1 rounded-full text-sm font-semibold bg-blue-600 text-white">
-              ✅ Both attacks selected
+            <div className="inline-block px-2 py-1 rounded-full text-xs font-semibold bg-blue-600 text-white">
+              ✅ Both selected
             </div>
           )}
         </div>
       </div>
-      <div className="grid gap-3">
+      
+      <div className="grid grid-cols-3 gap-1">
         {attacks.map((attack) => {
           const Icon = ATTACK_ICONS[attack];
           const isSelected = selectedAttack === attack;
@@ -106,7 +106,7 @@ export const AttackSelector: React.FC<AttackSelectorProps> = ({
               disabled={isDisabled}
               variant={isSelected ? "default" : "outline"}
               className={`
-                h-16 p-4 flex flex-col items-center justify-center transition-all relative
+                h-12 p-1 flex flex-col items-center justify-center transition-all relative text-xs
                 ${isSelected 
                   ? `${baseColor} text-white hover:opacity-90` 
                   : 'border-purple-500/50 text-purple-200 hover:bg-purple-500/10 hover:border-purple-400'
@@ -115,23 +115,13 @@ export const AttackSelector: React.FC<AttackSelectorProps> = ({
                 ${disabledAttacks.includes(attack) ? 'border-red-500/50 bg-red-900/20' : ''}
               `}
             >
-              <Icon className="h-5 w-5 mb-1" />
-              <span className="font-semibold">
+              <Icon className="h-3 w-3 mb-1" />
+              <span className="font-semibold text-xs leading-none">
                 {getAttackName(attack)}
               </span>
               {disabledAttacks.includes(attack) && (
-                <span className="text-xs text-red-300 mt-1 text-center leading-tight">
-                  🚫 Cooldown
-                </span>
-              )}
-              {!isSelected && !disabledAttacks.includes(attack) && isPlayerTurn && (
-                <span className="text-xs opacity-75 mt-1 text-center leading-tight">
-                  {getAttackDescription(attack)}
-                </span>
-              )}
-              {!isSelected && !disabledAttacks.includes(attack) && !isPlayerTurn && (
-                <span className="text-xs opacity-75 mt-1 text-center leading-tight">
-                  Wait for your turn
+                <span className="text-xs text-red-300 leading-none">
+                  🚫
                 </span>
               )}
             </Button>
@@ -140,9 +130,9 @@ export const AttackSelector: React.FC<AttackSelectorProps> = ({
       </div>
 
       {selectedAttack && (
-        <div className="text-center p-3 bg-green-900/30 rounded-lg border border-green-500/30">
-          <p className="text-green-300 text-sm">
-            ✓ {t.attack} {t.selected}: <span className="font-semibold text-green-200">
+        <div className="text-center p-1 bg-green-900/30 rounded border border-green-500/30">
+          <p className="text-green-300 text-xs">
+            ✓ <span className="font-semibold text-green-200">
               {getAttackName(selectedAttack)}
             </span>
           </p>

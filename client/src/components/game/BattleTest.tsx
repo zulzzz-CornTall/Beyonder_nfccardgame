@@ -184,74 +184,85 @@ export const BattleTest: React.FC = () => {
         onComplete={() => setCurrentAttackEffect(null)}
       />
 
-      {/* Main Battle Area - Compact Vertical Layout */}
-      <div className="flex flex-col gap-1 max-w-3xl mx-auto h-[60vh]">
+      {/* Main Battle Area - Optimized Layout */}
+      <div className="flex flex-col gap-2 max-w-4xl mx-auto h-[calc(100vh-160px)] min-h-[500px]">
         {/* Player 2 - Top (Rotated 180 degrees) */}
         {battleState.players.filter(p => p.id === 2).map((player) => (
-          <div key={player.id} className="flex-1">
+          <div key={player.id} className="h-[48%]">
             <Card className="bg-black/50 backdrop-blur-sm border-black/50 h-full">
-              <CardContent className={`p-1 h-full transform rotate-180`}>
-                {/* Player Name and Health */}
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-lg font-bold text-white">
-                      {player.name} {player.isRobot && '🤖'}
-                    </h3>
-                    <HealthBar
-                      current={player.health}
-                      max={player.maxHealth}
-                      compact={true}
-                    />
+              <CardContent className={`p-2 h-full transform rotate-180`}>
+                <div className="flex h-full">
+                  {/* Left: Character Image - Large and Prominent */}
+                  <div className="flex-shrink-0 w-32 flex flex-col items-center justify-center mr-4">
+                    {player.selectedCharacterCard && (
+                      <>
+                        <div className="w-20 h-20 rounded-lg border-2 border-yellow-400/80 bg-gray-800 overflow-hidden shadow-lg mb-2">
+                          <img
+                            src={player.selectedCharacterCard.image}
+                            alt={player.selectedCharacterCard.name}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              e.currentTarget.src = '/textures/sand.jpg';
+                            }}
+                          />
+                        </div>
+                        <div className="text-center">
+                          <p className="text-white font-semibold text-xs">{player.selectedCharacterCard.name}</p>
+                          <p className="text-yellow-400 text-xs capitalize">{player.selectedCharacterCard.element}</p>
+                        </div>
+                      </>
+                    )}
                   </div>
-                </div>
 
-                {/* Character Image - Large and Prominent */}
-                {player.selectedCharacterCard && (
-                  <div className="flex flex-col items-center mb-4">
-                    <div className="w-24 h-24 rounded-lg border-2 border-yellow-400/80 bg-gray-800 overflow-hidden shadow-lg">
-                      <img
-                        src={player.selectedCharacterCard.image}
-                        alt={player.selectedCharacterCard.name}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          e.currentTarget.src = '/textures/sand.jpg';
-                        }}
-                      />
+                  {/* Right: Player Info and Actions */}
+                  <div className="flex-1 flex flex-col justify-between">
+                    {/* Player Name and Health */}
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-sm font-bold text-white">
+                          {player.name} {player.isRobot && '🤖'}
+                        </h3>
+                        <HealthBar
+                          current={player.health}
+                          max={player.maxHealth}
+                          compact={true}
+                        />
+                      </div>
                     </div>
-                    <div className="text-center mt-2">
-                      <p className="text-white font-semibold text-sm">{player.selectedCharacterCard.name}</p>
-                      <p className="text-yellow-400 text-xs capitalize">{player.selectedCharacterCard.element}</p>
+
+                    {/* Action Area */}
+                    <div className="flex-1 flex flex-col justify-center space-y-2">
+                      {/* Attack Selection */}
+                      {battleState.phase === 'selecting' && (
+                        <div className="max-h-32 overflow-hidden">
+                          <AttackSelector
+                            playerId={player.id}
+                            selectedAttack={player.selectedAttack}
+                            disabled={battleState.phase !== 'selecting'}
+                          />
+                        </div>
+                      )}
+                      {/* Rock-Paper-Scissors Roulette */}
+                      {battleState.phase === 'rps' && player.selectedAttack && (
+                        <div className="flex justify-center">
+                          <RouletteRPS
+                            playerId={player.id}
+                            playerName={player.name}
+                            selectedAttack={player.selectedAttack}
+                          />
+                        </div>
+                      )}
+
+                      {/* Battle Phase Status */}
+                      {player.selectedAttack && (
+                        <p className="text-xs text-yellow-300 text-center">
+                          <span className="font-semibold text-white">
+                            {player.selectedAttack.charAt(0).toUpperCase() + player.selectedAttack.slice(1)}
+                          </span>
+                        </p>
+                      )}
                     </div>
                   </div>
-                )}
-
-                {/* Compact Action Area */}
-                <div className="space-y-1">
-                  {/* Attack Selection */}
-                  {battleState.phase === 'selecting' && (
-                    <AttackSelector
-                      playerId={player.id}
-                      selectedAttack={player.selectedAttack}
-                      disabled={battleState.phase !== 'selecting'}
-                    />
-                  )}
-                  {/* Rock-Paper-Scissors Roulette */}
-                  {battleState.phase === 'rps' && player.selectedAttack && (
-                    <RouletteRPS
-                      playerId={player.id}
-                      playerName={player.name}
-                      selectedAttack={player.selectedAttack}
-                    />
-                  )}
-
-                  {/* Battle Phase Status - Compact */}
-                  {player.selectedAttack && (
-                    <p className="text-xs text-yellow-300 text-center">
-                      <span className="font-semibold text-white">
-                        {player.selectedAttack.charAt(0).toUpperCase() + player.selectedAttack.slice(1)}
-                      </span>
-                    </p>
-                  )}
                 </div>
               </CardContent>
             </Card>
@@ -260,70 +271,81 @@ export const BattleTest: React.FC = () => {
 
         {/* Player 1 - Bottom */}
         {battleState.players.filter(p => p.id === 1).map((player) => (
-          <div key={player.id} className="flex-1">
+          <div key={player.id} className="h-[48%]">
             <Card className="bg-black/50 backdrop-blur-sm border-black/50 h-full">
-              <CardContent className={`p-1 h-full`}>
-                {/* Player Name and Health */}
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-lg font-bold text-white">
-                      {player.name} {player.isRobot && '🤖'}
-                    </h3>
-                    <HealthBar
-                      current={player.health}
-                      max={player.maxHealth}
-                      compact={true}
-                    />
+              <CardContent className={`p-2 h-full`}>
+                <div className="flex h-full">
+                  {/* Left: Character Image - Large and Prominent */}
+                  <div className="flex-shrink-0 w-32 flex flex-col items-center justify-center mr-4">
+                    {player.selectedCharacterCard && (
+                      <>
+                        <div className="w-20 h-20 rounded-lg border-2 border-yellow-400/80 bg-gray-800 overflow-hidden shadow-lg mb-2">
+                          <img
+                            src={player.selectedCharacterCard.image}
+                            alt={player.selectedCharacterCard.name}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              e.currentTarget.src = '/textures/sand.jpg';
+                            }}
+                          />
+                        </div>
+                        <div className="text-center">
+                          <p className="text-white font-semibold text-xs">{player.selectedCharacterCard.name}</p>
+                          <p className="text-yellow-400 text-xs capitalize">{player.selectedCharacterCard.element}</p>
+                        </div>
+                      </>
+                    )}
                   </div>
-                </div>
 
-                {/* Character Image - Large and Prominent */}
-                {player.selectedCharacterCard && (
-                  <div className="flex flex-col items-center mb-4">
-                    <div className="w-24 h-24 rounded-lg border-2 border-yellow-400/80 bg-gray-800 overflow-hidden shadow-lg">
-                      <img
-                        src={player.selectedCharacterCard.image}
-                        alt={player.selectedCharacterCard.name}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          e.currentTarget.src = '/textures/sand.jpg';
-                        }}
-                      />
+                  {/* Right: Player Info and Actions */}
+                  <div className="flex-1 flex flex-col justify-between">
+                    {/* Player Name and Health */}
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-sm font-bold text-white">
+                          {player.name} {player.isRobot && '🤖'}
+                        </h3>
+                        <HealthBar
+                          current={player.health}
+                          max={player.maxHealth}
+                          compact={true}
+                        />
+                      </div>
                     </div>
-                    <div className="text-center mt-2">
-                      <p className="text-white font-semibold text-sm">{player.selectedCharacterCard.name}</p>
-                      <p className="text-yellow-400 text-xs capitalize">{player.selectedCharacterCard.element}</p>
+
+                    {/* Action Area */}
+                    <div className="flex-1 flex flex-col justify-center space-y-2">
+                      {/* Attack Selection */}
+                      {battleState.phase === 'selecting' && (
+                        <div className="max-h-32 overflow-hidden">
+                          <AttackSelector
+                            playerId={player.id}
+                            selectedAttack={player.selectedAttack}
+                            disabled={battleState.phase !== 'selecting'}
+                          />
+                        </div>
+                      )}
+                      {/* Rock-Paper-Scissors Roulette */}
+                      {battleState.phase === 'rps' && player.selectedAttack && (
+                        <div className="flex justify-center">
+                          <RouletteRPS
+                            playerId={player.id}
+                            playerName={player.name}
+                            selectedAttack={player.selectedAttack}
+                          />
+                        </div>
+                      )}
+
+                      {/* Battle Phase Status */}
+                      {player.selectedAttack && (
+                        <p className="text-xs text-yellow-300 text-center">
+                          <span className="font-semibold text-white">
+                            {player.selectedAttack.charAt(0).toUpperCase() + player.selectedAttack.slice(1)}
+                          </span>
+                        </p>
+                      )}
                     </div>
                   </div>
-                )}
-
-                {/* Compact Action Area */}
-                <div className="space-y-1">
-                  {/* Attack Selection */}
-                  {battleState.phase === 'selecting' && (
-                    <AttackSelector
-                      playerId={player.id}
-                      selectedAttack={player.selectedAttack}
-                      disabled={battleState.phase !== 'selecting'}
-                    />
-                  )}
-                  {/* Rock-Paper-Scissors Roulette */}
-                  {battleState.phase === 'rps' && player.selectedAttack && (
-                    <RouletteRPS
-                      playerId={player.id}
-                      playerName={player.name}
-                      selectedAttack={player.selectedAttack}
-                    />
-                  )}
-
-                  {/* Battle Phase Status - Compact */}
-                  {player.selectedAttack && (
-                    <p className="text-xs text-yellow-300 text-center">
-                      <span className="font-semibold text-white">
-                        {player.selectedAttack.charAt(0).toUpperCase() + player.selectedAttack.slice(1)}
-                      </span>
-                    </p>
-                  )}
                 </div>
               </CardContent>
             </Card>
