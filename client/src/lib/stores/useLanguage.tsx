@@ -333,7 +333,25 @@ const translations: Record<SupportedLanguage, Translation> = {
     // Status messages
     cardsReady: "Cartes (Personnage Prêt)",
     needCharacter: "Cartes (Besoin de Personnage)",
-    noCards: "Aucune Carte"
+    noCards: "Aucune Carte",
+    
+    // Rock Paper Scissors
+    spinningRoulette: "Roulette qui Tourne",
+    readyToSpin: "Prêt à tourner",
+    startRoulette: "Démarrer la Roulette",
+    
+    // Battle Results
+    attackUsed: "Attaque Utilisée",
+    effectiveness: "Efficacité",
+    damageDealt: "Dégâts Infligés",
+    criticalHit: "COUP CRITIQUE",
+    continuingIn3Seconds: "Continuation dans 3 secondes",
+    
+    // NFC Card Display
+    cannotScanDuringBattle: "Impossible de scanner les cartes pendant le combat! Veuillez attendre la fin du combat.",
+    scanFirstCard: "Scanner la Première Carte",
+    scanAnotherCard: "Scanner une Autre Carte",
+    maxCardsReached: "Vous ne pouvez scanner que jusqu'à 3 cartes par joueur!"
   },
   id: {
     mainTitle: "Arena Pertempuran",
@@ -427,7 +445,25 @@ const translations: Record<SupportedLanguage, Translation> = {
     // Status messages
     cardsReady: "Kartu (Karakter Siap)",
     needCharacter: "Kartu (Perlu Karakter)",
-    noCards: "Tidak Ada Kartu"
+    noCards: "Tidak Ada Kartu",
+    
+    // Rock Paper Scissors
+    spinningRoulette: "Roulette Berputar",
+    readyToSpin: "Siap untuk berputar",
+    startRoulette: "Mulai Roulette",
+    
+    // Battle Results
+    attackUsed: "Serangan Digunakan",
+    effectiveness: "Efektivitas",
+    damageDealt: "Damage yang Diberikan",
+    criticalHit: "SERANGAN KRITIS",
+    continuingIn3Seconds: "Melanjutkan dalam 3 detik",
+    
+    // NFC Card Display
+    cannotScanDuringBattle: "Tidak bisa memindai kartu selama pertempuran! Harap tunggu sampai pertempuran selesai.",
+    scanFirstCard: "Pindai Kartu Pertama",
+    scanAnotherCard: "Pindai Kartu Lain",
+    maxCardsReached: "Anda hanya bisa memindai hingga 3 kartu per pemain!"
   },
   pt: {
     mainTitle: "Arena de Batalha",
@@ -521,7 +557,25 @@ const translations: Record<SupportedLanguage, Translation> = {
     // Status messages
     cardsReady: "Cartas (Personagem Pronto)",
     needCharacter: "Cartas (Precisa de Personagem)",
-    noCards: "Sem Cartas"
+    noCards: "Sem Cartas",
+    
+    // Rock Paper Scissors
+    spinningRoulette: "Roleta Girando",
+    readyToSpin: "Pronto para girar",
+    startRoulette: "Iniciar Roleta",
+    
+    // Battle Results
+    attackUsed: "Ataque Usado",
+    effectiveness: "Efetividade",
+    damageDealt: "Dano Causado",
+    criticalHit: "GOLPE CRÍTICO",
+    continuingIn3Seconds: "Continuando em 3 segundos",
+    
+    // NFC Card Display
+    cannotScanDuringBattle: "Não é possível escanear cartas durante a batalha! Por favor, aguarde até o fim da batalha.",
+    scanFirstCard: "Escanear Primeira Carta",
+    scanAnotherCard: "Escanear Outra Carta",
+    maxCardsReached: "Você só pode escanear até 3 cartas por jogador!"
   },
   es: {
     mainTitle: "Arena de Batalla",
@@ -615,7 +669,25 @@ const translations: Record<SupportedLanguage, Translation> = {
     // Status messages
     cardsReady: "Cartas (Personaje Listo)",
     needCharacter: "Cartas (Necesita Personaje)",
-    noCards: "Sin Cartas"
+    noCards: "Sin Cartas",
+    
+    // Rock Paper Scissors
+    spinningRoulette: "Ruleta Girando",
+    readyToSpin: "Listo para girar",
+    startRoulette: "Iniciar Ruleta",
+    
+    // Battle Results
+    attackUsed: "Ataque Usado",
+    effectiveness: "Efectividad",
+    damageDealt: "Daño Causado",
+    criticalHit: "GOLPE CRÍTICO",
+    continuingIn3Seconds: "Continuando en 3 segundos",
+    
+    // NFC Card Display
+    cannotScanDuringBattle: "¡No se puede escanear cartas durante la batalla! Por favor espera hasta que termine la batalla.",
+    scanFirstCard: "Escanear Primera Carta",
+    scanAnotherCard: "Escanear Otra Carta",
+    maxCardsReached: "¡Solo puedes escanear hasta 3 cartas por jugador!"
   },
   ar: {
     mainTitle: "حلبة المعركة",
@@ -709,7 +781,25 @@ const translations: Record<SupportedLanguage, Translation> = {
     // Status messages
     cardsReady: "البطاقات (الشخصية جاهزة)",
     needCharacter: "البطاقات (تحتاج شخصية)",
-    noCards: "لا توجد بطاقات"
+    noCards: "لا توجد بطاقات",
+    
+    // Rock Paper Scissors
+    spinningRoulette: "الروليت يدور",
+    readyToSpin: "جاهز للدوران",
+    startRoulette: "ابدأ الروليت",
+    
+    // Battle Results
+    attackUsed: "الهجوم المستخدم",
+    effectiveness: "الفعالية",
+    damageDealt: "الضرر الملحق",
+    criticalHit: "ضربة حرجة",
+    continuingIn3Seconds: "المتابعة في 3 ثوان",
+    
+    // NFC Card Display
+    cannotScanDuringBattle: "لا يمكن مسح البطاقات أثناء المعركة! انتظر حتى تنتهي المعركة.",
+    scanFirstCard: "مسح البطاقة الأولى",
+    scanAnotherCard: "مسح بطاقة أخرى",
+    maxCardsReached: "يمكنك فقط مسح حتى 3 بطاقات لكل لاعب!"
   },
   tl: {
     mainTitle: "Arena ng Labanan",
@@ -803,7 +893,25 @@ const translations: Record<SupportedLanguage, Translation> = {
     // Status messages
     cardsReady: "Mga Kard (Handa na ang Character)",
     needCharacter: "Mga Kard (Kailangan ng Character)",
-    noCards: "Walang mga Kard"
+    noCards: "Walang mga Kard",
+    
+    // Rock Paper Scissors
+    spinningRoulette: "Umuikot ang Roulette",
+    readyToSpin: "Handa na mag-spin",
+    startRoulette: "Simulan ang Roulette",
+    
+    // Battle Results
+    attackUsed: "Ginamit na Atake",
+    effectiveness: "Bisa",
+    damageDealt: "Damage na Ginawa",
+    criticalHit: "CRITICAL HIT",
+    continuingIn3Seconds: "Magpapatuloy sa 3 segundo",
+    
+    // NFC Card Display
+    cannotScanDuringBattle: "Hindi maaaring mag-scan ng mga kard habang may labanan! Maghintay na matapos ang labanan.",
+    scanFirstCard: "I-scan ang Unang Kard",
+    scanAnotherCard: "I-scan ang Ibang Kard",
+    maxCardsReached: "Hanggang 3 kard lang ang pwedeng i-scan bawat manlalaro!"
   },
   th: {
     mainTitle: "สนามรบ",
@@ -991,7 +1099,25 @@ const translations: Record<SupportedLanguage, Translation> = {
     // Status messages
     cardsReady: "カード（キャラクター準備完了）",
     needCharacter: "カード（キャラクターが必要）",
-    noCards: "カードなし"
+    noCards: "カードなし",
+    
+    // Rock Paper Scissors
+    spinningRoulette: "ルーレット回転中",
+    readyToSpin: "回転準備完了",
+    startRoulette: "ルーレット開始",
+    
+    // Battle Results
+    attackUsed: "使用した攻撃",
+    effectiveness: "効果",
+    damageDealt: "与えたダメージ",
+    criticalHit: "クリティカルヒット",
+    continuingIn3Seconds: "3秒後に続行",
+    
+    // NFC Card Display
+    cannotScanDuringBattle: "バトル中はカードをスキャンできません！バトル終了まで待ってください。",
+    scanFirstCard: "最初のカードをスキャン",
+    scanAnotherCard: "別のカードをスキャン",
+    maxCardsReached: "1プレイヤーにつき最大3枚までしかスキャンできません！"
   },
   zh: {
     mainTitle: "战斗竞技场",
@@ -1085,7 +1211,25 @@ const translations: Record<SupportedLanguage, Translation> = {
     // Status messages
     cardsReady: "卡片（角色就绪）",
     needCharacter: "卡片（需要角色）",
-    noCards: "无卡片"
+    noCards: "无卡片",
+    
+    // Rock Paper Scissors
+    spinningRoulette: "轮盘旋转中",
+    readyToSpin: "准备旋转",
+    startRoulette: "开始轮盘",
+    
+    // Battle Results
+    attackUsed: "使用的攻击",
+    effectiveness: "效果",
+    damageDealt: "造成的伤害",
+    criticalHit: "暴击",
+    continuingIn3Seconds: "3秒后继续",
+    
+    // NFC Card Display
+    cannotScanDuringBattle: "战斗中无法扫描卡片！请等待战斗结束。",
+    scanFirstCard: "扫描第一张卡片",
+    scanAnotherCard: "扫描另一张卡片",
+    maxCardsReached: "每位玩家最多只能扫描3张卡片！"
   },
   ko: {
     mainTitle: "배틀 아레나",
@@ -1179,7 +1323,25 @@ const translations: Record<SupportedLanguage, Translation> = {
     // Status messages
     cardsReady: "카드 (캐릭터 준비 완료)",
     needCharacter: "카드 (캐릭터 필요)",
-    noCards: "카드 없음"
+    noCards: "카드 없음",
+    
+    // Rock Paper Scissors
+    spinningRoulette: "룰렛 회전 중",
+    readyToSpin: "회전 준비 완료",
+    startRoulette: "룰렛 시작",
+    
+    // Battle Results
+    attackUsed: "사용된 공격",
+    effectiveness: "효과",
+    damageDealt: "입힌 피해",
+    criticalHit: "크리티컬 히트",
+    continuingIn3Seconds: "3초 후 계속",
+    
+    // NFC Card Display
+    cannotScanDuringBattle: "전투 중에는 카드를 스캔할 수 없습니다! 전투가 끝날 때까지 기다려주세요.",
+    scanFirstCard: "첫 번째 카드 스캔",
+    scanAnotherCard: "다른 카드 스캔",
+    maxCardsReached: "플레이어당 최대 3장까지만 스캔할 수 있습니다!"
   },
   ru: {
     mainTitle: "Боевая Арена",
@@ -1273,7 +1435,25 @@ const translations: Record<SupportedLanguage, Translation> = {
     // Status messages
     cardsReady: "Карты (Персонаж Готов)",
     needCharacter: "Карты (Нужен Персонаж)",
-    noCards: "Нет Карт"
+    noCards: "Нет Карт",
+    
+    // Rock Paper Scissors
+    spinningRoulette: "Рулетка Крутится",
+    readyToSpin: "Готово к вращению",
+    startRoulette: "Запустить Рулетку",
+    
+    // Battle Results
+    attackUsed: "Использованная Атака",
+    effectiveness: "Эффективность",
+    damageDealt: "Нанесённый Урон",
+    criticalHit: "КРИТИЧЕСКИЙ УДАР",
+    continuingIn3Seconds: "Продолжение через 3 секунды",
+    
+    // NFC Card Display
+    cannotScanDuringBattle: "Нельзя сканировать карты во время битвы! Пожалуйста, дождитесь окончания битвы.",
+    scanFirstCard: "Отсканировать Первую Карту",
+    scanAnotherCard: "Отсканировать Другую Карту",
+    maxCardsReached: "Можно отсканировать максимум 3 карты на игрока!"
   }
 };
 
