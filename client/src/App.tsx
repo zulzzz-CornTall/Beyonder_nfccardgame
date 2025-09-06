@@ -103,8 +103,8 @@ function App() {
     } = useAudio.getState();
 
     // Use the latest uploaded background music
-    const backgroundMusic = new Audio('/attached_assets/Raise your cards, the battle\'s near,_1757076397428.mp3');
-    const mainTheme = new Audio('/attached_assets/Raise your cards, the battle\'s near,_1757076397428.mp3');
+    const backgroundMusic = new Audio('/attached_assets/Raise your cards, the battle\'s near,_1757131910467.mp3');
+    const mainTheme = new Audio('/attached_assets/Raise your cards, the battle\'s near,_1757131910467.mp3');
     const hitSound = new Audio('/sounds/hit.mp3');
     const successSound = new Audio('/sounds/success.mp3');
     const clickSound = new Audio('/sounds/hit.mp3'); // Using hit sound as click sound
