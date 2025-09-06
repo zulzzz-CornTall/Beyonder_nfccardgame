@@ -1005,7 +1005,25 @@ const translations: Record<SupportedLanguage, Translation> = {
     // Status messages
     cardsReady: "การ์ด (ตัวละครพร้อม)",
     needCharacter: "การ์ด (ต้องการตัวละคร)",
-    noCards: "ไม่มีการ์ด"
+    noCards: "ไม่มีการ์ด",
+    
+    // Rock Paper Scissors
+    spinningRoulette: "รูเล็ตหมุน",
+    readyToSpin: "พร้อมหมุน",
+    startRoulette: "เริ่มรูเล็ต",
+    
+    // Battle Results
+    attackUsed: "การโจมตีที่ใช้",
+    effectiveness: "ประสิทธิภาพ",
+    damageDealt: "ความเสียหายที่สร้าง",
+    criticalHit: "โจมตีวิกฤต",
+    continuingIn3Seconds: "ดำเนินต่อใน 3 วินาที",
+    
+    // NFC Card Display
+    cannotScanDuringBattle: "ไม่สามารถสแกนการ์ดระหว่างการต่อสู้! โปรดรอจนกว่าการต่อสู้จะสิ้นสุด",
+    scanFirstCard: "สแกนการ์ดแรก",
+    scanAnotherCard: "สแกนการ์ดอื่น",
+    maxCardsReached: "สามารถสแกนได้สูงสุด 3 การ์ดต่อผู้เล่น!"
   },
   ja: {
     mainTitle: "バトルアリーナ",
