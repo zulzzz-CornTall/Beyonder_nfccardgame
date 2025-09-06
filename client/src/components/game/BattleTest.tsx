@@ -10,11 +10,11 @@ import { RouletteRPS } from './RouletteRPS';
 import { AttackEffects } from './AttackEffects';
 import { DialogueDisplay } from './DialogueDisplay';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, RotateCcw } from 'lucide-react';
 
 export const BattleTest: React.FC = () => {
-  const { battleState, setGamePhase, resolveRound, resetBattle, startBattle, makeRobotDecision } = useFighting();
+  const { battleState, setGamePhase, resolveRound, resetBattle, startBattle, makeRobotDecision, getCurrentTurnPlayer, getPlayerTurnOrder } = useFighting();
   const { playHit, playClick, playAttack, playSuccess } = useAudio();
   const { t } = useLanguage();
   const [currentAttackEffect, setCurrentAttackEffect] = useState<string | null>(null);
@@ -33,7 +33,7 @@ export const BattleTest: React.FC = () => {
       }
     }
   }, [battleState.phase, dialogueStep]);
-  
+
   // Show battle dialogues during combat
   useEffect(() => {
     if (battleState.phase === 'rps' && dialogueStep === 1) {
@@ -65,10 +65,10 @@ export const BattleTest: React.FC = () => {
           console.log('Starting attack sequence:', winnerPlayer.selectedAttack);
           setAttackingPlayer(winnerPlayer.id);
           setAttackAnimation('attacking');
-          
+
           // Play dash sound immediately
           playClick(); // Dash sound
-          
+
           // Play attack-specific sound and show effects
           setTimeout(() => {
             // Play different sound based on attack type
@@ -88,7 +88,7 @@ export const BattleTest: React.FC = () => {
             setCurrentAttackEffect(winnerPlayer.selectedAttack);
             setAttackAnimation('hit');
           }, 500);
-          
+
           // Return to idle position
           setTimeout(() => {
             setAttackAnimation('idle');
@@ -100,18 +100,24 @@ export const BattleTest: React.FC = () => {
   }, [battleState.lastBattleResult, playHit, battleState.players]);
 
   const allPlayersSelectedAttacks = battleState.players.every(p => p.selectedAttack);
-  const { getCurrentTurnPlayer, getPlayerTurnOrder } = useFighting();
   const turnOrder = getPlayerTurnOrder();
   const currentTurnPlayer = getCurrentTurnPlayer();
+
+  const getPlayerDisplayName = (player: any) => {
+    if (player.selectedCharacterCard && player.selectedCharacterCard.character.name) {
+      return player.selectedCharacterCard.character.name;
+    }
+    return player.name;
+  };
 
   const renderCharacterCard = (player: any, isPlayer2: boolean) => {
     const isAttacking = attackingPlayer === player.id && attackAnimation === 'attacking';
     const isBeingHit = attackingPlayer !== player.id && attackAnimation === 'hit';
-    
+
     return (
       <div className={`relative transition-all duration-500 ${
-        isPlayer2 
-          ? (isAttacking ? 'transform translate-x-20' : 'transform translate-x-0') 
+        isPlayer2
+          ? (isAttacking ? 'transform translate-x-20' : 'transform translate-x-0')
           : (isAttacking ? 'transform -translate-x-20' : 'transform translate-x-0')
       } ${isBeingHit ? 'animate-hit-impact' : ''}`}>
         {/* Character Image - Large and Prominent */}
@@ -132,7 +138,7 @@ export const BattleTest: React.FC = () => {
               />
             )}
           </div>
-          
+
           {/* Attack Effect Overlay */}
           {isAttacking && (
             <>
@@ -141,7 +147,7 @@ export const BattleTest: React.FC = () => {
               <div className="absolute -inset-2 bg-gradient-radial from-yellow-400/40 via-orange-500/20 to-transparent rounded-full animate-power-surge"></div>
             </>
           )}
-          
+
           {/* Character Info */}
           <div className={`absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-center ${
             isPlayer2 ? 'transform scale-x-[-1]' : ''
@@ -151,7 +157,7 @@ export const BattleTest: React.FC = () => {
             </h3>
           </div>
         </div>
-        
+
         {/* Health Bar - Prominent */}
         <div className="mt-12 mb-4">
           <div className="text-center mb-2">
@@ -162,7 +168,7 @@ export const BattleTest: React.FC = () => {
       </div>
     );
   };
-  
+
   const renderControlPanel = (player: any) => (
     <Card className="bg-black/70 backdrop-blur-sm border-yellow-400/50">
       <CardContent className="p-4">
@@ -199,9 +205,9 @@ export const BattleTest: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-red-900 via-orange-800 to-yellow-700 p-2 sm:p-4">
-      {/* Header */}
-      <div className="flex justify-between items-center mb-2 sm:mb-3">
+    <div className="h-screen w-full bg-gradient-to-br from-red-900 via-orange-800 to-yellow-700 flex flex-col overflow-hidden">
+      {/* Header with round info and controls - Compact */}
+      <div className="flex justify-between items-center p-3 bg-black/30 flex-shrink-0">
         <Button
           onClick={() => {
             playClick();
@@ -216,8 +222,8 @@ export const BattleTest: React.FC = () => {
         </Button>
 
         <div className="text-center">
-          <h1 className="text-xl sm:text-2xl font-bold text-white">{t.round} {battleState.currentRound}</h1>
-          <p className="text-yellow-300 text-xs sm:text-sm">
+          <h1 className="text-xl font-bold text-white">{t.round} {battleState.currentRound}</h1>
+          <p className="text-yellow-300 text-sm">
             {battleState.phase === 'selecting' && t.selectYourAttacks}
             {battleState.phase === 'rps' && t.chooserps}
             {battleState.phase === 'resolving' && t.determiningWinner}
@@ -244,7 +250,7 @@ export const BattleTest: React.FC = () => {
         attack={currentAttackEffect as any}
         onComplete={() => setCurrentAttackEffect(null)}
       />
-      
+
       {/* Additional Visual Effects */}
       {attackAnimation !== 'idle' && (
         <div className="fixed inset-0 z-40 pointer-events-none">
@@ -252,47 +258,132 @@ export const BattleTest: React.FC = () => {
         </div>
       )}
 
-      {/* Main Battle Arena */}
-      <div className="relative max-w-6xl mx-auto">
-        {/* Battle Background Effects */}
-        <div className="absolute inset-0 bg-gradient-radial from-yellow-400/20 via-transparent to-transparent rounded-full animate-pulse"></div>
-        
-        {/* Character Face-off Area */}
-        <div className="relative h-[400px] flex items-center justify-between px-8 md:px-16">
-          {/* Player 1 */}
-          {battleState.players.filter(p => p.id === 1).map((player) => (
-            <div key={player.id} className="flex flex-col items-center">
-              {renderCharacterCard(player, false)}
+      {/* Main Battle Area - 16:9 Desktop Optimized Layout */}
+      <div className="flex-1 flex flex-col min-h-0">
+        {/* Characters Section - Upper Half */}
+        <div className="flex-1 grid grid-cols-2 gap-8 p-6">
+          {/* Player 1 Character */}
+          <div className="flex flex-col items-center justify-center space-y-4">
+            {/* Character Info Header */}
+            <div className="text-center bg-purple-900/30 p-3 rounded border border-purple-500/30 w-full max-w-xs">
+              <p className="text-purple-200 text-sm">{getPlayerDisplayName(battleState.players.find(p => p.id === 1))}</p>
+              {battleState.players.find(p => p.id === 1)?.selectedCharacterCard && (
+                <>
+                  <p className="text-white font-semibold">{battleState.players.find(p => p.id === 1)?.selectedCharacterCard.character.name}</p>
+                  {battleState.players.find(p => p.id === 1)?.selectedPowerCard && (
+                    <p className="text-blue-300 text-sm">{t.power}: {battleState.players.find(p => p.id === 1)?.selectedPowerCard.power.name}</p>
+                  )}
+                </>
+              )}
             </div>
-          ))}
-          
-          {/* VS Indicator */}
-          <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
-            <div className="text-6xl font-bold text-yellow-400 animate-pulse drop-shadow-2xl">
-              VS
+
+            {/* Health Bar */}
+            <div className="w-full max-w-xs">
+              <HealthBar
+                currentHP={battleState.players.find(p => p.id === 1)?.currentHP}
+                maxHP={battleState.players.find(p => p.id === 1)?.maxHP}
+                playerName={getPlayerDisplayName(battleState.players.find(p => p.id === 1))}
+                isActive={battleState.phase === 'selecting' && currentTurnPlayer?.id === 1}
+              />
             </div>
-            <div className="text-center mt-2">
-              <div className="text-white font-bold text-lg bg-black/70 px-3 py-1 rounded-full">
-                Round {battleState.currentRound}
-              </div>
+
+            {/* Character Display */}
+            <div className="flex-1 bg-purple-900/20 rounded-lg border border-purple-500/30 flex items-center justify-center w-full max-w-xs h-48 relative overflow-hidden">
+              {battleState.players.find(p => p.id === 1)?.selectedCharacterCard?.character.image ? (
+                <img
+                  src={battleState.players.find(p => p.id === 1)?.selectedCharacterCard.character.image}
+                  alt={battleState.players.find(p => p.id === 1)?.selectedCharacterCard.character.name}
+                  className={`max-w-full max-h-full object-contain transition-all duration-500 ${
+                    attackAnimation === 'player1-attack' ? 'scale-110 animate-pulse' : ''
+                  }`}
+                />
+              ) : (
+                <div className="text-8xl">👤</div>
+              )}
+
+              {/* Attack Effect Overlay */}
+              {currentAttackEffect === 'player1' && (
+                <div className="absolute inset-0 bg-gradient-radial from-red-500/50 via-orange-500/30 to-transparent animate-ping"></div>
+              )}
             </div>
           </div>
-          
-          {/* Player 2 */}
-          {battleState.players.filter(p => p.id === 2).map((player) => (
-            <div key={player.id} className="flex flex-col items-center">
-              {renderCharacterCard(player, true)}
+
+          {/* Player 2 Character */}
+          <div className="flex flex-col items-center justify-center space-y-4">
+            {/* Character Info Header */}
+            <div className="text-center bg-blue-900/30 p-3 rounded border border-blue-500/30 w-full max-w-xs">
+              <p className="text-blue-200 text-sm">{getPlayerDisplayName(battleState.players.find(p => p.id === 2))}</p>
+              {battleState.players.find(p => p.id === 2)?.selectedCharacterCard && (
+                <>
+                  <p className="text-white font-semibold">{battleState.players.find(p => p.id === 2)?.selectedCharacterCard.character.name}</p>
+                  {battleState.players.find(p => p.id === 2)?.selectedPowerCard && (
+                    <p className="text-purple-300 text-sm">{t.power}: {battleState.players.find(p => p.id === 2)?.selectedPowerCard.power.name}</p>
+                  )}
+                </>
+              )}
             </div>
-          ))}
+
+            {/* Health Bar */}
+            <div className="w-full max-w-xs">
+              <HealthBar
+                currentHP={battleState.players.find(p => p.id === 2)?.currentHP}
+                maxHP={battleState.players.find(p => p.id === 2)?.maxHP}
+                playerName={getPlayerDisplayName(battleState.players.find(p => p.id === 2))}
+                isActive={battleState.phase === 'selecting' && currentTurnPlayer?.id === 2}
+              />
+            </div>
+
+            {/* Character Display */}
+            <div className="flex-1 bg-blue-900/20 rounded-lg border border-blue-500/30 flex items-center justify-center w-full max-w-xs h-48 relative overflow-hidden">
+              {battleState.players.find(p => p.id === 2)?.selectedCharacterCard?.character.image ? (
+                <img
+                  src={battleState.players.find(p => p.id === 2)?.selectedCharacterCard.character.image}
+                  alt={battleState.players.find(p => p.id === 2)?.selectedCharacterCard.character.name}
+                  className={`max-w-full max-h-full object-contain transition-all duration-500 ${
+                    attackAnimation === 'player2-attack' ? 'scale-110 animate-pulse' : ''
+                  }`}
+                />
+              ) : battleState.players.find(p => p.id === 2)?.isRobot ? (
+                <div className="text-8xl">🤖</div>
+              ) : (
+                <div className="text-8xl">👤</div>
+              )}
+
+              {/* Attack Effect Overlay */}
+              {currentAttackEffect === 'player2' && (
+                <div className="absolute inset-0 bg-gradient-radial from-blue-500/50 via-cyan-500/30 to-transparent animate-ping"></div>
+              )}
+            </div>
+          </div>
         </div>
-        
-        {/* Control Panels */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-          {battleState.players.map((player) => (
-            <div key={player.id}>
-              {renderControlPanel(player)}
-            </div>
-          ))}
+
+        {/* Attack Selectors Section - Lower Half */}
+        <div className="h-80 grid grid-cols-2 gap-8 px-6 pb-6 flex-shrink-0">
+          {/* Player 1 Attack Selector */}
+          <div className="flex justify-center">
+            {!battleState.players.find(p => p.id === 1)?.isRobot && (
+              <div className="w-full max-w-xs">
+                <AttackSelector
+                  playerId={1}
+                  selectedAttack={battleState.players.find(p => p.id === 1)?.selectedAttack}
+                  disabled={battleState.phase !== 'selecting'}
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Player 2 Attack Selector */}
+          <div className="flex justify-center">
+            {!battleState.players.find(p => p.id === 2)?.isRobot && (
+              <div className="w-full max-w-xs">
+                <AttackSelector
+                  playerId={2}
+                  selectedAttack={battleState.players.find(p => p.id === 2)?.selectedAttack}
+                  disabled={battleState.phase !== 'selecting'}
+                />
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -316,7 +407,7 @@ export const BattleTest: React.FC = () => {
           </div>
         </div>
       )}
-      
+
       {/* AI Dialogue Display */}
       {showingDialogue && (
         <DialogueDisplay
