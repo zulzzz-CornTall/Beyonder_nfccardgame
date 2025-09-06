@@ -104,8 +104,8 @@ export const BattleTest: React.FC = () => {
   const currentTurnPlayer = getCurrentTurnPlayer();
 
   const getPlayerDisplayName = (player: any) => {
-    if (player.selectedCharacterCard && player.selectedCharacterCard.character.name) {
-      return player.selectedCharacterCard.character.name;
+    if (player.selectedCharacterCard && player.selectedCharacterCard.name) {
+      return player.selectedCharacterCard.name;
     }
     return player.name;
   };
