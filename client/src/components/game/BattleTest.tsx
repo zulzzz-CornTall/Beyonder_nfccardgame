@@ -15,7 +15,7 @@ import { ArrowLeft, RotateCcw } from 'lucide-react';
 
 export const BattleTest: React.FC = () => {
   const { battleState, setGamePhase, resolveRound, resetBattle, startBattle, makeRobotDecision } = useFighting();
-  const { playHit, playClick } = useAudio();
+  const { playHit, playClick, playAttack, playSuccess } = useAudio();
   const { t } = useLanguage();
   const [currentAttackEffect, setCurrentAttackEffect] = useState<string | null>(null);
   const [showingDialogue, setShowingDialogue] = useState<'intro' | 'battle1' | 'battle2' | 'win' | 'lose' | null>(null);
@@ -66,9 +66,25 @@ export const BattleTest: React.FC = () => {
           setAttackingPlayer(winnerPlayer.id);
           setAttackAnimation('attacking');
           
-          // Play attack sound and show dash animation
+          // Play dash sound immediately
+          playClick(); // Dash sound
+          
+          // Play attack-specific sound and show effects
           setTimeout(() => {
-            playHit();
+            // Play different sound based on attack type
+            switch(winnerPlayer.selectedAttack) {
+              case 'burst':
+                playAttack(); // Explosive sound
+                break;
+              case 'guts':
+                playHit(); // Impact sound  
+                break;
+              case 'slash':
+                playSuccess(); // Sharp sound
+                break;
+              default:
+                playHit();
+            }
             setCurrentAttackEffect(winnerPlayer.selectedAttack);
             setAttackAnimation('hit');
           }, 500);
@@ -97,12 +113,14 @@ export const BattleTest: React.FC = () => {
         isPlayer2 
           ? (isAttacking ? 'transform translate-x-20' : 'transform translate-x-0') 
           : (isAttacking ? 'transform -translate-x-20' : 'transform translate-x-0')
-      } ${isBeingHit ? 'animate-bounce' : ''}`}>
+      } ${isBeingHit ? 'animate-hit-impact' : ''}`}>
         {/* Character Image - Large and Prominent */}
         <div className={`relative ${
           isPlayer2 ? 'transform scale-x-[-1]' : ''
         }`}>
-          <div className="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 rounded-full border-4 border-yellow-400 bg-gradient-to-br from-orange-600 to-red-700 shadow-2xl overflow-hidden">
+          <div className={`w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 rounded-full border-4 border-yellow-400 bg-gradient-to-br from-orange-600 to-red-700 shadow-2xl overflow-hidden ${
+            isAttacking ? 'animate-battle-glow' : ''
+          }`}>
             {player.selectedCharacterCard && (
               <img
                 src={player.selectedCharacterCard.image}
@@ -117,7 +135,11 @@ export const BattleTest: React.FC = () => {
           
           {/* Attack Effect Overlay */}
           {isAttacking && (
-            <div className="absolute inset-0 bg-yellow-400/30 rounded-full animate-ping"></div>
+            <>
+              <div className="absolute inset-0 bg-yellow-400/30 rounded-full animate-ping"></div>
+              <div className="absolute inset-0 bg-white/20 rounded-full animate-pulse"></div>
+              <div className="absolute -inset-2 bg-gradient-radial from-yellow-400/40 via-orange-500/20 to-transparent rounded-full animate-power-surge"></div>
+            </>
           )}
           
           {/* Character Info */}
